@@ -32,7 +32,16 @@ router.post("/registration", async (req, res) => {
     // Set status based on role
     const status = role === "admin" ? "approved" : "pending";
 
-    // Create new user with status "pending"
+     // Convert availableHours into the expected format
+     let formattedAvailableHours = [];
+     if (role === "teacher" && availableHours) {
+       formattedAvailableHours = availableHours.map((hour) => ({
+         day: hour.day,
+         slots: [{ startTime: hour.startTime, endTime: hour.endTime }],
+       }));
+     }
+
+    // Create new user"
     const newUser = new User({
       name,
       email,
@@ -41,7 +50,7 @@ router.post("/registration", async (req, res) => {
       department,
       studentId: role === "student" ? studentId : undefined,
       course: role === "teacher" ? course : undefined,
-      availableHours: role === "teacher" ? availableHours : undefined,
+      availableHours: role === "teacher" ? formattedAvailableHours : undefined,
       status, // Admin status is "approved", others are "pending"
     });
 
@@ -198,9 +207,11 @@ function generateUserObject(user) {
   delete userObj.password;
 
   // Remove availableHours for admin
-  if (user.role === "admin") {
+  if (user.role === "admin" || user.role === "student") {
     delete userObj.availableHours;
   }
+  
+
   userObj["accessToken"] = accessToken;
   userObj["refreshToken"] = refreshToken;
   return userObj;
