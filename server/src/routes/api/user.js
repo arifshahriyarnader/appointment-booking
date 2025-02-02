@@ -149,6 +149,20 @@ router.put("/users/:id", authenticateToken, async (req, res) => {
   }
 });
 
+//delete user 
+router.delete("/users/:id", authenticateToken, async(req,res) =>{
+    try{
+        const user=await User.findByIdAndDelete(req.params.id);
+        if(!user){
+            return res.status(404).json({message:"User not found"});
+        }
+        res.status(200).json({message:"User deleted successfully"})
+    }
+    catch(error){
+        res.status(500).json({ message: "Server error", error });
+    }
+})
+
 export default router;
 
 async function handleEmailLogin({ password, user, res }) {
