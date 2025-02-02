@@ -1,6 +1,7 @@
 import express from "express";
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
+import {authenticateToken} from '../../middleware/index.js';
 import { User } from "../../models/index.js";
 
 const router = express.Router();
@@ -8,7 +9,16 @@ const router = express.Router();
 // registration
 router.post("/registration", async (req, res) => {
   try {
-    const { name, email, password, role, department, studentId, course, availableHours } = req.body;
+    const {
+      name,
+      email,
+      password,
+      role,
+      department,
+      studentId,
+      course,
+      availableHours,
+    } = req.body;
 
     // Check if user already exists
     const existingUser = await User.findOne({ email });
@@ -19,8 +29,8 @@ router.post("/registration", async (req, res) => {
     // Hash the password
     const hashedPassword = await bcrypt.hash(password, 10);
 
-     // Set status based on role
-     const status = role === "admin" ? "approved" : "pending";
+    // Set status based on role
+    const status = role === "admin" ? "approved" : "pending";
 
     // Create new user with status "pending"
     const newUser = new User({
@@ -55,4 +65,127 @@ router.post("/registration", async (req, res) => {
   }
 });
 
+//login a user
+router.post("/login", async (req, res) => {
+  try {
+    const { type, email, password, refreshToken } = req.body;
+    if (type === "email") {
+      const user = await User.findOne({ email: email });
+      if (!user) {
+        res.status(500).json({ message: "User not found" });
+      }
+
+      // Check user approval status
+      if (user.status === "pending") {
+        return res
+          .status(403)
+          .json({
+            message: "Your registration is pending approval from the admin.",
+          });
+      }
+      if (user.status === "rejected") {
+        return res
+          .status(403)
+          .json({
+            message: "Your registration has been rejected by the admin.",
+          });
+      }
+
+      await handleEmailLogin({ password, user, res });
+    } else if (type === "refresh") {
+      if (!refreshToken) {
+        return res.status(401).json({ message: "Refresh token not found" });
+      } else {
+        await handleRefreshToken({ refreshToken, res });
+      }
+    } else {
+      return res.status(400).json({ message: "Invalid login type" });
+    }
+  } catch (error) {
+    res.status(500).json({ message: "Something went wrong" });
+  }
+});
+
+//get user profile
+router.get("/user-profile", authenticateToken, async (req, res) => {
+  try {
+    const id = req.user._id;
+    const user = await User.findById(id);
+    if (user) {
+      return res.json(user);
+    } else {
+      return res.status(500).json({ message: "User not found" });
+    }
+  } catch (error) {
+    res.status(500).json({ message: "Something went wrong" });
+  }
+});
+
 export default router;
+
+async function handleEmailLogin({ password, user, res }) {
+  const isValidPassword = await bcrypt.compare(password, user.password);
+  if (isValidPassword) {
+    const userObj = await generateUserObject(user);
+    return res.json(userObj);
+  } else {
+    return res.status(401).json({ message: "Unable to login" });
+  }
+}
+
+function generateUserObject(user) {
+  const { accessToken, refreshToken } = generateToken(user);
+  const userObj = user.toJSON();
+  delete userObj.password;
+
+  // Remove availableHours for admin
+  if (user.role === "admin") {
+    delete userObj.availableHours; 
+  }
+  userObj["accessToken"] = accessToken;
+  userObj["refreshToken"] = refreshToken;
+  return userObj;
+}
+
+function generateToken(user) {
+  const accessToken = jwt.sign(
+    {
+      email: user.email,
+      _id: user._id,
+      userType: user.userType,
+    },
+    process.env.JWT_SECRET,
+    {
+      expiresIn: "1d",
+    }
+  );
+  const refreshToken = jwt.sign(
+    {
+      email: user.email,
+      _id: user._id,
+      userType: user.userType,
+    },
+    process.env.JWT_SECRET,
+    {
+      expiresIn: "30d",
+    }
+  );
+  return { accessToken, refreshToken };
+}
+
+function handleRefreshToken({ refreshToken, res }) {
+  jwt.verify(refreshToken, process.env.JWT_SECRET, async (err, payload) => {
+    if (err) {
+      return res.status(404).json({ message: "Unauthorized" });
+    } else {
+      const user = await User.findById(payload._id);
+      if (user) {
+        const userObj = generateUserObject(user);
+        return res.status(200).json(userObj);
+      } else {
+        return res.status(404).json({ message: "Unauthorized" });
+      }
+    }
+  });
+}
+
