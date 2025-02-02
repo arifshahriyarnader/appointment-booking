@@ -72,7 +72,7 @@ router.post("/login", async (req, res) => {
     if (type === "email") {
       const user = await User.findOne({ email: email });
       if (!user) {
-        res.status(500).json({ message: "User not found" });
+        return res.status(500).json({ message: "User not found" });
       }
 
       // Check user approval status
@@ -120,6 +120,18 @@ router.get("/user-profile", authenticateToken, async (req, res) => {
     res.status(500).json({ message: "Something went wrong" });
   }
 });
+
+
+//get all users (only admin)
+router.get("/users", authenticateToken, async(req,res) =>{
+    try{
+        const users= await User.find();
+        res.status(200).json(users);
+    }
+    catch(error){
+        res.status(500).json({message:"Server error", error})
+    }
+})
 
 export default router;
 
