@@ -1,7 +1,7 @@
 import express from "express";
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
-import {authenticateToken} from '../../middleware/index.js';
+import { authenticateToken } from "../../middleware/index.js";
 import { User } from "../../models/index.js";
 
 const router = express.Router();
@@ -77,18 +77,14 @@ router.post("/login", async (req, res) => {
 
       // Check user approval status
       if (user.status === "pending") {
-        return res
-          .status(403)
-          .json({
-            message: "Your registration is pending approval from the admin.",
-          });
+        return res.status(403).json({
+          message: "Your registration is pending approval from the admin.",
+        });
       }
       if (user.status === "rejected") {
-        return res
-          .status(403)
-          .json({
-            message: "Your registration has been rejected by the admin.",
-          });
+        return res.status(403).json({
+          message: "Your registration has been rejected by the admin.",
+        });
       }
 
       await handleEmailLogin({ password, user, res });
@@ -121,17 +117,37 @@ router.get("/user-profile", authenticateToken, async (req, res) => {
   }
 });
 
-
 //get all users (only admin)
-router.get("/users", authenticateToken, async(req,res) =>{
-    try{
-        const users= await User.find();
-        res.status(200).json(users);
+router.get("/users", authenticateToken, async (req, res) => {
+  try {
+    const users = await User.find();
+    res.status(200).json(users);
+  } catch (error) {
+    res.status(500).json({ message: "Server error", error });
+  }
+});
+
+//approve or reject user (only admin)
+router.put("/users/:id", authenticateToken, async (req, res) => {
+  try {
+    const { status } = req.body;
+    if (!["approved", "rejected"].includes(status)) {
+      return res.status(400).json({ message: "Invalid Status" });
     }
-    catch(error){
-        res.status(500).json({message:"Server error", error})
+
+    const user = await User.findByIdAndUpdate(
+      req.params.id,
+      { status },
+      { new: true }
+    );
+    if (!user) {
+      return res.status(404).json({ message: "User not found" });
     }
-})
+    res.status(200).json({ message: `User ${status} successfully`, user });
+  } catch (error) {
+    res.status(500).json({ message: "Server error", error });
+  }
+});
 
 export default router;
 
@@ -152,7 +168,7 @@ function generateUserObject(user) {
 
   // Remove availableHours for admin
   if (user.role === "admin") {
-    delete userObj.availableHours; 
+    delete userObj.availableHours;
   }
   userObj["accessToken"] = accessToken;
   userObj["refreshToken"] = refreshToken;
@@ -200,4 +216,3 @@ function handleRefreshToken({ refreshToken, res }) {
     }
   });
 }
-
