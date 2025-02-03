@@ -24,34 +24,37 @@ function generateTimeSlots(startTime, endTime) {
 }
 
 //add available hours
-router.post("/add", authenticateToken, async (req, res) => {
+
+
+router.post("/add-multiple", authenticateToken, async (req, res) => {
   try {
     if (req.user.role !== "teacher") {
-      return res
-        .status(403)
-        .json({ message: "Only teachers can add available hours" });
+      return res.status(403).json({ message: "Only teachers can add available hours" });
     }
-    const availableHoursData = req.body.availableHours;
 
-    const availableHours = availableHoursData.map(
-      ({ day, startTime, endTime }) => {
-        const slots = generateTimeSlots(startTime, endTime);
-        return {
-          teacher: req.user._id,
-          day,
-          slots,
-        };
-      }
-    );
+    const availableHoursArray = req.body.availableHours; // Expecting an array of available hours
+    if (!Array.isArray(availableHoursArray) || availableHoursArray.length === 0) {
+      return res.status(400).json({ message: "Invalid data format. Expected an array." });
+    }
 
-    await AvailableHour.insertMany(availableHours);
+    const availableHours = availableHoursArray.map(({ day, startTime, endTime }) => ({
+      teacher: req.user._id,
+      day,
+      slots: generateTimeSlots(startTime, endTime),
+    }));
 
-    res
-      .status(201)
-      .json({ message: "Available hours added successfully", availableHours });
+    // Save all available hours in bulk
+    const savedAvailableHours = await AvailableHour.insertMany(availableHours);
+
+    res.status(201).json({
+      message: "Available hours added successfully",
+      availableHours: savedAvailableHours,
+    });
   } catch (error) {
-    res.status(500).json({ message: "Server Error", error });
+    res.status(500).json({ message: "Server error", error });
   }
 });
+
+
 
 export default router;
