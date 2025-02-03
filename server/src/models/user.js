@@ -1,14 +1,5 @@
 import mongoose from "mongoose";
 
-const TimeSlotSchema = new mongoose.Schema({
-  startTime: { type: String, required: true },
-  endTime: { type: String, required: true },
-});
-
-const AvailableHourSchema = new mongoose.Schema({
-  day: { type: String, required: true },
-  slots: [TimeSlotSchema],
-});
 
 const UserSchema = new mongoose.Schema(
   {
@@ -23,7 +14,6 @@ const UserSchema = new mongoose.Schema(
     department: { type: String },
     studentId: { type: String, unique: true, sparse: true }, // only for students
     course: { type: String }, // only for teachers
-    availableHours: [AvailableHourSchema], // only for teachers
     status: {
       type: String,
       enum: ["pending", "approved", "rejected"],

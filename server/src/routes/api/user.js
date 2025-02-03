@@ -16,8 +16,7 @@ router.post("/registration", async (req, res) => {
       role,
       department,
       studentId,
-      course,
-      availableHours,
+      course
     } = req.body;
 
     // Check if user already exists
@@ -32,15 +31,6 @@ router.post("/registration", async (req, res) => {
     // Set status based on role
     const status = role === "admin" ? "approved" : "pending";
 
-     // Convert availableHours into the expected format
-     let formattedAvailableHours = [];
-     if (role === "teacher" && availableHours) {
-       formattedAvailableHours = availableHours.map((hour) => ({
-         day: hour.day,
-         slots: [{ startTime: hour.startTime, endTime: hour.endTime }],
-       }));
-     }
-
     // Create new user"
     const newUser = new User({
       name,
@@ -50,7 +40,6 @@ router.post("/registration", async (req, res) => {
       department,
       studentId: role === "student" ? studentId : undefined,
       course: role === "teacher" ? course : undefined,
-      availableHours: role === "teacher" ? formattedAvailableHours : undefined,
       status, // Admin status is "approved", others are "pending"
     });
 
@@ -62,13 +51,11 @@ router.post("/registration", async (req, res) => {
         ? "Admin registered successfully."
         : "User registered successfully. Awaiting admin approval.";
 
-    // Remove `availableHours` from the response if the user is not a teacher
-    const responseUser = newUser.toObject();
-    if (role !== "teacher") {
-      delete responseUser.availableHours;
-    }
+    
+     const responseUser = newUser.toObject();
+    
 
-    res.status(201).json({ message: responseMessage, user: responseUser });
+    res.status(201).json({ message: responseMessage, user:responseUser });
   } catch (error) {
     res.status(500).json({ message: "Server error", error });
   }
