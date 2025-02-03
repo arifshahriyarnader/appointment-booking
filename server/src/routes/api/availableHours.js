@@ -1,7 +1,7 @@
 import express from "express";
-import moment from 'moment';
+import moment from "moment";
 import { authenticateToken } from "../../middleware/index.js";
-import { AvailableHour} from "../../models/index.js";
+import { AvailableHour } from "../../models/index.js";
 
 const router = express.Router();
 
@@ -12,7 +12,7 @@ function generateTimeSlots(startTime, endTime) {
   const end = moment(endTime, "hh:mm A");
 
   while (start < end) {
-    let nextSlot = start.clone().add(20, 'minutes');
+    let nextSlot = start.clone().add(20, "minutes");
     slots.push({
       startTime: start.format("hh:mm A"),
       endTime: nextSlot.format("hh:mm A"),
@@ -31,18 +31,24 @@ router.post("/add", authenticateToken, async (req, res) => {
         .status(403)
         .json({ message: "Only teachers can add available hours" });
     }
-    const { day, startTime, endTime } = req.body;
-    const slots = generateTimeSlots(startTime, endTime);
+    const availableHoursData = req.body.availableHours;
 
-    const availableHour = new AvailableHour({
-      teacher: req.user._id,
-      day,
-      slots,
-    });
-    await availableHour.save();
+    const availableHours = availableHoursData.map(
+      ({ day, startTime, endTime }) => {
+        const slots = generateTimeSlots(startTime, endTime);
+        return {
+          teacher: req.user._id,
+          day,
+          slots,
+        };
+      }
+    );
+
+    await AvailableHour.insertMany(availableHours);
+
     res
       .status(201)
-      .json({ message: "Available hours added successfully", availableHour });
+      .json({ message: "Available hours added successfully", availableHours });
   } catch (error) {
     res.status(500).json({ message: "Server Error", error });
   }
