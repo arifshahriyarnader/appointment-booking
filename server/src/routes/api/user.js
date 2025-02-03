@@ -209,7 +209,7 @@ function generateToken(user) {
     {
       email: user.email,
       _id: user._id,
-      userType: user.userType,
+      role: user.role,
     },
     process.env.JWT_SECRET,
     {
@@ -220,7 +220,7 @@ function generateToken(user) {
     {
       email: user.email,
       _id: user._id,
-      userType: user.userType,
+      role: user.role,
     },
     process.env.JWT_SECRET,
     {

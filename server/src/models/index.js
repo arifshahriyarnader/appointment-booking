@@ -1,2 +1,2 @@
 export * from './user.js';
-export * from './appointment.js';
+export * from './AvailableHour.js';
