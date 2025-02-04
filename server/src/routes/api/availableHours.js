@@ -43,9 +43,10 @@ router.post("/add-multiple", authenticateToken, async (req, res) => {
     }
 
     const availableHours = availableHoursArray.map(
-      ({ day, startTime, endTime }) => ({
+      ({ day, date, startTime, endTime }) => ({
         teacher: req.user._id,
         day,
+        date:new Date(date),
         slots: generateTimeSlots(startTime, endTime),
       })
     );
@@ -120,6 +121,7 @@ router.get("/all", async (req, res) => {
     const matchQuery = {};
     if (teacherId) matchQuery.teacher = new mongoose.Types.ObjectId(teacherId);
     if (day) matchQuery.day = day;
+    
 
     pipeline.push({ $match: matchQuery });
 
@@ -151,6 +153,7 @@ router.get("/all", async (req, res) => {
       $project: {
         _id: 1,
         day: 1,
+        date: 1,
         slots: 1,
         createdAt: 1,
         teacher: {

@@ -14,6 +14,7 @@ const AvailableHourSchema = new mongoose.Schema(
       required: true,
     },
     day: { type: String, required: true },
+    date: { type: Date, required: true }, 
     slots: [TimeSlotSchema], // Automatically generated slots
   },
   { timestamps: true }
