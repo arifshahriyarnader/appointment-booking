@@ -105,4 +105,74 @@ router.put("/update-multiple", authenticateToken, async (req, res) => {
   }
 });
 
+//get all available hours
+router.get("/all", async (req, res) => {
+  try {
+    let current = parseInt(req.query.current) || 1;
+    let pageSize = parseInt(req.query.pageSize) || 10;
+    let sort = req.query.sort || "asc";
+    let teacherId = req.query.teacherId;
+    let day = req.query.day;
+
+    const pipeline = [];
+
+    // Optional filters (Teacher & Day)
+    const matchQuery = {};
+    if (teacherId) matchQuery.teacher = new mongoose.Types.ObjectId(teacherId);
+    if (day) matchQuery.day = day;
+
+    pipeline.push({ $match: matchQuery });
+
+    // Sorting (ascending or descending)
+    pipeline.push({
+      $sort: { createdAt: sort === "asc" ? 1 : -1 },
+    });
+
+    // Pagination
+    pipeline.push({ $skip: (current - 1) * pageSize });
+    pipeline.push({ $limit: pageSize });
+
+    // Populate teacher details (name, email)
+    pipeline.push({
+      $lookup: {
+        from: "users",
+        localField: "teacher",
+        foreignField: "_id",
+        as: "teacher",
+      },
+    });
+
+    pipeline.push({
+      $unwind: "$teacher",
+    });
+
+    // Selecting required fields
+    pipeline.push({
+      $project: {
+        _id: 1,
+        day: 1,
+        slots: 1,
+        createdAt: 1,
+        teacher: {
+          _id: "$teacher._id",
+          name: "$teacher.name",
+          email: "$teacher.email",
+        },
+      },
+    });
+
+    const availableHours = await AvailableHour.aggregate(pipeline);
+
+    res.status(200).json({
+      current,
+      pageSize,
+      totalRecords: availableHours.length,
+      availableHours,
+    });
+  } catch (error) {
+    res.status(500).json({ message: "Server error", error });
+  }
+});
+
+
 export default router;
