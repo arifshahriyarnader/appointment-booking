@@ -157,6 +157,7 @@ router.get("/all", async (req, res) => {
           _id: "$teacher._id",
           name: "$teacher.name",
           email: "$teacher.email",
+          department:"$teacher.department",
         },
       },
     });
@@ -174,5 +175,23 @@ router.get("/all", async (req, res) => {
   }
 });
 
+//delete available hours
+router.delete("/:id", authenticateToken, async(req,res) =>{
+  try{
+    const {id} =req.params;
+    const availableHour=await AvailableHour.findById(id);
+    if(!availableHour){
+      return res.status(404).json({message:"Available hours not found"});
+    }
+    if(availableHour.teacher.toString() !== req.user._id){
+      return res.status(403).json({message:"You can delete your own available hours"});
+    }
+    await AvailableHour.findByIdAndDelete(id);
+    res.status(200).json({message:"Available hours deleted successfully"});
+  }
+  catch(error){
+    res.status(500).json({ message: "Server error", error });
+  }
+})
 
 export default router;
