@@ -58,7 +58,7 @@ router.post("/appoinment", authenticateToken, async (req, res) => {
     const existingAppointment = await Appointment.findOne({
       teacher: teacher,
       date: date,
-     "slots.startTime": slots.startTime,
+      "slots.startTime": slots.startTime,
       "slots.endTime": slots.endTime,
     });
     if (existingAppointment) {
@@ -74,7 +74,28 @@ router.post("/appoinment", authenticateToken, async (req, res) => {
       status: "pending",
     });
     await appointment.save();
-    res.status(201).json({message:"Appointment request sent! Waiting for teacher's approval"})
+    res
+      .status(201)
+      .json({
+        message: "Appointment request sent! Waiting for teacher's approval",
+      });
+  } catch (error) {
+    res.status(500).json({ message: "Server error", error });
+  }
+});
+
+//check appoointment status
+router.get("/appointment-status", authenticateToken, async (req, res) => {
+  try {
+    if (req.user.role !== "student") {
+      return res
+        .status(401)
+        .json({ message: "Only students can view their appointment status" });
+    }
+    const appointments = await Appointment.find({ student: req.user._id })
+      .populate("teacher", "name email department course")
+      .sort({ createdAt: -1 });
+    res.status(200).json({ appointments });
   } catch (error) {
     res.status(500).json({ message: "Server error", error });
   }
