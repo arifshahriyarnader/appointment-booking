@@ -46,7 +46,7 @@ router.post("/add-multiple", authenticateToken, async (req, res) => {
       ({ day, date, startTime, endTime }) => ({
         teacher: req.user._id,
         day,
-        date:new Date(date),
+        date: new Date(date),
         slots: generateTimeSlots(startTime, endTime),
       })
     );
@@ -121,7 +121,6 @@ router.get("/all", async (req, res) => {
     const matchQuery = {};
     if (teacherId) matchQuery.teacher = new mongoose.Types.ObjectId(teacherId);
     if (day) matchQuery.day = day;
-    
 
     pipeline.push({ $match: matchQuery });
 
@@ -160,7 +159,7 @@ router.get("/all", async (req, res) => {
           _id: "$teacher._id",
           name: "$teacher.name",
           email: "$teacher.email",
-          department:"$teacher.department",
+          department: "$teacher.department",
         },
       },
     });
@@ -179,40 +178,71 @@ router.get("/all", async (req, res) => {
 });
 
 //delete available hours
-router.delete("/:id", authenticateToken, async(req,res) =>{
-  try{
-    const {id} =req.params;
-    const availableHour=await AvailableHour.findById(id);
-    if(!availableHour){
-      return res.status(404).json({message:"Available hours not found"});
+router.delete("/:id", authenticateToken, async (req, res) => {
+  try {
+    const { id } = req.params;
+    const availableHour = await AvailableHour.findById(id);
+    if (!availableHour) {
+      return res.status(404).json({ message: "Available hours not found" });
     }
-    if(availableHour.teacher.toString() !== req.user._id){
-      return res.status(403).json({message:"You can delete your own available hours"});
+    if (availableHour.teacher.toString() !== req.user._id) {
+      return res
+        .status(403)
+        .json({ message: "You can delete your own available hours" });
     }
     await AvailableHour.findByIdAndDelete(id);
-    res.status(200).json({message:"Available hours deleted successfully"});
-  }
-  catch(error){
+    res.status(200).json({ message: "Available hours deleted successfully" });
+  } catch (error) {
     res.status(500).json({ message: "Server error", error });
   }
-})
+});
 
 //teacher view who can sent the appointments request
-router.get("/appointment-status", authenticateToken, async(req,res) =>{
-  try{
-    if(req.user.role !== "teacher"){
-      return res.status(401).json({message:"Only teacher can view appointments request"})
+router.get("/appointment-status", authenticateToken, async (req, res) => {
+  try {
+    if (req.user.role !== "teacher") {
+      return res
+        .status(401)
+        .json({ message: "Only teacher can view appointments request" });
     }
-    const appointments = await Appointment.find({teacher:req.user._id})
-    .populate("student", "name email")
-    .sort({createdAt: -1});
+    const appointments = await Appointment.find({ teacher: req.user._id })
+      .populate("student", "name email")
+      .sort({ createdAt: -1 });
 
-    res.status(200).json({message:appointments});
-  }
-  catch(error){
+    res.status(200).json({ message: appointments });
+  } catch (error) {
     res.status(500).json({ message: "Server error", error });
   }
-})
+});
 
+//teacher approve or reject appointments request
+router.put("/appointment/:id/status", authenticateToken, async (req, res) => {
+  try {
+    if (req.user.role !== "teacher") {
+      return res
+        .status(403)
+        .json({ message: "Only Teacher can update appointment status" });
+    }
+    const { id } = req.params;
+    const { status } = req.body;
+    if (!["approved", "rejected"].includes(status)) {
+      return res.status(400).json({ message: "Invalid status value" });
+    }
+    const appointment = await Appointment.findOne({
+      _id: id,
+      teacher: req.user._id,
+    });
+    if (!appointment) {
+      return res.status(404).json({ message: "Appointment not found" });
+    }
+    appointment.status = status;
+    await appointment.save();
+    res
+      .status(200)
+      .json({ message: `Appointment ${status} successfully`, appointment });
+  } catch (error) {
+    res.status(500).json({ message: "Server error", error });
+  }
+});
 
 export default router;
