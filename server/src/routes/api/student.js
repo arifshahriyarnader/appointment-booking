@@ -45,4 +45,39 @@ router.get("/teacher/:id/slots", async (req, res) => {
   }
 });
 
+//students booked an appoinment
+router.post("/appoinment", authenticateToken, async (req, res) => {
+  try {
+    if (req.user.role !== "student") {
+      return res
+        .status(403)
+        .json({ message: "Only students can books an appointment" });
+    }
+    const { teacher, date, slots, course, agenda } = req.body;
+
+    const existingAppointment = await Appointment.findOne({
+      teacher: teacher,
+      date: date,
+     "slots.startTime": slots.startTime,
+      "slots.endTime": slots.endTime,
+    });
+    if (existingAppointment) {
+      return res.status(400).json({ message: "This slot is already booked" });
+    }
+    const appointment = new Appointment({
+      student: req.user._id,
+      teacher: teacher,
+      course,
+      date,
+      slots,
+      agenda,
+      status: "pending",
+    });
+    await appointment.save();
+    res.status(201).json({message:"Appointment request sent! Waiting for teacher's approval"})
+  } catch (error) {
+    res.status(500).json({ message: "Server error", error });
+  }
+});
+
 export default router;
