@@ -84,7 +84,7 @@ router.post("/appoinment", authenticateToken, async (req, res) => {
   }
 });
 
-//check appoointment status
+//check appointment status
 router.get("/appointment-status", authenticateToken, async (req, res) => {
   try {
     if (req.user.role !== "student") {

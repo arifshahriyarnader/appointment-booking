@@ -1,7 +1,7 @@
 import express from "express";
 import moment from "moment";
 import { authenticateToken } from "../../middleware/index.js";
-import { AvailableHour } from "../../models/index.js";
+import { Appointment, AvailableHour } from "../../models/index.js";
 
 const router = express.Router();
 
@@ -196,5 +196,23 @@ router.delete("/:id", authenticateToken, async(req,res) =>{
     res.status(500).json({ message: "Server error", error });
   }
 })
+
+//teacher view who can sent the appointments request
+router.get("/appointment-status", authenticateToken, async(req,res) =>{
+  try{
+    if(req.user.role !== "teacher"){
+      return res.status(401).json({message:"Only teacher can view appointments request"})
+    }
+    const appointments = await Appointment.find({teacher:req.user._id})
+    .populate("student", "name email")
+    .sort({createdAt: -1});
+
+    res.status(200).json({message:appointments});
+  }
+  catch(error){
+    res.status(500).json({ message: "Server error", error });
+  }
+})
+
 
 export default router;
