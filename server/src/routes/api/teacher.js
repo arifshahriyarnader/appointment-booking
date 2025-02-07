@@ -267,4 +267,28 @@ router.get("/schedule/today", authenticateToken, async (req, res) => {
   }
 });
 
+//upcoming appointment schedule
+router.get("/appointment/upcoming", authenticateToken, async (req, res) => {
+  try {
+    if (req.user.role !== "teacher") {
+      return res.status(403).json({
+        message: "Only Teacher can view upcoming appointment schedule",
+      });
+    }
+    const today = new Date();
+
+    const appointments = await Appointment.find({
+      teacher: req.user._id,
+      date: { $gte: today.toISOString().split("T")[0] },
+      status: "approved",
+    })
+      .sort({ date: 1, slots: 1 })
+      .populate("student", "name email")
+      .populate("teacher", "course");
+    res.status(200).json({ message: appointments });
+  } catch (error) {
+    res.status(500).json({ message: "Server error", error });
+  }
+});
+
 export default router;
