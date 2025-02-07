@@ -114,10 +114,18 @@ router.get("/appointment/history", authenticateToken, async (req, res) => {
     })
       .populate("teacher", "name email course")
       .sort({ date: -1 });
-
+      if (pastAppointments.length === 0) {
+        return res.status(200).json({ message: "You have no past appointments." });
+      }
+      const formattedAppointments = pastAppointments.map((appointment) => ({
+        _id: appointment._id,
+        teacher: appointment.teacher,
+        date: appointment.date,
+        status: appointment.status === "approved" ? "Completed" : appointment.status, // Shows "Completed" if approved
+      }));
     res
       .status(200)
-      .json({ message: "Your past appointments list", pastAppointments });
+      .json({pastAppointments : formattedAppointments});
   } catch (error) {
     res.status(500).json({ message: "Server error", error });
   }
