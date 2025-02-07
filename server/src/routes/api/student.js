@@ -101,4 +101,29 @@ router.get("/appointment-status", authenticateToken, async (req, res) => {
   }
 });
 
+//past appointments history
+router.get("/appointment/history", authenticateToken, async (req, res) => {
+  try {
+    if (req.user.role !== "student") {
+      return res
+        .status(403)
+        .json({ message: "Only students can view their past appointments" });
+    }
+    const today = new Date();
+    const pastAppointments = await Appointment.find({
+      student: req.user._id,
+      date: { $lt: today },
+    })
+      .populate("teacher", "name email course")
+      .sort({ date: -1 });
+
+    res
+      .status(200)
+      .json({ message: "Your past appointments list", pastAppointments });
+  } catch (error) {
+    res.status(500).json({ message: "Server error", error });
+  }
+});
+
+
 export default router;
