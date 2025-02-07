@@ -245,4 +245,26 @@ router.put("/appointment/:id/status", authenticateToken, async (req, res) => {
   }
 });
 
+//daily appointment schedules
+router.get("/schedule/today", authenticateToken, async (req, res) => {
+  try {
+    if (req.user.role !== "teacher") {
+      return res
+        .status(403)
+        .json({ message: "Only Teacher can view daily appointment schedule" });
+    }
+    const today = new Date().toISOString().split("T")[0];
+    const appointments = await Appointment.find({
+      teacher: req.user._id,
+      date: today,
+      status: "approved",
+    })
+      .populate("student", "name email")
+      .populate("teacher", "course");
+    res.status(200).json({ appointments });
+  } catch (error) {
+    res.status(500).json({ message: "Server error", error });
+  }
+});
+
 export default router;
