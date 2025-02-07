@@ -74,11 +74,9 @@ router.post("/appoinment", authenticateToken, async (req, res) => {
       status: "pending",
     });
     await appointment.save();
-    res
-      .status(201)
-      .json({
-        message: "Appointment request sent! Waiting for teacher's approval",
-      });
+    res.status(201).json({
+      message: "Appointment request sent! Waiting for teacher's approval",
+    });
   } catch (error) {
     res.status(500).json({ message: "Server error", error });
   }
@@ -120,6 +118,60 @@ router.get("/appointment/history", authenticateToken, async (req, res) => {
     res
       .status(200)
       .json({ message: "Your past appointments list", pastAppointments });
+  } catch (error) {
+    res.status(500).json({ message: "Server error", error });
+  }
+});
+
+//get today's appointments
+router.get("/appointment/today", authenticateToken, async (req, res) => {
+  try {
+    if (req.user.role !== "student") {
+      return res
+        .status(403)
+        .json({
+          message: "Only students can view their todays appointment list",
+        });
+    }
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    const tomorrow = new Date(today);
+    tomorrow.setDate(tomorrow.getDate() + 1);
+    const todayAppointments = await Appointment.find({
+      student: req.user._id,
+      date: { $gte: today, $lt: tomorrow },
+    })
+      .populate("teacher", "name email course")
+      .sort({ date: 1 });
+      if(todayAppointments.length === 0){
+        return res.status(403).json({message:"You have no appointment schedule for today"})
+      }
+    res.status(200).json({ todayAppointments });
+  } catch (error) {
+    res.status(500).json({ message: "Server error", error });
+  }
+});
+
+//get upcoming schedule
+router.get("/appointment/upcoming", authenticateToken, async (req, res) => {
+  try {
+    if (req.user.role !== "student") {
+      return res.status(403).json({ message: "Only students can access upcoming appointments" });
+    }
+
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    const nextWeek = new Date(today);
+    nextWeek.setDate(nextWeek.getDate() + 7);
+
+    const upcomingAppointments = await Appointment.find({
+      student: req.user._id,
+      date: { $gte: today, $lt: nextWeek },
+    })
+      .populate("teacher", "name email course")
+      .sort({ date: 1 });
+
+    res.status(200).json({ upcomingAppointments });
   } catch (error) {
     res.status(500).json({ message: "Server error", error });
   }

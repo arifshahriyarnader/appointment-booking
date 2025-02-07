@@ -261,6 +261,11 @@ router.get("/schedule/today", authenticateToken, async (req, res) => {
     })
       .populate("student", "name email")
       .populate("teacher", "course");
+    if(appointments.length === 0) {
+      return res
+        .status(403)
+        .json({ message: "You have no appointment schedule for today" });
+    }
     res.status(200).json({ appointments });
   } catch (error) {
     res.status(500).json({ message: "Server error", error });
@@ -290,6 +295,5 @@ router.get("/appointment/upcoming", authenticateToken, async (req, res) => {
     res.status(500).json({ message: "Server error", error });
   }
 });
-
 
 export default router;
