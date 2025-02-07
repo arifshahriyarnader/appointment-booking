@@ -83,17 +83,72 @@ router.post("/appoinment", authenticateToken, async (req, res) => {
 });
 
 //check appointment status
+
 router.get("/appointment-status", authenticateToken, async (req, res) => {
   try {
     if (req.user.role !== "student") {
-      return res
-        .status(401)
-        .json({ message: "Only students can view their appointment status" });
+      return res.status(401).json({ message: "Only students can view their appointment status" });
     }
+
+    // Fetch appointments with populated teacher and student details
     const appointments = await Appointment.find({ student: req.user._id })
-      .populate("teacher", "name email department course")
+      .populate("teacher", "name email course") 
+      .populate("student", "name email") 
       .sort({ createdAt: -1 });
-    res.status(200).json({ appointments });
+
+    // If no appointments found
+    if (!appointments.length) {
+      return res.status(200).json({ message: "You have no booked appointments." });
+    }
+
+    // Formatting response for better readability
+    const formattedAppointments = appointments.map((appointment) => ({
+      _id: appointment._id,
+      date: appointment.date,
+      timeSlot: `${appointment.slots.startTime} - ${appointment.slots.endTime}`,
+      status: appointment.status,
+      teacher: {
+        name: appointment.teacher.name,
+        email: appointment.teacher.email,
+        course: appointment.teacher.course,
+      },
+      student: {
+        name: appointment.student.name,
+        email: appointment.student.email,
+      },
+      agenda: appointment.agenda,
+    }));
+
+    res.status(200).json({ appointments: formattedAppointments });
+  } catch (error) {
+    res.status(500).json({ message: "Server error", error });
+  }
+});
+
+
+// Student cancels their appointment
+router.put("/appointment/cancel/:id", authenticateToken, async (req, res) => {
+  try {
+    if (req.user.role !== "student") {
+      return res.status(403).json({ message: "Only students can cancel appointments" });
+    }
+
+    const appointment = await Appointment.findOne({ _id: req.params.id, student: req.user._id });
+
+    if (!appointment) {
+      return res.status(404).json({ message: "Appointment not found or not owned by the student" });
+    }
+
+    // Ensure appointment is not already approved or completed
+    if (appointment.status === "approved" || appointment.status === "completed") {
+      return res.status(400).json({ message: "You cannot cancel an approved or completed appointment" });
+    }
+
+    // Update appointment status to "canceled"
+    appointment.status = "canceled";
+    await appointment.save();
+
+    res.status(200).json({ message: "Appointment canceled successfully", appointment });
   } catch (error) {
     res.status(500).json({ message: "Server error", error });
   }
