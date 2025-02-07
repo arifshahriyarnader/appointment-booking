@@ -23,27 +23,32 @@ router.get("/teacher/:id", async (req, res) => {
 router.get("/teacher/:id/slots", async (req, res) => {
   try {
     const availableHours = await AvailableHour.find({ teacher: req.params.id });
-    const bookedAppointment = await Appointment.find({
+
+    const bookedAppointments = await Appointment.find({
       teacher: req.params.id,
-    }).select("date day timeSlot");
+    }).select("date slots");
+
     const bookedSlotsSet = new Set(
-      bookedAppointment.map(
-        (appt) => `${appt.date.toISOString().split("T")[0]} ${appt.timeSlot}`
+      bookedAppointments.map(
+        (appt) => `${appt.date.toISOString().split("T")[0]} ${appt.slots.startTime}`
       )
     );
+
     const formattedSlots = availableHours.map((day) => ({
       day: day.day,
       slots: day.slots.map((slot) => ({
         startTime: slot.startTime,
         endTime: slot.endTime,
-        isBooked: bookedSlotsSet.has(`${day.day} ${slot.startTime}`),
+        isBooked: bookedSlotsSet.has(`${day.date.toISOString().split("T")[0]} ${slot.startTime}`),
       })),
     }));
+
     res.status(200).json({ availableSlots: formattedSlots });
   } catch (error) {
     res.status(500).json({ message: "Server error", error });
   }
 });
+
 
 //students booked an appoinment
 router.post("/appoinment", authenticateToken, async (req, res) => {
@@ -83,7 +88,6 @@ router.post("/appoinment", authenticateToken, async (req, res) => {
 });
 
 //check appointment status
-
 router.get("/appointment-status", authenticateToken, async (req, res) => {
   try {
     if (req.user.role !== "student") {
