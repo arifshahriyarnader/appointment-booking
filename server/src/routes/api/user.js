@@ -147,7 +147,7 @@ router.get("/user-profile", authenticateToken, async (req, res) => {
   }
 });
 
-//get all students (only admin)
+//get all students
 router.get("/all-students", authenticateToken, async(req,res) =>{
   try{
     if(req.user.role !== "admin"){
@@ -161,6 +161,19 @@ router.get("/all-students", authenticateToken, async(req,res) =>{
   }
 })
 
+//get all teachers 
+router.get("/all-teachers", authenticateToken, async(req,res) =>{
+  try{
+    if(req.user.role !== "admin"){
+      return res.status(403).json({message:"Only admin can view all teachers list"})
+    }
+    const teachers=await User.find({role:"teacher"}).select("-password");
+    res.status(200).json({teachers})
+  }
+  catch(error){
+    res.status(500).json({ message: "Something went wrong" });
+  }
+})
 
 //approve or reject user (only admin)
 router.put("/users/:id", authenticateToken, async (req, res) => {
