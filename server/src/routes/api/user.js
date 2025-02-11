@@ -1,6 +1,7 @@
 import express from "express";
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
+import { appConfig } from "../../config/index.js";
 import { authenticateToken } from "../../middleware/index.js";
 import { User } from "../../models/index.js";
 
@@ -245,11 +246,6 @@ function generateUserObject(user) {
   const userObj = user.toJSON();
   delete userObj.password;
 
-  // Remove availableHours for admin
-  if (user.role === "admin" || user.role === "student") {
-    delete userObj.availableHours;
-  }
-
   userObj["accessToken"] = accessToken;
   userObj["refreshToken"] = refreshToken;
   return userObj;
@@ -262,7 +258,7 @@ function generateToken(user) {
       _id: user._id,
       role: user.role,
     },
-    process.env.JWT_SECRET,
+   appConfig.AUTH.JWT_SECRET,
     {
       expiresIn: "1d",
     }
@@ -273,7 +269,7 @@ function generateToken(user) {
       _id: user._id,
       role: user.role,
     },
-    process.env.JWT_SECRET,
+    appConfig.AUTH.JWT_SECRET,
     {
       expiresIn: "30d",
     }
@@ -282,7 +278,7 @@ function generateToken(user) {
 }
 
 function handleRefreshToken({ refreshToken, res }) {
-  jwt.verify(refreshToken, process.env.JWT_SECRET, async (err, payload) => {
+  jwt.verify(refreshToken, appConfig.AUTH.JWT_SECRET, async (err, payload) => {
     if (err) {
       return res.status(404).json({ message: "Unauthorized" });
     } else {
