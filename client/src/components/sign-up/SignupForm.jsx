@@ -40,12 +40,23 @@ export const SignupForm = () => {
       course: role === "teacher" ? formData.course : undefined,
       studentId: role === "student" ? formData.studentId : undefined,
     };
-    authServices
-      .signup(payload)
-      .then(() =>
-        alert("User Registration Successful. Awaiting admin approval")
-      ).catch(() => alert("Failed to sign up"));
-    console.log("Form is submitted", payload);
+    
+    try {
+      await authServices.signup(payload);
+      alert("User Registration Successful. Awaiting admin approval");
+      // Reset form fields
+      setFormData({
+        name: "",
+        email: "",
+        password: "",
+        department: "",
+        course: role === "teacher" ? "" : undefined,
+        studentId: role === "student" ? "" : undefined,
+      });
+    } catch (error) {
+      console.error("Signup error:", error.response?.data || error.message);
+      alert("Failed to sign up");
+    }
   };
 
   return (
