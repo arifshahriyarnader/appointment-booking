@@ -11,6 +11,7 @@ export const SignupForm = () => {
     department: "",
     course: "",
     studentId: "",
+    honeypot: "",
   });
 
   // Handle input changes
@@ -31,6 +32,10 @@ export const SignupForm = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
 
+    if (formData.honeypot) {
+      console.warn("Bot detected, form submission blocked.");
+      return;
+    }
     const payload = {
       name: formData.name,
       email: formData.email,
@@ -40,7 +45,7 @@ export const SignupForm = () => {
       course: role === "teacher" ? formData.course : undefined,
       studentId: role === "student" ? formData.studentId : undefined,
     };
-    
+
     try {
       await authServices.signup(payload);
       alert("User Registration Successful. Awaiting admin approval");
@@ -52,6 +57,7 @@ export const SignupForm = () => {
         department: "",
         course: role === "teacher" ? "" : undefined,
         studentId: role === "student" ? "" : undefined,
+        honeypot: "",
       });
     } catch (error) {
       console.error("Signup error:", error.response?.data || error.message);
@@ -148,7 +154,16 @@ export const SignupForm = () => {
               required
             />
           )}
-
+          {/* Honeypot Field (Hidden from users) */}
+          <input
+            type="text"
+            name="honeypot"
+            value={formData.honeypot}
+            onChange={handleChange}
+            className="hidden" // Hide this field
+            autoComplete="off"
+            tabIndex="-1"
+          />
           <button
             type="submit"
             className="w-full bg-blue-500 text-white py-2 rounded hover:bg-blue-600"
