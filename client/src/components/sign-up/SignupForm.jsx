@@ -2,7 +2,7 @@ import { useState } from "react";
 import { Link } from "react-router-dom";
 
 export const SignupForm = () => {
-  const [role, setRole] = useState("teacher"); // Default role is "teacher"
+  const [role, setRole] = useState("teacher");
   const [formData, setFormData] = useState({
     name: "",
     email: "",
@@ -11,8 +11,8 @@ export const SignupForm = () => {
     course: "",
     studentId: "",
   });
-  const [message, setMessage] = useState(""); // State for success message
-  const [error, setError] = useState(""); // State for error message
+  const [message, setMessage] = useState("");
+  const [error, setError] = useState("");
 
   // Handle input changes
   const handleChange = (e) => {
@@ -29,42 +29,10 @@ export const SignupForm = () => {
     });
   };
 
-  // Handle form submission
   const handleSubmit = async (e) => {
     e.preventDefault();
-    setMessage(""); // Clear previous messages
+    setMessage("");
     setError("");
-
-    try {
-      const response = await fetch(
-        "http://localhost:5000/api/auth/registration",
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({ ...formData, role }),
-        }
-      );
-
-      const data = await response.json();
-
-      if (response.ok) {
-        setMessage("User registration successful! Awaiting admin approval.");
-        setFormData({
-          name: "",
-          email: "",
-          password: "",
-          department: "",
-          course: "",
-          studentId: "",
-        });
-      } else {
-        setError(data.message || "Registration failed. Please try again.");
-      }
-    } catch (err) {
-      setError("Server error. Please try again later.", err);
-    }
   };
 
   return (

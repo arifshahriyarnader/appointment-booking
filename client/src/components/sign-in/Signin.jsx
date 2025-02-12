@@ -33,10 +33,7 @@ export const Signin = () => {
           </button>
           <p className="text-center mt-4 text-gray-600">
             I have no account. Please Sign UP{" "}
-            <Link
-              to="/"
-              className="text-blue-500 font-bold hover:underline"
-            >
+            <Link to="/" className="text-blue-500 font-bold hover:underline">
               Sign UP
             </Link>
           </p>
