@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { Link } from "react-router-dom";
+import { authServices } from "../../auth";
 
 export const SignupForm = () => {
   const [role, setRole] = useState("teacher");
@@ -11,8 +12,6 @@ export const SignupForm = () => {
     course: "",
     studentId: "",
   });
-  const [message, setMessage] = useState("");
-  const [error, setError] = useState("");
 
   // Handle input changes
   const handleChange = (e) => {
@@ -31,8 +30,22 @@ export const SignupForm = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    setMessage("");
-    setError("");
+
+    const payload = {
+      name: formData.name,
+      email: formData.email,
+      password: formData.password,
+      role,
+      department: formData.department,
+      course: role === "teacher" ? formData.course : undefined,
+      studentId: role === "student" ? formData.studentId : undefined,
+    };
+    authServices
+      .signup(payload)
+      .then(() =>
+        alert("User Registration Successful. Awaiting admin approval")
+      ).catch(() => alert("Failed to sign up"));
+    console.log("Form is submitted", payload);
   };
 
   return (
@@ -59,14 +72,6 @@ export const SignupForm = () => {
             As a Student
           </button>
         </div>
-
-        {/* Success Message */}
-        {message && (
-          <div className="text-green-600 text-center mb-2">{message}</div>
-        )}
-
-        {/* Error Message */}
-        {error && <div className="text-red-600 text-center mb-2">{error}</div>}
 
         {/* Signup Form */}
         <form onSubmit={handleSubmit} className="space-y-4">
