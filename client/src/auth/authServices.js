@@ -36,12 +36,13 @@ export const signup = ({
     studentId: role === "student" ? studentId : undefined,
   });
 
-export const login = async ({ type, email, password }) => {
+export const login = async ({ type, email, password, refreshToken }) => {
   try {
     const response = await axios.post(`${appConfig.BASE_URL}/api/users/login`, {
       type,
       email,
       password,
+      refreshToken,
     });
 
     const authUser = {
@@ -52,7 +53,7 @@ export const login = async ({ type, email, password }) => {
         role: response.data.role,
         status: response.data.status,
       },
-      token: response.data.accessToken,
+      accessToken: response.data.accessToken,
       refreshToken: response.data.refreshToken,
     };
 
