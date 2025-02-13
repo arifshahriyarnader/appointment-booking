@@ -7,6 +7,16 @@ const saveAuthUser = (authUser) =>
 const getAuthUser = (authUser) =>
   JSON.parse(localStorage.getItem(appConfig.CURRENT_USER_KEY));
 
+export const isUserLoggedIn = () => {
+  if (getAuthUser()) {
+    return true;
+  }
+  return false;
+};
+
+export const getAccessToken=() =>getAuthUser().accessToken;
+export const getRefreshToken=() =>getAuthUser().refreshToken;
+
 export const signup = ({
   name,
   email,
@@ -52,4 +62,8 @@ export const login = async ({ type, email, password }) => {
     console.error("Login failed:", error.response?.data || error.message);
     throw error;
   }
+};
+
+export const logout = () => {
+  localStorage.removeItem(appConfig.CURRENT_USER_KEY);
 };
