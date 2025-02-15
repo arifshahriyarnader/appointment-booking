@@ -1,5 +1,7 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { appConfig } from "../../common/config";
+import { authServices } from "../../auth";
 import AddSlot from "./AddSlot";
 import GetAllSlots from "./GetAllSlots";
 import ViewAppointmentRequest from "./ViewAppointmentRequest";
@@ -10,9 +12,11 @@ export const TeacherDashboard = () => {
   const [selectedOption, setSelectedOption] = useState("addSlot");
   const navigate = useNavigate();
 
+  
   const handleLogout = () => {
-    localStorage.removeItem("accessToken");
-    localStorage.removeItem("refreshToken");
+    const user=JSON.parse(localStorage.getItem(appConfig.CURRENT_USER_KEY))
+    authServices.logout();
+    localStorage.removeItem(user);
     alert("Logged out successfully!");
     navigate("/login");
   };
