@@ -1,7 +1,8 @@
 import { useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { authServices } from "../../auth";
 export const Signin = () => {
+  const navigate = useNavigate();
   const [formData, setFormData] = useState({
     email: "",
     password: "",
@@ -38,7 +39,7 @@ export const Signin = () => {
       }
 
       if (user.role === "teacher") {
-        alert("Teacher login successful!");
+        navigate("/teacher-dashboard");
       } else if (user.role === "student") {
         alert("Student login successful!");
       } else {
