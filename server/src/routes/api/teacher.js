@@ -1,4 +1,5 @@
 import express from "express";
+import mongoose from "mongoose";
 import moment from "moment";
 import { authenticateToken } from "../../middleware/index.js";
 import { Appointment, AvailableHour } from "../../models/index.js";
@@ -98,23 +99,29 @@ router.put("/update/:id", authenticateToken, async (req, res) => {
 });
 
 //get all available hours
-router.get("/all", async (req, res) => {
+router.get("/all", authenticateToken, async (req, res) => {
   try {
+    // Ensure only teachers can access
+    if (req.user.role !== "teacher") {
+      return res
+        .status(403)
+        .json({ message: "Only teachers can view their available hours" });
+    }
+
     let current = parseInt(req.query.current) || 1;
     let pageSize = parseInt(req.query.pageSize) || 10;
     let sort = req.query.sort || "asc";
-    let teacherId = req.query.teacherId;
     let day = req.query.day;
 
     const pipeline = [];
     const today = new Date();
     today.setHours(0, 0, 0, 0);
 
-    // Optional filters (Teacher & Day)
     const matchQuery = {
-      date: { $gte: today }, // 🔹 Only include upcoming or today's slots
+      teacher: new mongoose.Types.ObjectId(req.user._id),
+      date: { $gte: today },
     };
-    if (teacherId) matchQuery.teacher = new mongoose.Types.ObjectId(teacherId);
+
     if (day) matchQuery.day = day;
 
     pipeline.push({ $match: matchQuery });
@@ -138,9 +145,7 @@ router.get("/all", async (req, res) => {
       },
     });
 
-    pipeline.push({
-      $unwind: "$teacher",
-    });
+    pipeline.push({ $unwind: "$teacher" });
 
     // Selecting required fields
     pipeline.push({
