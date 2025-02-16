@@ -24,7 +24,7 @@ function generateTimeSlots(startTime, endTime) {
 }
 
 //add available hours
-router.post("/add-multiple", authenticateToken, async (req, res) => {
+router.post("/add", authenticateToken, async (req, res) => {
   try {
     if (req.user.role !== "teacher") {
       return res
@@ -32,39 +32,35 @@ router.post("/add-multiple", authenticateToken, async (req, res) => {
         .json({ message: "Only teachers can add available hours" });
     }
 
-    const availableHoursArray = req.body.availableHours; // Expecting an array of available hours
-    if (
-      !Array.isArray(availableHoursArray) ||
-      availableHoursArray.length === 0
-    ) {
+    const { day, date, startTime, endTime } = req.body;
+
+    if (!day || !date || !startTime || !endTime) {
       return res
         .status(400)
-        .json({ message: "Invalid data format. Expected an array." });
+        .json({ message: "All fields (day, date, startTime, endTime) are required." });
     }
 
-    const availableHours = availableHoursArray.map(
-      ({ day, date, startTime, endTime }) => ({
-        teacher: req.user._id,
-        day,
-        date: new Date(date),
-        slots: generateTimeSlots(startTime, endTime),
-      })
-    );
+    const newAvailableHour = new AvailableHour({
+      teacher: req.user._id,
+      day,
+      date: new Date(date),
+      slots: generateTimeSlots(startTime, endTime),
+    });
 
-    // Save all available hours in bulk
-    const savedAvailableHours = await AvailableHour.insertMany(availableHours);
+    const savedAvailableHour = await newAvailableHour.save();
 
     res.status(201).json({
-      message: "Available hours added successfully",
-      availableHours: savedAvailableHours,
+      message: "Available hour added successfully",
+      availableHour: savedAvailableHour,
     });
   } catch (error) {
     res.status(500).json({ message: "Server error", error });
   }
 });
 
+
 //update available hours
-router.put("/update-multiple", authenticateToken, async (req, res) => {
+router.put("/update/:id", authenticateToken, async (req, res) => {
   try {
     if (req.user.role !== "teacher") {
       return res
@@ -72,39 +68,36 @@ router.put("/update-multiple", authenticateToken, async (req, res) => {
         .json({ message: "Only teachers can update available hours" });
     }
 
-    const updatedAvailableHours = req.body.availableHours; // Expecting an array
+    const { id } = req.params;
+    const { day, startTime, endTime } = req.body;
 
-    if (
-      !Array.isArray(updatedAvailableHours) ||
-      updatedAvailableHours.length === 0
-    ) {
+    if (!day || !startTime || !endTime) {
       return res
         .status(400)
-        .json({ message: "Invalid data format. Expected an array." });
+        .json({ message: "All fields (day, startTime, endTime) are required." });
     }
 
-    const updatePromises = updatedAvailableHours.map(
-      async ({ _id, day, startTime, endTime }) => {
-        const slots = generateTimeSlots(startTime, endTime); // Generate new slots
+    const slots = generateTimeSlots(startTime, endTime);
 
-        return AvailableHour.findOneAndUpdate(
-          { _id, teacher: req.user._id }, // Ensure teacher can only update their own data
-          { day, slots },
-          { new: true }
-        );
-      }
+    const updatedAvailableHour = await AvailableHour.findOneAndUpdate(
+      { _id: id, teacher: req.user._id }, // Ensure teacher can only update their own data
+      { day, slots },
+      { new: true }
     );
 
-    const updatedHours = await Promise.all(updatePromises);
+    if (!updatedAvailableHour) {
+      return res.status(404).json({ message: "Available hour not found" });
+    }
 
     res.status(200).json({
-      message: "Available hours updated successfully",
-      updatedHours,
+      message: "Available hour updated successfully",
+      availableHour: updatedAvailableHour,
     });
   } catch (error) {
     res.status(500).json({ message: "Server error", error });
   }
 });
+
 
 //get all available hours
 router.get("/all", async (req, res) => {
