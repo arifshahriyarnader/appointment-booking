@@ -61,7 +61,8 @@ router.post("/admin/register-user", authenticateToken, async (req, res) => {
       return res.status(403).json({ message: "Only admins can create users" });
     }
 
-    const { name, email, password, role, department, studentId, course } = req.body;
+    const { name, email, password, role, department, studentId, course } =
+      req.body;
 
     // Check if user already exists
     const existingUser = await User.findOne({ email });
@@ -89,12 +90,13 @@ router.post("/admin/register-user", authenticateToken, async (req, res) => {
 
     await newUser.save();
 
-    res.status(201).json({ message: "User registered successfully", user: newUser });
+    res
+      .status(201)
+      .json({ message: "User registered successfully", user: newUser });
   } catch (error) {
     res.status(500).json({ message: "Server error", error });
   }
 });
-
 
 //login a user
 router.post("/login", async (req, res) => {
@@ -149,32 +151,34 @@ router.get("/user-profile", authenticateToken, async (req, res) => {
 });
 
 //get all students
-router.get("/all-students", authenticateToken, async(req,res) =>{
-  try{
-    if(req.user.role !== "admin"){
-      return res.status(403).json({message:"Only admin can view all students list"})
+router.get("/all-students", authenticateToken, async (req, res) => {
+  try {
+    if (req.user.role !== "admin") {
+      return res
+        .status(403)
+        .json({ message: "Only admin can view all students list" });
     }
-    const students=await User.find({role:"student"}).select("-password");
-    res.status(200).json({students});
-  }
-  catch(error){
+    const students = await User.find({ role: "student" }).select("-password");
+    res.status(200).json({ students });
+  } catch (error) {
     res.status(500).json({ message: "Something went wrong" });
   }
-})
+});
 
-//get all teachers 
-router.get("/all-teachers", authenticateToken, async(req,res) =>{
-  try{
-    if(req.user.role !== "admin"){
-      return res.status(403).json({message:"Only admin can view all teachers list"})
+//get all teachers
+router.get("/all-teachers", authenticateToken, async (req, res) => {
+  try {
+    if (req.user.role !== "admin") {
+      return res
+        .status(403)
+        .json({ message: "Only admin can view all teachers list" });
     }
-    const teachers=await User.find({role:"teacher"}).select("-password");
-    res.status(200).json({teachers})
-  }
-  catch(error){
+    const teachers = await User.find({ role: "teacher" }).select("-password");
+    res.status(200).json({ teachers });
+  } catch (error) {
     res.status(500).json({ message: "Something went wrong" });
   }
-})
+});
 
 //approve or reject user (only admin)
 router.put("/users/:id", authenticateToken, async (req, res) => {
@@ -258,7 +262,7 @@ function generateToken(user) {
       _id: user._id,
       role: user.role,
     },
-   appConfig.AUTH.JWT_SECRET,
+    appConfig.AUTH.JWT_SECRET,
     {
       expiresIn: "1d",
     }

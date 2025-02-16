@@ -35,11 +35,9 @@ router.post("/add", authenticateToken, async (req, res) => {
     const { day, date, startTime, endTime } = req.body;
 
     if (!day || !date || !startTime || !endTime) {
-      return res
-        .status(400)
-        .json({
-          message: "All fields (day, date, startTime, endTime) are required.",
-        });
+      return res.status(400).json({
+        message: "All fields (day, date, startTime, endTime) are required.",
+      });
     }
 
     const newAvailableHour = new AvailableHour({
@@ -73,11 +71,9 @@ router.put("/update/:id", authenticateToken, async (req, res) => {
     const { day, startTime, endTime } = req.body;
 
     if (!day || !startTime || !endTime) {
-      return res
-        .status(400)
-        .json({
-          message: "All fields (day, startTime, endTime) are required.",
-        });
+      return res.status(400).json({
+        message: "All fields (day, startTime, endTime) are required.",
+      });
     }
 
     const slots = generateTimeSlots(startTime, endTime);
@@ -111,9 +107,13 @@ router.get("/all", async (req, res) => {
     let day = req.query.day;
 
     const pipeline = [];
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
 
     // Optional filters (Teacher & Day)
-    const matchQuery = {};
+    const matchQuery = {
+      date: { $gte: today }, // 🔹 Only include upcoming or today's slots
+    };
     if (teacherId) matchQuery.teacher = new mongoose.Types.ObjectId(teacherId);
     if (day) matchQuery.day = day;
 
@@ -128,7 +128,7 @@ router.get("/all", async (req, res) => {
     pipeline.push({ $skip: (current - 1) * pageSize });
     pipeline.push({ $limit: pageSize });
 
-    // Populate teacher details (name, email)
+    // Populate teacher details (name, department)
     pipeline.push({
       $lookup: {
         from: "users",
@@ -153,7 +153,6 @@ router.get("/all", async (req, res) => {
         teacher: {
           _id: "$teacher._id",
           name: "$teacher.name",
-          email: "$teacher.email",
           department: "$teacher.department",
         },
       },

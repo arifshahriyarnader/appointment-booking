@@ -35,7 +35,7 @@ const GetAllSlots = () => {
 
   return (
     <div className="p-6 bg-white rounded-lg shadow-md">
-      <h2 className="text-xl font-bold mb-4">All Teacher Available Hours</h2>
+      <h2 className="text-xl font-bold mb-4">Teacher Available Hours</h2>
       {slots.length === 0 ? (
         <p className="text-center text-gray-600 text-base">No slots found</p>
       ) : (
