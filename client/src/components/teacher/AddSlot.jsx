@@ -9,9 +9,9 @@ const AddSlot = () => {
   const [endTime, setEndTime] = useState("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
-  const navigate=useNavigate();
+  const navigate = useNavigate();
 
-  const handleSubmit = async(e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
     setError("");
@@ -19,19 +19,18 @@ const AddSlot = () => {
     const payload = { date, day, startTime, endTime };
 
     try {
-      await addAvailableHours(payload); 
+      await addAvailableHours(payload);
       setDate("");
       setDay("");
       setStartTime("");
       setEndTime("");
       alert("Slot added successfully!");
-      navigate("/teacher-dashboard"); 
+      navigate("/teacher-dashboard");
     } catch (err) {
       setError(err.response?.data?.message || "Failed to add slot");
     } finally {
       setLoading(false);
     }
-
   };
 
   return (
@@ -92,7 +91,7 @@ const AddSlot = () => {
           className="w-full bg-green-500 text-white py-2 rounded-md hover:bg-green-600"
           disabled={loading}
         >
-           {loading ? "Adding..." : "Add Slot"}
+          {loading ? "Adding..." : "Add Slot"}
         </button>
       </form>
     </div>
