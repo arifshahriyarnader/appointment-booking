@@ -37,7 +37,9 @@ router.post("/add", authenticateToken, async (req, res) => {
     if (!day || !date || !startTime || !endTime) {
       return res
         .status(400)
-        .json({ message: "All fields (day, date, startTime, endTime) are required." });
+        .json({
+          message: "All fields (day, date, startTime, endTime) are required.",
+        });
     }
 
     const newAvailableHour = new AvailableHour({
@@ -58,7 +60,6 @@ router.post("/add", authenticateToken, async (req, res) => {
   }
 });
 
-
 //update available hours
 router.put("/update/:id", authenticateToken, async (req, res) => {
   try {
@@ -74,13 +75,15 @@ router.put("/update/:id", authenticateToken, async (req, res) => {
     if (!day || !startTime || !endTime) {
       return res
         .status(400)
-        .json({ message: "All fields (day, startTime, endTime) are required." });
+        .json({
+          message: "All fields (day, startTime, endTime) are required.",
+        });
     }
 
     const slots = generateTimeSlots(startTime, endTime);
 
     const updatedAvailableHour = await AvailableHour.findOneAndUpdate(
-      { _id: id, teacher: req.user._id }, // Ensure teacher can only update their own data
+      { _id: id, teacher: req.user._id },
       { day, slots },
       { new: true }
     );
@@ -97,7 +100,6 @@ router.put("/update/:id", authenticateToken, async (req, res) => {
     res.status(500).json({ message: "Server error", error });
   }
 });
-
 
 //get all available hours
 router.get("/all", async (req, res) => {

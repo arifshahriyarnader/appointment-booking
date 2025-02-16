@@ -1,20 +1,43 @@
 import { useState } from "react";
+import { addAvailableHours } from "../../api/services/teacherServices";
+import { useNavigate } from "react-router-dom";
 
 const AddSlot = () => {
   const [date, setDate] = useState("");
   const [day, setDay] = useState("");
   const [startTime, setStartTime] = useState("");
   const [endTime, setEndTime] = useState("");
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState("");
+  const navigate=useNavigate();
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async(e) => {
     e.preventDefault();
+    setLoading(true);
+    setError("");
     console.log({ date, day, startTime, endTime });
-    alert("Slot added successfully!");
+    const payload = { date, day, startTime, endTime };
+
+    try {
+      await addAvailableHours(payload); 
+      setDate("");
+      setDay("");
+      setStartTime("");
+      setEndTime("");
+      alert("Slot added successfully!");
+      navigate("/teacher-dashboard"); 
+    } catch (err) {
+      setError(err.response?.data?.message || "Failed to add slot");
+    } finally {
+      setLoading(false);
+    }
+
   };
 
   return (
     <div className="p-6 bg-white rounded-lg shadow-md">
       <h2 className="text-xl font-bold mb-4">Add Slots</h2>
+      {error && <p className="text-red-500">{error}</p>}
       <form onSubmit={handleSubmit} className="space-y-4">
         <div>
           <label className="block text-gray-700">Date</label>
@@ -67,8 +90,9 @@ const AddSlot = () => {
         <button
           type="submit"
           className="w-full bg-green-500 text-white py-2 rounded-md hover:bg-green-600"
+          disabled={loading}
         >
-          Add Slot
+           {loading ? "Adding..." : "Add Slot"}
         </button>
       </form>
     </div>
