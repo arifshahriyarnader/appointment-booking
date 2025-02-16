@@ -14,3 +14,8 @@ export const getAllAvailhours = async () => {
     console.log(error);
   }
 };
+
+export const deleteAvailhours = async (id) => {
+  const response = await http.delete(`api/teacher/${id}`);
+  return response.data;
+};

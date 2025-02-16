@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { getAllAvailhours } from "../../api/services/teacherServices";
+import { getAllAvailhours,deleteAvailhours } from "../../api/services/teacherServices";
 import { Pencil, Trash2 } from "lucide-react";
 
 const GetAllSlots = () => {
@@ -13,7 +13,7 @@ const GetAllSlots = () => {
         const data = await getAllAvailhours();
         setSlots(data?.availableHours || []);
       } catch (error) {
-        setError("Failed to load slots",error);
+        setError("Failed to load slots", error);
       } finally {
         setLoading(false);
       }
@@ -26,10 +26,25 @@ const GetAllSlots = () => {
     console.log("Edit clicked for:", id);
   };
 
-  const handleDelete = (id) => {
-    console.log("Delete clicked for:", id);
+  const handleDelete = async (id) => {
+    if (!window.confirm("Are you sure you want to delete this available hour?")) {
+      return;
+    }
+  
+    try {
+      console.log("Delete clicked for:", id);
+      
+      await deleteAvailhours(id); // API request
+  
+      // Update UI by removing the deleted slot
+      setSlots((prev) => prev.filter((slot) => slot._id !== id));
+  
+      alert("Available hour deleted successfully!");
+    } catch (error) {
+      alert("Failed to delete. " + (error.response?.data?.message || "Try again."));
+    }
   };
-
+  
   if (loading) return <p className="text-center text-gray-500">Loading...</p>;
   if (error) return <p className="text-center text-red-500">{error}</p>;
 
@@ -55,13 +70,17 @@ const GetAllSlots = () => {
               {slots.map((slot) => (
                 <tr key={slot._id} className="text-center">
                   <td className="border px-4 py-2">{slot.teacher.name}</td>
-                  <td className="border px-4 py-2">{slot.teacher.department}</td>
+                  <td className="border px-4 py-2">
+                    {slot.teacher.department}
+                  </td>
                   <td className="border px-4 py-2">
                     {new Date(slot.date).toLocaleDateString()}
                   </td>
                   <td className="border px-4 py-2">{slot.day}</td>
                   <td className="border px-4 py-2">
-                    {slot.slots.map((s) => `${s.startTime}-${s.endTime}`).join(", ")}
+                    {slot.slots
+                      .map((s) => `${s.startTime}-${s.endTime}`)
+                      .join(", ")}
                   </td>
                   <td className="border px-4 py-2 flex justify-center gap-3">
                     {/* Edit Button */}
