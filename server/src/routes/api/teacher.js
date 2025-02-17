@@ -69,9 +69,9 @@ router.put("/update/:id", authenticateToken, async (req, res) => {
     }
 
     const { id } = req.params;
-    const { day, startTime, endTime } = req.body;
+    const { day, date, startTime, endTime } = req.body;
 
-    if (!day || !startTime || !endTime) {
+    if (!day || !date || !startTime || !endTime) {
       return res.status(400).json({
         message: "All fields (day, startTime, endTime) are required.",
       });
@@ -81,7 +81,7 @@ router.put("/update/:id", authenticateToken, async (req, res) => {
 
     const updatedAvailableHour = await AvailableHour.findOneAndUpdate(
       { _id: id, teacher: req.user._id },
-      { day, slots },
+      { day, date, slots },
       { new: true }
     );
 

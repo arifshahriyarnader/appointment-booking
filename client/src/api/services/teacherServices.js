@@ -15,6 +15,16 @@ export const getAllAvailhours = async () => {
   }
 };
 
+export const updateAvailhours = async (id, updatedData) => {
+  try {
+    const response = await http.put(`/api/teacher/update/${id}`, updatedData);
+    return response.data;
+  } catch (error) {
+    console.error("API Update Error:", error);
+    throw error;
+  }
+};
+
 export const deleteAvailhours = async (id) => {
   const response = await http.delete(`api/teacher/${id}`);
   return response.data;
