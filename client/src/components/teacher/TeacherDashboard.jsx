@@ -22,9 +22,9 @@ export const TeacherDashboard = () => {
   };
 
   return (
-    <div className="flex flex-col min-h-screen">
+    <div className="flex flex-col h-screen w-full">
       {/* Header */}
-      <header className="flex justify-between items-center bg-gray-800 text-white p-4">
+      <header className="flex justify-between items-center bg-gray-800 text-white p-4 w-full">
         <h2 className="text-xl font-bold">Teacher Dashboard</h2>
         <button
           onClick={handleLogout}
@@ -34,9 +34,9 @@ export const TeacherDashboard = () => {
         </button>
       </header>
 
-      <div className="flex flex-grow">
+      <div className="flex flex-grow w-full">
         {/* Left Sidebar */}
-        <div className="w-1/4 bg-gray-800 text-white p-4">
+        <div className="w-1/4 bg-gray-800 text-white p-4 min-h-screen">
           <ul className="space-y-2">
             <li>
               <button
@@ -82,8 +82,8 @@ export const TeacherDashboard = () => {
         </div>
 
         {/* Right Content Area */}
-        <div className="w-3/4 p-6 bg-gray-100">
-          {selectedOption === "addSlot" && <AddSlot />}
+        <div className="w-4/5 p-6 bg-gray-100 min-h-screen">
+        {selectedOption === "addSlot" && <AddSlot />}
           {selectedOption === "getAllSlots" && <GetAllSlots />}
           {selectedOption === "viewAppointmentRequest" && (
             <ViewAppointmentRequest />
