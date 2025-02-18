@@ -202,11 +202,20 @@ router.get("/appointment-status", authenticateToken, async (req, res) => {
     if (req.user.role !== "teacher") {
       return res
         .status(401)
-        .json({ message: "Only teacher can view appointments request" });
+        .json({ message: "Only teacher can view appointment requests" });
     }
-    const appointments = await Appointment.find({ teacher: req.user._id })
+
+    // Get today's date at midnight (00:00:00)
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+
+    // Fetch only appointments with today or future dates
+    const appointments = await Appointment.find({
+      teacher: req.user._id,
+      date: { $gte: today }, //Only include appointments for today or future dates
+    })
       .populate("student", "name email")
-      .sort({ createdAt: -1 });
+      .sort({ date: 1 }); // Sort by date (earliest first)
 
     res.status(200).json({ message: appointments });
   } catch (error) {
