@@ -23,7 +23,7 @@ const UpcomingAppointmentSchedule = () => {
       if (error) return <p className="text-red-500">{error}</p>;
   return (
     <div className="p-4">
-      <h2 className="text-xl font-bold mb-4">Daily Appointment Schedule</h2>
+      <h2 className="text-xl font-bold mb-4">Upcoming Appointment Schedule</h2>
       {appointments.length === 0 ? (
         <p className="text-gray-500">
           You have no upcoming appointment schedule
