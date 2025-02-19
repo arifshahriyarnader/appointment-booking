@@ -7,6 +7,7 @@ import GetAllSlots from "./GetAllSlots";
 import ViewAppointmentRequest from "./ViewAppointmentRequest";
 import DailyAppointmentSehedules from "./DailyAppointmentSehedules";
 import UpcomingAppointmentSchedule from "./UpcomingAppointmentSchedule";
+import PastAppointmentSchedule from "./PastAppointmentSchedule";
 
 export const TeacherDashboard = () => {
   const [selectedOption, setSelectedOption] = useState("addSlot");
@@ -78,6 +79,14 @@ export const TeacherDashboard = () => {
                 Upcoming Appointment Schedule
               </button>
             </li>
+            <li>
+              <button
+                className="w-full p-2 bg-blue-600 hover:bg-blue-700 rounded"
+                onClick={() => setSelectedOption("pastAppointmentSchedule")}
+              >
+                Past Appointments List
+              </button>
+            </li>
           </ul>
         </div>
 
@@ -93,6 +102,9 @@ export const TeacherDashboard = () => {
           )}
           {selectedOption === "upcomingAppointmentSchedule" && (
             <UpcomingAppointmentSchedule />
+          )}
+          {selectedOption === "pastAppointmentSchedule" && (
+            <PastAppointmentSchedule />
           )}
         </div>
       </div>
