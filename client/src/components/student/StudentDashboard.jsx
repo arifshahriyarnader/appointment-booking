@@ -1,0 +1,133 @@
+import { useState } from "react";
+import { useNavigate } from "react-router-dom";
+import { appConfig } from "../../common/config";
+import { authServices } from "../../auth";
+import {
+  AllTeacher,
+  AppointmentStatus,
+  BookAppointment,
+  DailyAppointmentList,
+  PastAppointmentList,
+  TeacherBookedSlots,
+  TeacherProfile,
+  UpcomingAppointmentList,
+} from "./index";
+
+export const StudentDashboard = () => {
+  const [selectedOption, setSelectedOption] = useState("allTeacher");
+  const navigate = useNavigate();
+
+  const handleLogout = () => {
+    const user = JSON.parse(localStorage.getItem(appConfig.CURRENT_USER_KEY));
+    authServices.logout();
+    localStorage.removeItem(user);
+    alert("Logged out successfully!");
+    navigate("/login");
+  };
+
+  return (
+    <div className="flex flex-col h-screen w-full">
+      {/* Header */}
+      <header className="flex justify-between items-center bg-gray-800 text-white p-4 w-full">
+        <h2 className="text-xl font-bold">Student Dashboard</h2>
+        <button
+          onClick={handleLogout}
+          className="bg-red-600 hover:bg-red-700 text-white py-2 px-4 rounded"
+        >
+          Logout
+        </button>
+      </header>
+
+      <div className="flex flex-grow w-full">
+        {/* Left Sidebar */}
+        <div className="w-1/4 bg-gray-800 text-white p-4 min-h-screen">
+          <ul className="space-y-2">
+            <li>
+              <button
+                className="w-full p-2 bg-blue-600 hover:bg-blue-700 rounded"
+                onClick={() => setSelectedOption("allTeacher")}
+              >
+                All Teacher
+              </button>
+            </li>
+            <li>
+              <button
+                className="w-full p-2 bg-blue-600 hover:bg-blue-700 rounded"
+                onClick={() => setSelectedOption("appointmentStatus")}
+              >
+                Appointment Status
+              </button>
+            </li>
+            <li>
+              <button
+                className="w-full p-2 bg-blue-600 hover:bg-blue-700 rounded"
+                onClick={() => setSelectedOption("bookAppointment")}
+              >
+                Book an Appointment
+              </button>
+            </li>
+            <li>
+              <button
+                className="w-full p-2 bg-blue-600 hover:bg-blue-700 rounded"
+                onClick={() => setSelectedOption("dailyAppointmentSchedule")}
+              >
+                Daily Appointment List
+              </button>
+            </li>
+
+            <li>
+              <button
+                className="w-full p-2 bg-blue-600 hover:bg-blue-700 rounded"
+                onClick={() => setSelectedOption("pastAppointmentHistory")}
+              >
+                Past Appointment History
+              </button>
+            </li>
+            <li>
+              <button
+                className="w-full p-2 bg-blue-600 hover:bg-blue-700 rounded"
+                onClick={() => setSelectedOption("teacherBookedSlot")}
+              >
+                Teacher Booked Slot
+              </button>
+            </li>
+            <li>
+              <button
+                className="w-full p-2 bg-blue-600 hover:bg-blue-700 rounded"
+                onClick={() => setSelectedOption("teacherProfile")}
+              >
+                Teacher Profile
+              </button>
+            </li>
+            <li>
+              <button
+                className="w-full p-2 bg-blue-600 hover:bg-blue-700 rounded"
+                onClick={() => setSelectedOption("upcomingAppointmentSchedule")}
+              >
+                Upcoming Appointment List
+              </button>
+            </li>
+          </ul>
+        </div>
+
+        {/* Right Content Area */}
+        <div className="w-4/5 p-6 bg-gray-100 min-h-screen">
+          {selectedOption === "allTeacher" && <AllTeacher />}
+          {selectedOption === "appointmentStatus" && <AppointmentStatus />}
+          {selectedOption === "bookAppointment" && <BookAppointment />}
+          {selectedOption === "dailyAppointmentSchedule" && (
+            <DailyAppointmentList />
+          )}
+          {selectedOption === "pastAppointmentHistory" && (
+            <PastAppointmentList />
+          )}
+          {selectedOption === "teacherBookedSlot" && <TeacherBookedSlots />}
+          {selectedOption === "teacherProfile" && <TeacherProfile />}
+          {selectedOption === "upcomingAppointmentSchedule" && (
+            <UpcomingAppointmentList />
+          )}
+        </div>
+      </div>
+    </div>
+  );
+};
