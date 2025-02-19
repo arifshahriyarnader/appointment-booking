@@ -62,3 +62,13 @@ export const dailyAppointmentSchedule = async () => {
     console.log(error);
   }
 };
+
+export const upcomingAppointmentSchedule = async () => {
+  try {
+    const response = await http.get(`/api/teacher/appointment/upcoming`);
+    console.log("Upcoming Appointment Schedule", response.data);
+    return response.data;
+  } catch (error) {
+    console.log(error);
+  }
+};

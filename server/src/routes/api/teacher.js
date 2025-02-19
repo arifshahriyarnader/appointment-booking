@@ -298,7 +298,7 @@ router.get("/appointment/upcoming", authenticateToken, async (req, res) => {
       .sort({ date: 1, slots: 1 })
       .populate("student", "name email")
       .populate("teacher", "course");
-    res.status(200).json({ message: appointments });
+    res.status(200).json({ appointments });
   } catch (error) {
     res.status(500).json({ message: "Server error", error });
   }
