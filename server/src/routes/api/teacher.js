@@ -304,4 +304,38 @@ router.get("/appointment/upcoming", authenticateToken, async (req, res) => {
   }
 });
 
+//past appointment history
+router.get("/past-schedule/history", authenticateToken, async (req, res) => {
+  try {
+   
+    if (req.user.role !== "teacher") {
+      return res.status(403).json({ message: "Only teachers can view past appointments." });
+    }
+
+    // Get today's date and convert it to start of the day (00:00:00)
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+
+    // Find past appointments (before today)
+    const pastAppointments = await Appointment.find({
+      teacher: req.user._id,
+      date: { $lt: today }, // Less than today (yesterday and earlier)
+      status: "approved",
+    })
+      .populate("student", "name email")
+      .populate("teacher", "course")
+      .sort({ date: -1 }); // Sort by most recent first
+
+    if (pastAppointments.length === 0) {
+      return res.status(404).json({ message: "No past appointment history found." });
+    }
+
+    res.status(200).json({ pastAppointments });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: "Server error", error });
+  }
+});
+
+
 export default router;
