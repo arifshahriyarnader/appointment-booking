@@ -52,3 +52,13 @@ export const updateAppointmentStatus = async (id, updatedData) => {
     throw error;
   }
 };
+
+export const dailyAppointmentSchedule = async () => {
+  try {
+    const response = await http.get(`/api/teacher/schedule/today`);
+    console.log("Daily Appointmnets Schedule:", response.data);
+    return response.data;
+  } catch (error) {
+    console.log(error);
+  }
+};
