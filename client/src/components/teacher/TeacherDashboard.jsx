@@ -2,20 +2,21 @@ import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { appConfig } from "../../common/config";
 import { authServices } from "../../auth";
-import AddSlot from "./AddSlot";
-import GetAllSlots from "./GetAllSlots";
-import ViewAppointmentRequest from "./ViewAppointmentRequest";
-import DailyAppointmentSehedules from "./DailyAppointmentSehedules";
-import UpcomingAppointmentSchedule from "./UpcomingAppointmentSchedule";
-import PastAppointmentSchedule from "./PastAppointmentSchedule";
+import {
+  AddSlot,
+  GetAllSlots,
+  ViewAppointmentRequest,
+  DailyAppointmentSehedules,
+  UpcomingAppointmentSchedule,
+  PastAppointmentSchedule,
+} from "./index";
 
 export const TeacherDashboard = () => {
   const [selectedOption, setSelectedOption] = useState("addSlot");
   const navigate = useNavigate();
 
-  
   const handleLogout = () => {
-    const user=JSON.parse(localStorage.getItem(appConfig.CURRENT_USER_KEY))
+    const user = JSON.parse(localStorage.getItem(appConfig.CURRENT_USER_KEY));
     authServices.logout();
     localStorage.removeItem(user);
     alert("Logged out successfully!");
@@ -92,7 +93,7 @@ export const TeacherDashboard = () => {
 
         {/* Right Content Area */}
         <div className="w-4/5 p-6 bg-gray-100 min-h-screen">
-        {selectedOption === "addSlot" && <AddSlot />}
+          {selectedOption === "addSlot" && <AddSlot />}
           {selectedOption === "getAllSlots" && <GetAllSlots />}
           {selectedOption === "viewAppointmentRequest" && (
             <ViewAppointmentRequest />

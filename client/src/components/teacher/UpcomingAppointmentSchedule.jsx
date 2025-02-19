@@ -1,26 +1,26 @@
 import { useState, useEffect } from "react";
-import {upcomingAppointmentSchedule} from "../../api/services/teacherServices";
+import { upcomingAppointmentSchedule } from "../../api/services/teacherServices";
 const UpcomingAppointmentSchedule = () => {
   const [appointments, setAppointments] = useState([]);
-    const [loading, setLoading] = useState(true);
-    const [error, setError] = useState("");
-    useEffect(() => {
-        const fetchAppointments = async () => {
-          try {
-            const data = await upcomingAppointmentSchedule();
-            setAppointments(data?.appointments || []);
-          } catch (error) {
-            setError("Failed to upcoming appointments schedule", error);
-          } finally {
-            setLoading(false);
-          }
-        };
-    
-        fetchAppointments();
-      }, []);
-    
-      if (loading) return <p>Loading upcoming appointments...</p>;
-      if (error) return <p className="text-red-500">{error}</p>;
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState("");
+  useEffect(() => {
+    const fetchAppointments = async () => {
+      try {
+        const data = await upcomingAppointmentSchedule();
+        setAppointments(data?.appointments || []);
+      } catch (error) {
+        setError("Failed to upcoming appointments schedule", error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchAppointments();
+  }, []);
+
+  if (loading) return <p>Loading upcoming appointments...</p>;
+  if (error) return <p className="text-red-500">{error}</p>;
   return (
     <div className="p-4">
       <h2 className="text-xl font-bold mb-4">Upcoming Appointment Schedule</h2>
@@ -66,7 +66,7 @@ const UpcomingAppointmentSchedule = () => {
         </table>
       )}
     </div>
-  )
-}
+  );
+};
 
-export default UpcomingAppointmentSchedule
+export default UpcomingAppointmentSchedule;
