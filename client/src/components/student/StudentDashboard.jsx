@@ -15,6 +15,7 @@ import {
 
 export const StudentDashboard = () => {
   const [selectedOption, setSelectedOption] = useState("allTeacher");
+  const [searchQuery, setSearchQuery] = useState("")
   const navigate = useNavigate();
 
   const handleLogout = () => {
@@ -23,6 +24,11 @@ export const StudentDashboard = () => {
     localStorage.removeItem(user);
     alert("Logged out successfully!");
     navigate("/login");
+  };
+
+  const handleSearch = () => {
+    console.log("Searching for:", searchQuery);
+    // You can implement filtering logic here
   };
 
   return (
@@ -37,6 +43,23 @@ export const StudentDashboard = () => {
           Logout
         </button>
       </header>
+
+       {/* Search Bar */}
+       <div className="flex justify-end items-center p-4 bg-gray-100 w-full">
+        <input
+          type="text"
+          placeholder="Search..."
+          className="p-2 border border-gray-300 rounded-l-md w-1/3"
+          value={searchQuery}
+          onChange={(e) => setSearchQuery(e.target.value)}
+        />
+        <button
+          onClick={handleSearch}
+          className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-r-md"
+        >
+          Search
+        </button>
+      </div>
 
       <div className="flex flex-grow w-full">
         {/* Left Sidebar */}
