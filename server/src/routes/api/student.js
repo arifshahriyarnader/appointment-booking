@@ -3,12 +3,11 @@ import { authenticateToken } from "../../middleware/index.js";
 import { User, AvailableHour, Appointment } from "../../models/index.js";
 const router = express.Router();
 
-//get all teacher available hours
-router.get("/all-teacher-available-hours", async(req,res) =>{
+//get all teachers
+router.get("/all-teachers", async(req,res) =>{
   try{
-    const teacher=await User.find({ role: "teacher" }).select("-password");
-    const availableHours=await AvailableHour.find({teacher:req.params.id});
-    res.status(200).json({teacher,availableHours});
+    const teacher=await User.find({ role: "teacher", status:"approved" }).select("-password");
+    res.status(200).json({teacher});
   }
   catch (error) {
     res.status(500).json({ message: "Server error", error });
