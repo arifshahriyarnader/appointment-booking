@@ -9,13 +9,12 @@ import {
   DailyAppointmentList,
   PastAppointmentList,
   TeacherBookedSlots,
-  TeacherProfile,
   UpcomingAppointmentList,
 } from "./index";
 
 export const StudentDashboard = () => {
   const [selectedOption, setSelectedOption] = useState("allTeacher");
-  const [searchQuery, setSearchQuery] = useState("")
+  const [searchQuery, setSearchQuery] = useState("");
   const navigate = useNavigate();
 
   const handleLogout = () => {
@@ -28,24 +27,21 @@ export const StudentDashboard = () => {
 
   const handleSearch = () => {
     console.log("Searching for:", searchQuery);
-    // You can implement filtering logic here
   };
 
   return (
     <div className="flex flex-col h-screen w-full">
-      {/* Header */}
       <header className="flex justify-between items-center bg-gray-800 text-white p-4 w-full">
         <h2 className="text-xl font-bold">Student Dashboard</h2>
         <button
           onClick={handleLogout}
-          className="bg-red-600 hover:bg-red-700 text-white py-2 px-4 rounded"
+          className="bg-red-600 hover:bg-red-700 text-white py-2 px-4 rounded cursor-pointer"
         >
           Logout
         </button>
       </header>
 
-       {/* Search Bar */}
-       <div className="flex justify-end items-center p-4 bg-gray-100 w-full">
+      <div className="flex justify-end items-center p-4 bg-gray-100 w-full">
         <input
           type="text"
           placeholder="Search..."
@@ -114,14 +110,7 @@ export const StudentDashboard = () => {
                 Teacher Booked Slot
               </button>
             </li>
-            <li>
-              <button
-                className="w-full p-2 bg-blue-600 hover:bg-blue-700 rounded"
-                onClick={() => setSelectedOption("teacherProfile")}
-              >
-                Teacher Profile
-              </button>
-            </li>
+
             <li>
               <button
                 className="w-full p-2 bg-blue-600 hover:bg-blue-700 rounded"
@@ -145,7 +134,6 @@ export const StudentDashboard = () => {
             <PastAppointmentList />
           )}
           {selectedOption === "teacherBookedSlot" && <TeacherBookedSlots />}
-          {selectedOption === "teacherProfile" && <TeacherProfile />}
           {selectedOption === "upcomingAppointmentSchedule" && (
             <UpcomingAppointmentList />
           )}

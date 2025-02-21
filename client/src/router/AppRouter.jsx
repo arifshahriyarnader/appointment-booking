@@ -1,5 +1,11 @@
 import { Route, Routes } from "react-router-dom";
-import { SigninPage, SignupPage, StudentDashboardPage, TeacherDashboardPage } from "../pages";
+import {
+  SigninPage,
+  SignupPage,
+  StudentDashboardPage,
+  TeacherDashboardPage,
+  TeacherProfilePage,
+} from "../pages";
 import SecureRoute from "./SecureRoute";
 
 const AppRouter = () => {
@@ -20,6 +26,14 @@ const AppRouter = () => {
         element={
           <SecureRoute>
             <StudentDashboardPage />
+          </SecureRoute>
+        }
+      />
+      <Route
+        path="/teacher-profile/:teacherId"
+        element={
+          <SecureRoute>
+            <TeacherProfilePage />
           </SecureRoute>
         }
       />

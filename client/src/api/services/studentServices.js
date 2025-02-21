@@ -9,3 +9,13 @@ export const getAllTeachersList = async () => {
     console.log(error);
   }
 };
+
+export const getTeacherProfile = async (teacherId) => {
+  try {
+    const response = await http.get(`/api/student-appointment/teacher/${teacherId}`);
+    return response.data;
+  } catch (error) {
+    console.error("Error fetching teacher profile:", error);
+    return null;
+  }
+};

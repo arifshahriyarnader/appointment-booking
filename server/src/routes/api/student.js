@@ -4,15 +4,17 @@ import { User, AvailableHour, Appointment } from "../../models/index.js";
 const router = express.Router();
 
 //get all teachers
-router.get("/all-teachers", async(req,res) =>{
-  try{
-    const teacher=await User.find({ role: "teacher", status:"approved" }).select("-password");
-    res.status(200).json({teacher});
-  }
-  catch (error) {
+router.get("/all-teachers", async (req, res) => {
+  try {
+    const teacher = await User.find({
+      role: "teacher",
+      status: "approved",
+    }).select("-password");
+    res.status(200).json({ teacher });
+  } catch (error) {
     res.status(500).json({ message: "Server error", error });
   }
-})
+});
 
 //get teacher profile with available hours
 router.get("/teacher/:id", async (req, res) => {
@@ -23,7 +25,16 @@ router.get("/teacher/:id", async (req, res) => {
     if (!teacher || teacher.role !== "teacher") {
       return res.status(404).json({ message: "Teacher Not found" });
     }
-    const availableHours = await AvailableHour.find({ teacher: req.params.id });
+
+    // Get today's date and filter only future available hours
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+
+    const availableHours = await AvailableHour.find({
+      teacher: req.params.id,
+      date: { $gte: today },
+    });
+
     res.status(200).json({ teacher, availableHours });
   } catch (error) {
     res.status(500).json({ message: "Server error", error });
@@ -41,7 +52,8 @@ router.get("/teacher/:id/slots", async (req, res) => {
 
     const bookedSlotsSet = new Set(
       bookedAppointments.map(
-        (appt) => `${appt.date.toISOString().split("T")[0]} ${appt.slots.startTime}`
+        (appt) =>
+          `${appt.date.toISOString().split("T")[0]} ${appt.slots.startTime}`
       )
     );
 
@@ -50,7 +62,9 @@ router.get("/teacher/:id/slots", async (req, res) => {
       slots: day.slots.map((slot) => ({
         startTime: slot.startTime,
         endTime: slot.endTime,
-        isBooked: bookedSlotsSet.has(`${day.date.toISOString().split("T")[0]} ${slot.startTime}`),
+        isBooked: bookedSlotsSet.has(
+          `${day.date.toISOString().split("T")[0]} ${slot.startTime}`
+        ),
       })),
     }));
 
@@ -59,7 +73,6 @@ router.get("/teacher/:id/slots", async (req, res) => {
     res.status(500).json({ message: "Server error", error });
   }
 });
-
 
 //students booked an appoinment
 router.post("/appoinment", authenticateToken, async (req, res) => {
@@ -102,18 +115,22 @@ router.post("/appoinment", authenticateToken, async (req, res) => {
 router.get("/appointment-status", authenticateToken, async (req, res) => {
   try {
     if (req.user.role !== "student") {
-      return res.status(401).json({ message: "Only students can view their appointment status" });
+      return res
+        .status(401)
+        .json({ message: "Only students can view their appointment status" });
     }
 
     // Fetch appointments with populated teacher and student details
     const appointments = await Appointment.find({ student: req.user._id })
-      .populate("teacher", "name email course") 
-      .populate("student", "name email") 
+      .populate("teacher", "name email course")
+      .populate("student", "name email")
       .sort({ createdAt: -1 });
 
     // If no appointments found
     if (!appointments.length) {
-      return res.status(200).json({ message: "You have no booked appointments." });
+      return res
+        .status(200)
+        .json({ message: "You have no booked appointments." });
     }
 
     // Formatting response for better readability
@@ -140,30 +157,45 @@ router.get("/appointment-status", authenticateToken, async (req, res) => {
   }
 });
 
-
 // Student cancels their appointment
 router.put("/appointment/cancel/:id", authenticateToken, async (req, res) => {
   try {
     if (req.user.role !== "student") {
-      return res.status(403).json({ message: "Only students can cancel appointments" });
+      return res
+        .status(403)
+        .json({ message: "Only students can cancel appointments" });
     }
 
-    const appointment = await Appointment.findOne({ _id: req.params.id, student: req.user._id });
+    const appointment = await Appointment.findOne({
+      _id: req.params.id,
+      student: req.user._id,
+    });
 
     if (!appointment) {
-      return res.status(404).json({ message: "Appointment not found or not owned by the student" });
+      return res
+        .status(404)
+        .json({ message: "Appointment not found or not owned by the student" });
     }
 
     // Ensure appointment is not already approved or completed
-    if (appointment.status === "approved" || appointment.status === "completed") {
-      return res.status(400).json({ message: "You cannot cancel an approved or completed appointment" });
+    if (
+      appointment.status === "approved" ||
+      appointment.status === "completed"
+    ) {
+      return res
+        .status(400)
+        .json({
+          message: "You cannot cancel an approved or completed appointment",
+        });
     }
 
     // Update appointment status to "canceled"
     appointment.status = "canceled";
     await appointment.save();
 
-    res.status(200).json({ message: "Appointment canceled successfully", appointment });
+    res
+      .status(200)
+      .json({ message: "Appointment canceled successfully", appointment });
   } catch (error) {
     res.status(500).json({ message: "Server error", error });
   }
@@ -184,18 +216,19 @@ router.get("/appointment/history", authenticateToken, async (req, res) => {
     })
       .populate("teacher", "name email course")
       .sort({ date: -1 });
-      if (pastAppointments.length === 0) {
-        return res.status(200).json({ message: "You have no past appointments." });
-      }
-      const formattedAppointments = pastAppointments.map((appointment) => ({
-        _id: appointment._id,
-        teacher: appointment.teacher,
-        date: appointment.date,
-        status: appointment.status === "approved" ? "Completed" : appointment.status, // Shows "Completed" if approved
-      }));
-    res
-      .status(200)
-      .json({pastAppointments : formattedAppointments});
+    if (pastAppointments.length === 0) {
+      return res
+        .status(200)
+        .json({ message: "You have no past appointments." });
+    }
+    const formattedAppointments = pastAppointments.map((appointment) => ({
+      _id: appointment._id,
+      teacher: appointment.teacher,
+      date: appointment.date,
+      status:
+        appointment.status === "approved" ? "Completed" : appointment.status, // Shows "Completed" if approved
+    }));
+    res.status(200).json({ pastAppointments: formattedAppointments });
   } catch (error) {
     res.status(500).json({ message: "Server error", error });
   }
@@ -205,11 +238,9 @@ router.get("/appointment/history", authenticateToken, async (req, res) => {
 router.get("/appointment/today", authenticateToken, async (req, res) => {
   try {
     if (req.user.role !== "student") {
-      return res
-        .status(403)
-        .json({
-          message: "Only students can view their todays appointment list",
-        });
+      return res.status(403).json({
+        message: "Only students can view their todays appointment list",
+      });
     }
     const today = new Date();
     today.setHours(0, 0, 0, 0);
@@ -221,9 +252,11 @@ router.get("/appointment/today", authenticateToken, async (req, res) => {
     })
       .populate("teacher", "name email course")
       .sort({ date: 1 });
-      if(todayAppointments.length === 0){
-        return res.status(403).json({message:"You have no appointment schedule for today"})
-      }
+    if (todayAppointments.length === 0) {
+      return res
+        .status(403)
+        .json({ message: "You have no appointment schedule for today" });
+    }
     res.status(200).json({ todayAppointments });
   } catch (error) {
     res.status(500).json({ message: "Server error", error });
@@ -234,7 +267,9 @@ router.get("/appointment/today", authenticateToken, async (req, res) => {
 router.get("/appointment/upcoming", authenticateToken, async (req, res) => {
   try {
     if (req.user.role !== "student") {
-      return res.status(403).json({ message: "Only students can access upcoming appointments" });
+      return res
+        .status(403)
+        .json({ message: "Only students can access upcoming appointments" });
     }
 
     const today = new Date();
@@ -254,6 +289,5 @@ router.get("/appointment/upcoming", authenticateToken, async (req, res) => {
     res.status(500).json({ message: "Server error", error });
   }
 });
-
 
 export default router;

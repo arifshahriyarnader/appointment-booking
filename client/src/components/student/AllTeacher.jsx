@@ -1,9 +1,11 @@
 import { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { getAllTeachersList } from "../../api/services/studentServices";
 
 const AllTeacher = () => {
   const [teachers, setTeachers] = useState([]);
   const [loading, setLoading] = useState(true);
+  const navigate = useNavigate();
 
   useEffect(() => {
     const fetchTeachers = async () => {
@@ -19,6 +21,10 @@ const AllTeacher = () => {
     };
     fetchTeachers();
   }, []);
+
+  const handleViewProfile = (teacherId) => {
+    navigate(`/teacher-profile/${teacherId}`);
+  };
 
   return (
     <div className="p-6 bg-white shadow-md rounded-lg">
@@ -36,6 +42,7 @@ const AllTeacher = () => {
               <th className="border p-2">Email</th>
               <th className="border p-2">Department</th>
               <th className="border p-2">Course</th>
+              <th className="border p-2">Actions</th>{" "}
             </tr>
           </thead>
           <tbody>
@@ -45,6 +52,14 @@ const AllTeacher = () => {
                 <td className="border p-2">{teacher.email}</td>
                 <td className="border p-2">{teacher.department || "N/A"}</td>
                 <td className="border p-2">{teacher.course || "N/A"}</td>
+                <td className="border p-2 text-center">
+                  <button
+                    onClick={() => handleViewProfile(teacher._id)}
+                    className="bg-blue-500 text-white px-3 py-1 rounded hover:bg-blue-600 cursor-pointer"
+                  >
+                    View
+                  </button>
+                </td>
               </tr>
             ))}
           </tbody>
