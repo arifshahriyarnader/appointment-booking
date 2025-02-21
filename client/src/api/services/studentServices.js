@@ -19,3 +19,15 @@ export const getTeacherProfile = async (teacherId) => {
     return null;
   }
 };
+
+export const searchTeachers = async (query) => {
+  try {
+    const response = await http.get(`/api/student-appointment/search-teachers`, {
+      params: { query },
+    });
+    return response.data;
+  } catch (error) {
+    console.error("Error searching teachers:", error);
+    return [];
+  }
+};

@@ -11,10 +11,12 @@ import {
   TeacherBookedSlots,
   UpcomingAppointmentList,
 } from "./index";
+import { searchTeachers } from "../../api/services/studentServices";
 
 export const StudentDashboard = () => {
   const [selectedOption, setSelectedOption] = useState("allTeacher");
   const [searchQuery, setSearchQuery] = useState("");
+  const [searchResults, setSearchResults] = useState([]);
   const navigate = useNavigate();
 
   const handleLogout = () => {
@@ -25,7 +27,17 @@ export const StudentDashboard = () => {
     navigate("/login");
   };
 
-  const handleSearch = () => {
+  const handleSearch = async () => {
+    if (!searchQuery.trim()) {
+      setSearchResults([]);
+      return;
+    }
+    try {
+      const results = await searchTeachers(searchQuery);
+      setSearchResults(results);
+    } catch (error) {
+      console.error("Error during search:", error);
+    }
     console.log("Searching for:", searchQuery);
   };
 
@@ -64,11 +76,15 @@ export const StudentDashboard = () => {
             <li>
               <button
                 className="w-full p-2 bg-blue-600 hover:bg-blue-700 rounded"
-                onClick={() => setSelectedOption("allTeacher")}
+                onClick={() => {
+                  setSelectedOption("allTeacher");
+                  setSearchResults([]);
+                }}
               >
                 All Teacher
               </button>
             </li>
+
             <li>
               <button
                 className="w-full p-2 bg-blue-600 hover:bg-blue-700 rounded"
@@ -124,7 +140,9 @@ export const StudentDashboard = () => {
 
         {/* Right Content Area */}
         <div className="w-4/5 p-6 bg-gray-100 min-h-screen">
-          {selectedOption === "allTeacher" && <AllTeacher />}
+          {selectedOption === "allTeacher" && (
+            <AllTeacher searchResults={searchResults} />
+          )}
           {selectedOption === "appointmentStatus" && <AppointmentStatus />}
           {selectedOption === "bookAppointment" && <BookAppointment />}
           {selectedOption === "dailyAppointmentSchedule" && (

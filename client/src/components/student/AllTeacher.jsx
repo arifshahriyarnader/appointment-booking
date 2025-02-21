@@ -1,26 +1,32 @@
 import { useEffect, useState } from "react";
+import PropTypes from "prop-types";
 import { useNavigate } from "react-router-dom";
 import { getAllTeachersList } from "../../api/services/studentServices";
 
-const AllTeacher = () => {
+const AllTeacher = ({ searchResults }) => {
   const [teachers, setTeachers] = useState([]);
   const [loading, setLoading] = useState(true);
   const navigate = useNavigate();
 
   useEffect(() => {
-    const fetchTeachers = async () => {
-      setLoading(true);
-      try {
-        const response = await getAllTeachersList();
-        setTeachers(response.teacher || []);
-      } catch (error) {
-        console.error("Error fetching teachers:", error);
-      } finally {
-        setLoading(false);
-      }
-    };
-    fetchTeachers();
-  }, []);
+    if (!searchResults || searchResults.length === 0) {
+      const fetchTeachers = async () => {
+        setLoading(true);
+        try {
+          const response = await getAllTeachersList();
+          setTeachers(response.teacher || []);
+        } catch (error) {
+          console.error("Error fetching teachers:", error);
+        } finally {
+          setLoading(false);
+        }
+      };
+      fetchTeachers();
+    } else {
+      setTeachers(searchResults);
+      setLoading(false);
+    }
+  }, [searchResults]);
 
   const handleViewProfile = (teacherId) => {
     navigate(`/teacher-profile/${teacherId}`);
@@ -67,6 +73,10 @@ const AllTeacher = () => {
       )}
     </div>
   );
+};
+
+AllTeacher.propTypes = {
+  searchResults: PropTypes.array,
 };
 
 export default AllTeacher;

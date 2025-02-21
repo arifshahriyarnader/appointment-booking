@@ -41,6 +41,30 @@ router.get("/teacher/:id", async (req, res) => {
   }
 });
 
+// Search teachers by name or department
+router.get("/search-teachers", async (req, res) => {
+  try {
+    const { query } = req.query;
+
+    if (!query) {
+      return res.status(400).json({ message: "Search query is required" });
+    }
+    const teachers = await User.find({
+      role: "teacher",
+      status: "approved",
+      $or: [
+        { name: { $regex: query, $options: "i" } },
+        { department: { $regex: query, $options: "i" } },
+      ],
+    });
+
+    res.status(200).json(teachers);
+  } catch (error) {
+    console.error("Error fetching teachers:", error);
+    res.status(500).json({ message: "Server error" });
+  }
+});
+
 //get teacher available hours and booked
 router.get("/teacher/:id/slots", async (req, res) => {
   try {
@@ -182,11 +206,9 @@ router.put("/appointment/cancel/:id", authenticateToken, async (req, res) => {
       appointment.status === "approved" ||
       appointment.status === "completed"
     ) {
-      return res
-        .status(400)
-        .json({
-          message: "You cannot cancel an approved or completed appointment",
-        });
+      return res.status(400).json({
+        message: "You cannot cancel an approved or completed appointment",
+      });
     }
 
     // Update appointment status to "canceled"
