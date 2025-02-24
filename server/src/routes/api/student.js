@@ -1,4 +1,5 @@
 import express from "express";
+import moment from "moment";
 import { authenticateToken } from "../../middleware/index.js";
 import { User, AvailableHour, Appointment } from "../../models/index.js";
 const router = express.Router();
@@ -66,14 +67,25 @@ router.get("/search-teachers", async (req, res) => {
 });
 
 //get teacher available hours and booked
-router.get("/teacher/:id/slots", async (req, res) => {
+router.get("/teacher/:id/upcoming-booked-slots", async (req, res) => {
   try {
-    const availableHours = await AvailableHour.find({ teacher: req.params.id });
+    const today = new Date();
+    today.setHours(0, 0, 0, 0); 
 
+    const availableHours = await AvailableHour.find({
+      teacher: req.params.id,
+      date: { $gte: today }, 
+    }).lean();
+
+   
     const bookedAppointments = await Appointment.find({
       teacher: req.params.id,
-    }).select("date slots");
+      date: { $gte: today },
+    })
+      .select("date slots")
+      .lean();
 
+   
     const bookedSlotsSet = new Set(
       bookedAppointments.map(
         (appt) =>
@@ -81,22 +93,25 @@ router.get("/teacher/:id/slots", async (req, res) => {
       )
     );
 
-    const formattedSlots = availableHours.map((day) => ({
-      day: day.day,
-      slots: day.slots.map((slot) => ({
-        startTime: slot.startTime,
-        endTime: slot.endTime,
-        isBooked: bookedSlotsSet.has(
-          `${day.date.toISOString().split("T")[0]} ${slot.startTime}`
-        ),
-      })),
-    }));
+    const formattedSlots = availableHours
+      .filter((day) => new Date(day.date) >= today) 
+      .map((day) => ({
+        date: day.date.toISOString().split("T")[0], 
+        day: moment(day.date).format("dddd"), 
+        slots: day.slots.map((slot) => ({
+          startTime: slot.startTime,
+          endTime: slot.endTime,
+          isBooked: bookedSlotsSet.has(`${day.date.toISOString().split("T")[0]} ${slot.startTime}`),
+        })),
+      }));
 
-    res.status(200).json({ availableSlots: formattedSlots });
+    res.status(200).json({ teacherUpcomingBookedSlots: formattedSlots });
   } catch (error) {
+    console.error("Error fetching upcoming booked slots:", error);
     res.status(500).json({ message: "Server error", error });
   }
 });
+
 
 //students booked an appoinment
 router.post("/appoinment", authenticateToken, async (req, res) => {
