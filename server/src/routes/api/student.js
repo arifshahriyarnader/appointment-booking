@@ -70,14 +70,13 @@ router.get("/search-teachers", async (req, res) => {
 router.get("/teacher/:id/upcoming-booked-slots", async (req, res) => {
   try {
     const today = new Date();
-    today.setHours(0, 0, 0, 0); 
+    today.setHours(0, 0, 0, 0);
 
     const availableHours = await AvailableHour.find({
       teacher: req.params.id,
-      date: { $gte: today }, 
+      date: { $gte: today },
     }).lean();
 
-   
     const bookedAppointments = await Appointment.find({
       teacher: req.params.id,
       date: { $gte: today },
@@ -85,7 +84,6 @@ router.get("/teacher/:id/upcoming-booked-slots", async (req, res) => {
       .select("date slots")
       .lean();
 
-   
     const bookedSlotsSet = new Set(
       bookedAppointments.map(
         (appt) =>
@@ -94,14 +92,16 @@ router.get("/teacher/:id/upcoming-booked-slots", async (req, res) => {
     );
 
     const formattedSlots = availableHours
-      .filter((day) => new Date(day.date) >= today) 
+      .filter((day) => new Date(day.date) >= today)
       .map((day) => ({
-        date: day.date.toISOString().split("T")[0], 
-        day: moment(day.date).format("dddd"), 
+        date: day.date.toISOString().split("T")[0],
+        day: moment(day.date).format("dddd"),
         slots: day.slots.map((slot) => ({
           startTime: slot.startTime,
           endTime: slot.endTime,
-          isBooked: bookedSlotsSet.has(`${day.date.toISOString().split("T")[0]} ${slot.startTime}`),
+          isBooked: bookedSlotsSet.has(
+            `${day.date.toISOString().split("T")[0]} ${slot.startTime}`
+          ),
         })),
       }));
 
@@ -112,9 +112,8 @@ router.get("/teacher/:id/upcoming-booked-slots", async (req, res) => {
   }
 });
 
-
 //students booked an appoinment
-router.post("/appoinment", authenticateToken, async (req, res) => {
+router.post("/appointment", authenticateToken, async (req, res) => {
   try {
     if (req.user.role !== "student") {
       return res

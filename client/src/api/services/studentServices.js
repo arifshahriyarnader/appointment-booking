@@ -49,12 +49,20 @@ export const checkTeacherBookedSlots = async (teacherId) => {
   }
 };
 
-export const bookAppointment = async () => {
+export const bookAppointment = async (appointmentData) => {
   try {
-    const response = http.post("/api/student-appointment/appoinment");
-    console.log("Appointmnet Booked", response.data);
+    console.log("Attempting to book appointment:", appointmentData);
+
+    const response = await http.post(
+      "/api/student-appointment/appointment",
+      appointmentData
+    );
+
+    console.log("Response after booking:", response.data);
     return response.data;
   } catch (error) {
-    console.log(error);
+    console.error("Error booking appointment:", error);
+    console.error("Error response:", error.response?.data);
+    throw error;
   }
 };
