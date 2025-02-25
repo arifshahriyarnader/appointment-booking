@@ -42,6 +42,8 @@ export const Signin = () => {
         navigate("/teacher-dashboard");
       } else if (user.role === "student") {
         navigate("/student-dashboard");
+      } else if (user.role === "admin") {
+        navigate("/admin-dashboard");
       } else {
         alert("Login successful!");
       }

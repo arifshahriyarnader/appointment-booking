@@ -1,5 +1,6 @@
 import { Route, Routes } from "react-router-dom";
 import {
+  AdminDashboardPage,
   SigninPage,
   SignupPage,
   StudentDashboardPage,
@@ -34,6 +35,14 @@ const AppRouter = () => {
         element={
           <SecureRoute>
             <TeacherProfilePage />
+          </SecureRoute>
+        }
+      />
+      <Route
+        path="/admin-dashboard"
+        element={
+          <SecureRoute>
+            <AdminDashboardPage />
           </SecureRoute>
         }
       />
