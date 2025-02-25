@@ -67,35 +67,50 @@ export const bookAppointment = async (appointmentData) => {
   }
 };
 
-export const checkAppointmentStatus=async() =>{
-  try{
-    const response=await http.get("/api/student-appointment/appointment-status");
-    console.log("Appointment Status:",response.data)
-    return response.data
+export const checkAppointmentStatus = async () => {
+  try {
+    const response = await http.get(
+      "/api/student-appointment/appointment-status"
+    );
+    console.log("Appointment Status:", response.data);
+    return response.data;
+  } catch (error) {
+    console.log(error);
   }
-  catch(error){
-    console.log(error)
-  }
-}
+};
 
-export const todaysAppointmentList=async()=>{
-  try{
-    const response=await http.get("/api/student-appointment/appointment/today");
+export const todaysAppointmentList = async () => {
+  try {
+    const response = await http.get(
+      "/api/student-appointment/appointment/today"
+    );
     console.log("Todays Appointments List:", response.data);
-    return response.data
+    return response.data;
+  } catch (error) {
+    console.log(error);
   }
-  catch(error){
-    console.log(error)
-  }
-}
+};
 
-export const pastAppointmentList=async() =>{
-  try{
-    const response=await http.get("/api/student-appointment/appointment/history");
+export const pastAppointmentList = async () => {
+  try {
+    const response = await http.get(
+      "/api/student-appointment/appointment/history"
+    );
     console.log("Past Appointments List:", response.data);
-    return response.data
+    return response.data;
+  } catch (error) {
+    console.log(error);
   }
-  catch(error){
-    console.log(error)
+};
+
+export const upcomingAppointmentList = async () => {
+  try {
+    const response = await http.get(
+      "/api/student-appointment/appointment/upcoming"
+    );
+    console.log("Past Appointments List:", response.data);
+    return response.data;
+  } catch (error) {
+    console.log(error);
   }
-}
+};

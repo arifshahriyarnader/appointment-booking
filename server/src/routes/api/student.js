@@ -261,8 +261,8 @@ router.get("/appointment/history", authenticateToken, async (req, res) => {
       _id: appointment._id,
       teacher: appointment.teacher,
       date: appointment.date,
-      agenda: appointment.agenda, // Include agenda
-      slots: appointment.slots, // Include time slots
+      agenda: appointment.agenda, 
+      slots: appointment.slots,
       status:
         appointment.status === "approved" ? "Completed" : appointment.status, // Shows "Completed" if approved
     }));
