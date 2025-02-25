@@ -66,3 +66,14 @@ export const bookAppointment = async (appointmentData) => {
     throw error;
   }
 };
+
+export const checkAppointmentStatus=async() =>{
+  try{
+    const response=await http.get("/api/student-appointment/appointment-status");
+    console.log("Appointment Status:",response.data)
+    return response.data
+  }
+  catch(error){
+    console.log(error)
+  }
+}

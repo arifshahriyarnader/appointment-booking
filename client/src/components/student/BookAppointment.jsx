@@ -78,16 +78,13 @@ const BookAppointment = () => {
       course,
       agenda,
     };
-
     console.log("Sending appointment data:", appointmentData);
-
     try {
       const response = await bookAppointment(appointmentData);
       console.log("Response after booking:", response);
 
       if (response?.message) {
         alert(response.message);
-
         setSelectedTeacher("");
         setAvailableDates([]);
         setSelectedDate("");
@@ -100,7 +97,6 @@ const BookAppointment = () => {
       console.log("Error in handleBookAppointment:", error);
     }
   };
-
   return (
     <div className="max-w-lg mx-auto p-6 bg-white rounded-lg shadow-md">
       <h2 className="text-xl font-semibold mb-4">Book an Appointment</h2>

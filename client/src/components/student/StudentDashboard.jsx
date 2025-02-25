@@ -8,7 +8,6 @@ import {
   BookAppointment,
   DailyAppointmentList,
   PastAppointmentList,
-  TeacherBookedSlots,
   UpcomingAppointmentList,
 } from "./index";
 import { searchTeachers } from "../../api/services/studentServices";
@@ -88,17 +87,18 @@ export const StudentDashboard = () => {
             <li>
               <button
                 className="w-full p-2 bg-blue-600 hover:bg-blue-700 rounded"
-                onClick={() => setSelectedOption("appointmentStatus")}
-              >
-                Appointment Status
-              </button>
-            </li>
-            <li>
-              <button
-                className="w-full p-2 bg-blue-600 hover:bg-blue-700 rounded"
                 onClick={() => setSelectedOption("bookAppointment")}
               >
                 Book an Appointment
+              </button>
+            </li>
+
+            <li>
+              <button
+                className="w-full p-2 bg-blue-600 hover:bg-blue-700 rounded"
+                onClick={() => setSelectedOption("appointmentStatus")}
+              >
+                Appointment Status
               </button>
             </li>
             <li>
@@ -118,14 +118,6 @@ export const StudentDashboard = () => {
                 Past Appointment History
               </button>
             </li>
-            <li>
-              <button
-                className="w-full p-2 bg-blue-600 hover:bg-blue-700 rounded"
-                onClick={() => setSelectedOption("teacherBookedSlot")}
-              >
-                Teacher Booked Slot
-              </button>
-            </li>
 
             <li>
               <button
@@ -143,15 +135,14 @@ export const StudentDashboard = () => {
           {selectedOption === "allTeacher" && (
             <AllTeacher searchResults={searchResults} />
           )}
-          {selectedOption === "appointmentStatus" && <AppointmentStatus />}
           {selectedOption === "bookAppointment" && <BookAppointment />}
+          {selectedOption === "appointmentStatus" && <AppointmentStatus />}
           {selectedOption === "dailyAppointmentSchedule" && (
             <DailyAppointmentList />
           )}
           {selectedOption === "pastAppointmentHistory" && (
             <PastAppointmentList />
           )}
-          {selectedOption === "teacherBookedSlot" && <TeacherBookedSlots />}
           {selectedOption === "upcomingAppointmentSchedule" && (
             <UpcomingAppointmentList />
           )}
