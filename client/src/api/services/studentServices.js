@@ -77,3 +77,14 @@ export const checkAppointmentStatus=async() =>{
     console.log(error)
   }
 }
+
+export const todaysAppointmentList=async()=>{
+  try{
+    const response=await http.get("/api/student-appointment/appointment/today");
+    console.log("Todays Appointments List:", response.data);
+    return response.data
+  }
+  catch(error){
+    console.log(error)
+  }
+}

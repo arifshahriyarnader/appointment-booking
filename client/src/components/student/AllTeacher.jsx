@@ -5,6 +5,7 @@ import { getAllTeachersList } from "../../api/services/studentServices";
 
 const AllTeacher = ({ searchResults }) => {
   const [teachers, setTeachers] = useState([]);
+
   const [loading, setLoading] = useState(true);
   const navigate = useNavigate();
 
@@ -35,7 +36,6 @@ const AllTeacher = ({ searchResults }) => {
   return (
     <div className="p-6 bg-white shadow-md rounded-lg">
       <h2 className="text-xl font-bold mb-4">All Teachers List</h2>
-
       {loading ? (
         <p>Loading...</p>
       ) : teachers.length === 0 ? (
