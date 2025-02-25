@@ -47,7 +47,7 @@ const PastAppointmentSchedule = () => {
               <tr key={pastAppointment._id} className="text-center">
                 <td className="border p-2">{pastAppointment.student.name}</td>
                 <td className="border p-2">{pastAppointment.student.email}</td>
-                <td className="border p-2">{pastAppointment.teacher.course}</td>
+                <td className="border p-2">{pastAppointment.course}</td>
                 <td className="border p-2">{pastAppointment.agenda}</td>
                 <td className="border p-2">
                   {" "}
