@@ -88,3 +88,14 @@ export const todaysAppointmentList=async()=>{
     console.log(error)
   }
 }
+
+export const pastAppointmentList=async() =>{
+  try{
+    const response=await http.get("/api/student-appointment/appointment/history");
+    console.log("Past Appointments List:", response.data);
+    return response.data
+  }
+  catch(error){
+    console.log(error)
+  }
+}
