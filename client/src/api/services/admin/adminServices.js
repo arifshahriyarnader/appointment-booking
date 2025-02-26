@@ -18,3 +18,30 @@ export const userRegistrationRequestUpdate = async (id, status) => {
     console.log(error);
   }
 };
+
+export const getAllTeacher = async () => {
+  try {
+    const response = await http.get("/api/users/all-teachers");
+    return response.data;
+  } catch (error) {
+    console.log(error);
+  }
+};
+
+export const getAllStudent = async () => {
+  try {
+    const response = await http.get("/api/users/all-students");
+    return response.data;
+  } catch (error) {
+    console.log(error);
+  }
+};
+
+export const deleteUser = async (id) => {
+  try {
+    const response = await http.delete(`/api/users/users/${id}`);
+    return response.data;
+  } catch (error) {
+    console.log(error);
+  }
+};
