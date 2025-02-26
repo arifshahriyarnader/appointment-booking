@@ -180,6 +180,28 @@ router.get("/all-teachers", authenticateToken, async (req, res) => {
   }
 });
 
+//view registration request (admin only)
+router.get("/registration-request", authenticateToken, async (req, res) => {
+  try {
+    if (req.user.role !== "admin") {
+      return res.status(403).json({
+        message: "Only admin can view who sent the registration request",
+      });
+    }
+    const userRequest = await User.find({ status: "pending" }).select(
+      "name email role department course studentId status createdAt"
+    );
+    if (userRequest === 0) {
+      return res
+        .status(404)
+        .json({ message: "No pending registration request" });
+    }
+    res.status(200).json({ userRequest });
+  } catch (error) {
+    res.status(500).json({ message: "Something went wrong", error });
+  }
+});
+
 //approve or reject user (only admin)
 router.put("/users/:id", authenticateToken, async (req, res) => {
   try {
