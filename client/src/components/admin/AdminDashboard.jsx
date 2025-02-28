@@ -29,7 +29,7 @@ export const AdminDashboard = () => {
         <h2 className="text-xl font-bold">Admin Dashboard</h2>
         <button
           onClick={handleLogout}
-          className="bg-red-600 hover:bg-red-700 text-white py-2 px-4 rounded"
+          className="bg-red-600 hover:bg-red-700 text-white py-2 px-4 rounded cursor-pointer"
         >
           Logout
         </button>

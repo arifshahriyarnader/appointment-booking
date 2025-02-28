@@ -5,7 +5,6 @@ There are three functionalities in this project:
 3. Student
 
 Features: 
-
 1. Admin:
 	- Admin approves or rejects user registration request, without admin approval, the user can't be logged in
 	- Admin can create and delete teacher and student
