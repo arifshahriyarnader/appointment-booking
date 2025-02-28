@@ -1,8 +1,10 @@
 Booking Appointment Project between the university teacher and the student using Express JS, React JS, MongoDB, and Tailwind CSS
 There are three functionalities in this project:
-	=> Admin
-	=> Teacher
-	=> Student
+1. Admin
+2. Teacher
+3. Student
+
+Features: 
 
 1. Admin:
 	- Admin approves or rejects user registration request, without admin approval, the user can't be logged in
@@ -18,7 +20,7 @@ There are three functionalities in this project:
 	- Teacher can view appointment requests including date, course, and agenda.
 	- Teacher can approve or reject appointment requests.
 	- Teacher can view daily, upcoming, and past appointment schedules including course names, student names, agendas, date, and time slot.
-    
+
 
 3. Student:
 	- Students can sign up with a student name, email, password, student ID, and department. After the admin user registration approval then the user can be logged in.
