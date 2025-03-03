@@ -23,7 +23,7 @@ const GetAllStudent = () => {
 
   const handleDelete = async (id) => {
     const isConfirmed = window.confirm(
-      "Are you sure you want to delete this teacher?"
+      "Are you sure you want to delete this student?"
     );
     if (isConfirmed) {
       try {

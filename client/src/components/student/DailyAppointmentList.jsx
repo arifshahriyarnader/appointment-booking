@@ -16,7 +16,8 @@ const DailyAppointmentList = () => {
           setMessage("You have no appointment schedule for today");
         }
       } catch (error) {
-        setMessage("Error fetching appointments",error);
+        console.error("Error fetching appointments:", error);
+        setMessage("Error fetching appointments");
       } finally {
         setLoading(false);
       }
@@ -36,7 +37,9 @@ const DailyAppointmentList = () => {
           <thead>
             <tr className="bg-gray-200">
               <th className="border border-gray-300 px-4 py-2">Teacher Name</th>
-              <th className="border border-gray-300 px-4 py-2">Teacher Email</th>
+              <th className="border border-gray-300 px-4 py-2">
+                Teacher Email
+              </th>
               <th className="border border-gray-300 px-4 py-2">Course</th>
               <th className="border border-gray-300 px-4 py-2">Agenda</th>
               <th className="border border-gray-300 px-4 py-2">Date</th>
@@ -67,7 +70,11 @@ const DailyAppointmentList = () => {
                 </td>
                 <td
                   className={`border border-gray-300 px-4 py-2 font-semibold 
-                    ${appointment.status === "approved" ? "text-green-600" : "text-red-600"}`}
+                    ${
+                      appointment.status === "approved"
+                        ? "text-green-600"
+                        : "text-red-600"
+                    }`}
                 >
                   {appointment.status}
                 </td>

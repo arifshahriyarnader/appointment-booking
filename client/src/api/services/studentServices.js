@@ -87,7 +87,8 @@ export const todaysAppointmentList = async () => {
     console.log("Todays Appointments List:", response.data);
     return response.data;
   } catch (error) {
-    console.log(error);
+    console.error("Error in API call:", error);
+    return { error: true, message: "Failed to fetch appointments" };
   }
 };
 
