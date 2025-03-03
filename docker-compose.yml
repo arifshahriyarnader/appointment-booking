@@ -1,0 +1,36 @@
+services:
+  appointment-booking-server:
+    container_name: appointment-booking-server
+    build: 
+      context: ./server
+      dockerfile: Dockerfile
+    depends_on:
+      - appointment-booking-mongodb
+    ports:
+      - "5000:5000"
+    restart: on-failure
+    environment:  
+      - PORT=5000
+      - MONGODB_URI=mongodb://appointment-booking-mongodb:27017/appointment-booking
+      - JWT_SECRET=jigjbmbgmkfmkfmj458458945894554859y
+      - ALLOWED_ORIGIN=http://localhost:3000 
+
+  appointment-booking-mongodb:
+    image: mongo
+    container_name: appointment-booking-mongodb
+    ports:
+      - "27017:27017"
+
+  appointment-booking-client:
+    container_name: appointment-booking-client
+    build:
+      context: ./client
+      dockerfile: Dockerfile
+      args:
+        - VITE_BASE_URL=http://localhost:5000
+        - VITE_CURRENT_USER_KEY=APPOINTMENT_BOOKING_LOGGED_IN_USER
+    ports:
+      - "3000:80"
+    depends_on:
+      - appointment-booking-server
+

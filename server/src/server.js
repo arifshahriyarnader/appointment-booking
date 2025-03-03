@@ -8,7 +8,13 @@ import configureRoutes from "./routes/api/index.js";
 const app = express();
 
 app.use(bodyParser.json());
-app.use(cors({ origin: appConfig.ALLOWED_ORIGIN }));
+//app.use(cors({ origin: appConfig.ALLOWED_ORIGIN }));
+app.use(cors({
+  origin: "*",  // Fallback to allow all if not set
+  methods: ["GET", "POST", "PUT", "DELETE"],
+  allowedHeaders: ["Content-Type", "Authorization"],
+  credentials: true  // Important for cookies and auth headers
+}));
 app.use(express.json());
 
 //db
