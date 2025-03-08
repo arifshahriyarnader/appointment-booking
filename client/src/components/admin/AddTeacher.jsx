@@ -1,16 +1,18 @@
 import { useState } from "react";
 import { addTeacher } from "../../api/services/admin/adminServices";
+import { EyeIcon, EyeOffIcon } from "lucide-react";
 
 const AddTeacher = () => {
   const [formData, setFormData] = useState({
     name: "",
     email: "",
     password: "",
-    role: "teacher", 
+    role: "teacher",
     department: "",
     course: "",
   });
-  const [loading, setLoading] = useState(false); 
+  const [loading, setLoading] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
 
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
@@ -71,15 +73,24 @@ const AddTeacher = () => {
           className="w-full p-2 border border-gray-300 rounded-md"
           required
         />
-        <input
-          type="password"
-          name="password"
-          value={formData.password}
-          onChange={handleChange}
-          placeholder="Password"
-          className="w-full p-2 border border-gray-300 rounded-md"
-          required
-        />
+        <div className="relative">
+          <input
+            type={showPassword ? "text" : "password"}
+            name="password"
+            value={formData.password}
+            onChange={handleChange}
+            placeholder="Password"
+            className="w-full p-2 border border-gray-300 rounded-md"
+            required
+          />
+          <span
+            onClick={() => setShowPassword(!showPassword)}
+            className="absolute inset-y-0 right-3 cursor-pointer flex items-center text-gray-500 hover:text-gray-700"
+          >
+            {showPassword ? <EyeOffIcon size={20} /> : <EyeIcon size={20} />}
+          </span>
+        </div>
+
         <input
           type="text"
           name="department"

@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { Link } from "react-router-dom";
 import { authServices } from "../../auth";
+import { EyeIcon, EyeOffIcon } from "lucide-react";
 
 export const SignupForm = () => {
   const [role, setRole] = useState("teacher");
@@ -13,6 +14,7 @@ export const SignupForm = () => {
     studentId: "",
     honeypot: "",
   });
+  const [showPassword, setShowPassword] = useState(false);
 
   // Handle input changes
   const handleChange = (e) => {
@@ -110,8 +112,9 @@ export const SignupForm = () => {
             className="w-full px-3 py-2 border rounded"
             required
           />
+          <div className="relative">
           <input
-            type="password"
+            type={showPassword ? "text" : "password"}
             name="password"
             placeholder="Password"
             value={formData.password}
@@ -119,6 +122,13 @@ export const SignupForm = () => {
             className="w-full px-3 py-2 border rounded"
             required
           />
+          <span
+              onClick={() => setShowPassword(!showPassword)}
+              className="absolute inset-y-0 right-3  mt-[5px] cursor-pointer flex items-center text-gray-500 hover:text-gray-700"
+            >
+              {showPassword ? <EyeOffIcon size={20} /> : <EyeIcon size={20} />}
+            </span>
+          </div>
           <input
             type="text"
             name="department"

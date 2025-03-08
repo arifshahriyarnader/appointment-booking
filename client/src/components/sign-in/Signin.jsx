@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { EyeIcon, EyeOffIcon } from "lucide-react";
 import { Link, useNavigate } from "react-router-dom";
 import { authServices } from "../../auth";
 export const Signin = () => {
@@ -7,6 +8,7 @@ export const Signin = () => {
     email: "",
     password: "",
   });
+  const [showPassword, setShowPassword] = useState(false);
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
@@ -75,12 +77,12 @@ export const Signin = () => {
               required
             />
           </div>
-          <div className="mb-4">
+          <div className="mb-4 relative">
             <label className="block text-gray-700 text-sm font-bold mb-2">
               Password
             </label>
             <input
-              type="password"
+              type={showPassword ? "text" : "password"}
               name="password"
               placeholder="Password"
               value={formData.password}
@@ -88,6 +90,12 @@ export const Signin = () => {
               className="w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
               required
             />
+            <span
+              onClick={() => setShowPassword(!showPassword)}
+              className="absolute inset-y-0 right-3  mt-[25px] cursor-pointer flex items-center text-gray-500 hover:text-gray-700"
+            >
+              {showPassword ? <EyeOffIcon size={20} /> : <EyeIcon size={20} />}
+            </span>
           </div>
           <button
             type="submit"
