@@ -2,6 +2,7 @@ import { useState } from "react";
 import { Link } from "react-router-dom";
 import { authServices } from "../../auth";
 import { EyeIcon, EyeOffIcon } from "lucide-react";
+import { CustomAlert } from "../../common/components";
 
 export const SignupForm = () => {
   const [role, setRole] = useState("teacher");
@@ -15,6 +16,8 @@ export const SignupForm = () => {
     honeypot: "",
   });
   const [showPassword, setShowPassword] = useState(false);
+  const [alertOpen, setAlertOpen] = useState(false);
+  const [alertMessage, setAlertMessage] = useState({title:"", description:""})
 
   // Handle input changes
   const handleChange = (e) => {
@@ -50,7 +53,11 @@ export const SignupForm = () => {
 
     try {
       await authServices.signup(payload);
-      alert("User Registration Successful. Awaiting admin approval");
+      setAlertMessage({
+        title:"User Registration Successful",
+        description:"Awaiting admin approval",
+      })
+      setAlertOpen(true);
       // Reset form fields
       setFormData({
         name: "",
@@ -63,7 +70,11 @@ export const SignupForm = () => {
       });
     } catch (error) {
       console.error("Signup error:", error.response?.data || error.message);
-      alert("Failed to sign up");
+      setAlertMessage({
+        title:"Failed to sign up",
+        description: error.response?.data?.message || error.message,
+      })
+      setAlertOpen(true);
     }
   };
 
@@ -180,6 +191,7 @@ export const SignupForm = () => {
           >
             Register
           </button>
+          <CustomAlert open={alertOpen} setOpen={setAlertOpen} {...alertMessage} />
           <p className="text-center mt-4 text-gray-600">
             Already have an account?{" "}
             <Link
