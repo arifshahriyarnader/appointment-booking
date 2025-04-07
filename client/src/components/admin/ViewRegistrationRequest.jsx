@@ -3,9 +3,17 @@ import {
   userRegistrationRequest,
   userRegistrationRequestUpdate,
 } from "../../api/services/admin/adminServices";
+import { CustomAlert } from "../../common/components";
 
 const ViewRegistrationRequest = () => {
   const [requests, setRequests] = useState([]);
+  const [alertOpen, setAlertOpen] = useState(false);
+  const [alertMessage, setAlertMessage] = useState({
+    title: "",
+    description: "",
+  });
+  const [confirmOpen, setConfirmOpen] = useState(false);
+  const [currentAction, setCurrentAction] = useState({ id: null, status: "" });
 
   useEffect(() => {
     fetchRequests();
@@ -17,28 +25,60 @@ const ViewRegistrationRequest = () => {
       setRequests(data.userRequest || []);
     } catch (error) {
       console.log(error);
+      setAlertMessage({
+        title: "Error",
+        description: "Failed to fetch registration requests",
+      });
+      setAlertOpen(true);
     }
   };
 
-  const handleUpdateStatus = async (id, status) => {
-    if (
-      !window.confirm(
-        `Are you sure you want to mark this registration request as ${status}`
-      )
-    )
-      return;
+  const showConfirmation = (id, status) => {
+    setCurrentAction({ id, status });
+    setAlertMessage({
+      title: "Confirm Action",
+      description: `Are you sure you want to mark this registration request as ${status}?`,
+      variant: "default",
+      showCancel: true,
+    });
+    setConfirmOpen(true);
+  };
+
+  const handleUpdateStatus = async () => {
     try {
-      await userRegistrationRequestUpdate(id, { status });
+      await userRegistrationRequestUpdate(currentAction.id, {
+        status: currentAction.status,
+      });
       fetchRequests();
-      alert(`Registration Request ${status} successfully`);
+      setAlertMessage({
+        title: "Success",
+        description: `Registration Request ${currentAction.status} successfully`,
+        variant: "success",
+      });
+      setAlertOpen(true);
     } catch (error) {
       console.log(error);
+      setAlertMessage({
+        title: "Error",
+        description: "Failed to update registration request",
+        variant: "destructive",
+      });
+      setAlertOpen(true);
+    } finally {
+      setConfirmOpen(false);
     }
   };
 
   return (
     <div className="p-6">
       <h2 className="text-xl font-bold mb-4">User Registration Requests</h2>
+      <CustomAlert
+        open={confirmOpen}
+        setOpen={setConfirmOpen}
+        onConfirm={handleUpdateStatus}
+        {...alertMessage}
+      />
+      <CustomAlert open={alertOpen} setOpen={setAlertOpen} {...alertMessage} />
       <div className="overflow-x-auto">
         <table className="w-full border-collapse border border-gray-300">
           <thead>
@@ -74,17 +114,13 @@ const ViewRegistrationRequest = () => {
                     {user.status === "pending" && (
                       <div className="flex gap-2">
                         <button
-                          onClick={() =>
-                            handleUpdateStatus(user._id, "approved")
-                          }
+                          onClick={() => showConfirmation(user._id, "approved")}
                           className="bg-green-500 text-white px-2 py-1 rounded mr-2"
                         >
                           Approve
                         </button>
                         <button
-                          onClick={() =>
-                            handleUpdateStatus(user._id, "rejected")
-                          }
+                          onClick={() => showConfirmation(user._id, "rejected")}
                           className="bg-red-500 text-white px-2 py-1 rounded"
                         >
                           Reject

@@ -17,7 +17,10 @@ export const SignupForm = () => {
   });
   const [showPassword, setShowPassword] = useState(false);
   const [alertOpen, setAlertOpen] = useState(false);
-  const [alertMessage, setAlertMessage] = useState({title:"", description:""})
+  const [alertMessage, setAlertMessage] = useState({
+    title: "",
+    description: "",
+  });
 
   // Handle input changes
   const handleChange = (e) => {
@@ -54,9 +57,9 @@ export const SignupForm = () => {
     try {
       await authServices.signup(payload);
       setAlertMessage({
-        title:"User Registration Successful",
-        description:"Awaiting admin approval",
-      })
+        title: "User Registration Successful",
+        description: "Awaiting admin approval",
+      });
       setAlertOpen(true);
       // Reset form fields
       setFormData({
@@ -71,9 +74,9 @@ export const SignupForm = () => {
     } catch (error) {
       console.error("Signup error:", error.response?.data || error.message);
       setAlertMessage({
-        title:"Failed to sign up",
+        title: "Failed to sign up",
         description: error.response?.data?.message || error.message,
-      })
+      });
       setAlertOpen(true);
     }
   };
@@ -124,16 +127,16 @@ export const SignupForm = () => {
             required
           />
           <div className="relative">
-          <input
-            type={showPassword ? "text" : "password"}
-            name="password"
-            placeholder="Password"
-            value={formData.password}
-            onChange={handleChange}
-            className="w-full px-3 py-2 border rounded"
-            required
-          />
-          <span
+            <input
+              type={showPassword ? "text" : "password"}
+              name="password"
+              placeholder="Password"
+              value={formData.password}
+              onChange={handleChange}
+              className="w-full px-3 py-2 border rounded"
+              required
+            />
+            <span
               onClick={() => setShowPassword(!showPassword)}
               className="absolute inset-y-0 right-3  mt-[5px] cursor-pointer flex items-center text-gray-500 hover:text-gray-700"
             >
@@ -191,7 +194,11 @@ export const SignupForm = () => {
           >
             Register
           </button>
-          <CustomAlert open={alertOpen} setOpen={setAlertOpen} {...alertMessage} />
+          <CustomAlert
+            open={alertOpen}
+            setOpen={setAlertOpen}
+            {...alertMessage}
+          />
           <p className="text-center mt-4 text-gray-600">
             Already have an account?{" "}
             <Link
