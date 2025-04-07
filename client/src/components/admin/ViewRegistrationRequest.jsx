@@ -72,12 +72,14 @@ const ViewRegistrationRequest = () => {
   return (
     <div className="p-6">
       <h2 className="text-xl font-bold mb-4">User Registration Requests</h2>
+      { /* confirmation alert */}
       <CustomAlert
         open={confirmOpen}
         setOpen={setConfirmOpen}
         onConfirm={handleUpdateStatus}
         {...alertMessage}
       />
+      { /* result alert */}
       <CustomAlert open={alertOpen} setOpen={setAlertOpen} {...alertMessage} />
       <div className="overflow-x-auto">
         <table className="w-full border-collapse border border-gray-300">

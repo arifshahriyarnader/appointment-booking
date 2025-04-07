@@ -9,18 +9,22 @@ import {
   GetAllTeacher,
   ViewRegistrationRequest,
 } from "./index";
+import { CustomAlert } from "@/common/components";
 
 export const AdminDashboard = () => {
   const [selectedOption, setSelectedOption] = useState(
     "viewRegistrationRequest"
   );
+  const [logoutAlertOpen, setLogoutAlertOpen] = useState(false);
   const navigate = useNavigate();
   const handleLogout = () => {
     const user = JSON.parse(localStorage.getItem(appConfig.CURRENT_USER_KEY));
     authServices.logout();
     localStorage.removeItem(user);
-    alert("Logged out successfully!");
     navigate("/login");
+  };
+  const showLogoutConfirmation = () => {
+    setLogoutAlertOpen(true);
   };
   return (
     <div className="flex flex-col h-screen w-full">
@@ -28,12 +32,22 @@ export const AdminDashboard = () => {
       <header className="flex justify-between items-center bg-gray-800 text-white p-4 w-full">
         <h2 className="text-xl font-bold">Admin Dashboard</h2>
         <button
-          onClick={handleLogout}
+          onClick={showLogoutConfirmation}
           className="bg-red-600 hover:bg-red-700 text-white py-2 px-4 rounded cursor-pointer"
         >
           Logout
         </button>
       </header>
+
+      {/* Logout Confirmation Alert */}
+      <CustomAlert
+        open={logoutAlertOpen}
+        setOpen={setLogoutAlertOpen}
+        title="Confirm Logout"
+        description="Are you sure you want to logout?"
+        showCancel={true}
+        onConfirm={handleLogout}
+      />
 
       <div className="flex flex-grow w-full">
         {/* Left Sidebar */}
