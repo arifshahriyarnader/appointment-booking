@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { addStudent } from "../../api/services/admin/adminServices";
 import { EyeIcon, EyeOffIcon } from "lucide-react";
+import { CustomAlert } from "../../common/components";
 
 const AddStudent = () => {
   const [formData, setFormData] = useState({
@@ -13,6 +14,9 @@ const AddStudent = () => {
   });
   const [loading, setLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
+  const [alertOpen, setAlertOpen] = useState(false);
+  const [alertMessage, setAlertMessage] = useState({
+    title:"",description:""});
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
@@ -22,7 +26,12 @@ const AddStudent = () => {
     try {
       const response = await addStudent(formData);
       if (response?.user) {
-        alert("Student added successfully");
+        //alert("Student added successfully");
+        setAlertMessage({
+          title: "Success",
+          description: "Student added successfully",
+          variant: "success",
+        })
         setFormData({
           name: "",
           email: "",
@@ -32,11 +41,21 @@ const AddStudent = () => {
           studentId: "",
         });
       } else {
-        alert("Something went wrong. Please try agaain");
+        //alert("Something went wrong. Please try agaain");
+        setAlertMessage({
+          title: "Error",
+          description: "Something went wrong. Please try again.",
+          variant: "destructive",
+        })
       }
     } catch (error) {
       console.error("Error adding student", error);
-      alert(`Failed to add student`);
+      //alert(`Failed to add student`);
+      setAlertMessage({
+        title:"Error",
+        description:error.response?.data?.message || "Failed to add student",
+        variant:"destructive",
+      })
     } finally {
       setLoading(false);
     }
@@ -108,6 +127,7 @@ const AddStudent = () => {
           {loading ? "Adding..." : "Add Student"}
         </button>
       </form>
+      <CustomAlert open={alertOpen} setOpen={setAlertOpen} {...alertMessage} />
     </div>
   );
 };

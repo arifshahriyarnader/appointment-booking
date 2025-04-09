@@ -9,7 +9,7 @@ import {
   GetAllTeacher,
   ViewRegistrationRequest,
 } from "./index";
-import { CustomAlert } from "@/common/components";
+import { CustomAlert } from "../../common/components";
 
 export const AdminDashboard = () => {
   const [selectedOption, setSelectedOption] = useState(
