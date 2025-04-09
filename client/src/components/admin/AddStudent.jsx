@@ -16,7 +16,9 @@ const AddStudent = () => {
   const [showPassword, setShowPassword] = useState(false);
   const [alertOpen, setAlertOpen] = useState(false);
   const [alertMessage, setAlertMessage] = useState({
-    title:"",description:""});
+    title: "",
+    description: "",
+  });
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
@@ -26,12 +28,11 @@ const AddStudent = () => {
     try {
       const response = await addStudent(formData);
       if (response?.user) {
-        //alert("Student added successfully");
         setAlertMessage({
           title: "Success",
           description: "Student added successfully",
           variant: "success",
-        })
+        });
         setFormData({
           name: "",
           email: "",
@@ -41,23 +42,23 @@ const AddStudent = () => {
           studentId: "",
         });
       } else {
-        //alert("Something went wrong. Please try agaain");
         setAlertMessage({
           title: "Error",
           description: "Something went wrong. Please try again.",
           variant: "destructive",
-        })
+        });
       }
     } catch (error) {
       console.error("Error adding student", error);
-      //alert(`Failed to add student`);
+
       setAlertMessage({
-        title:"Error",
-        description:error.response?.data?.message || "Failed to add student",
-        variant:"destructive",
-      })
+        title: "Error",
+        description: error.response?.data?.message || "Failed to add student",
+        variant: "destructive",
+      });
     } finally {
       setLoading(false);
+      setAlertOpen(true);
     }
   };
 
