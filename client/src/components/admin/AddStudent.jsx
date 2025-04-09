@@ -25,6 +25,7 @@ const AddStudent = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    setLoading(true);
     try {
       const response = await addStudent(formData);
       if (response?.user) {

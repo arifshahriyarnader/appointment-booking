@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { addTeacher } from "../../api/services/admin/adminServices";
 import { EyeIcon, EyeOffIcon } from "lucide-react";
+import { CustomAlert } from "../../common/components";
 
 const AddTeacher = () => {
   const [formData, setFormData] = useState({
@@ -13,6 +14,12 @@ const AddTeacher = () => {
   });
   const [loading, setLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
+  const [alertOpen,setAlertOpen] =useState(false);
+  const [alertMessage, setAlertMessage] =useState({
+    title:"",
+    description:"",
+    variant:"default"
+  })
 
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
@@ -27,7 +34,11 @@ const AddTeacher = () => {
       console.log("Teacher added response:", response);
 
       if (response?.user) {
-        alert("Teacher added successfully!");
+        setAlertMessage({
+          title:"Success",
+          description:"Teacher added successfully",
+          variant:"success"
+        })
         setFormData({
           name: "",
           email: "",
@@ -37,17 +48,24 @@ const AddTeacher = () => {
           course: "",
         });
       } else {
-        alert("Something went wrong. Please try again.");
+        setAlertMessage({
+          title:"Error",
+          description:"Something went wrong. Please try again.",
+          variant:"destructive"
+        })
       }
     } catch (error) {
       console.error("Error adding teacher:", error);
-      alert(
-        `Failed to add teacher! ${
+      setAlertMessage({
+        title:"Error",
+        description:`Failed to add teacher! ${
           error.response?.data?.message || error.message
-        }`
-      );
+        }`,
+        variant:"destructive"
+      })
     } finally {
       setLoading(false);
+      setAlertOpen(true);
     }
   };
 
@@ -118,6 +136,7 @@ const AddTeacher = () => {
           {loading ? "Adding..." : "Add Teacher"}
         </button>
       </form>
+      <CustomAlert open={alertOpen} setOpen={setAlertOpen} {...alertMessage} />
     </div>
   );
 };
