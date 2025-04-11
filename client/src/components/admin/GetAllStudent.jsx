@@ -4,9 +4,17 @@ import {
   deleteUser,
   getAllStudent,
 } from "../../api/services/admin/adminServices";
+import { CustomAlert } from "../../common/components";
 
 const GetAllStudent = () => {
   const [students, setStudents] = useState([]);
+  const [alertOpen, setAlertOpen] = useState(false);
+  const [alertMessage, setAlertMessage] = useState({
+    title: "",
+    description: "",
+  });
+  const [confirmOpen, setConfirmOpen] = useState(false);
+  const [currentAction, setCurrentAction] = useState({ id: null });
 
   useEffect(() => {
     fetchStudents();
@@ -18,28 +26,62 @@ const GetAllStudent = () => {
       setStudents(data.students || []);
     } catch (error) {
       console.log(error);
+      setAlertMessage({
+        title: "Error",
+        description:
+          error.response?.data?.message || "Failed to fetch students",
+        variant: "destructive",
+      });
+      setAlertOpen(true);
     }
   };
-
-  const handleDelete = async (id) => {
-    const isConfirmed = window.confirm(
-      "Are you sure you want to delete this student?"
-    );
-    if (isConfirmed) {
-      try {
-        await deleteUser(id);
-        alert("Student Deleted Successfully");
-        fetchStudents();
-      } catch (error) {
-        alert("Failed to student delete")
-        console.log(error);
-      }
+  const showConfirmation = (id) => {
+    setCurrentAction({ id });
+    setAlertMessage({
+      title: "Confirm Action",
+      description: "Are you sure you want to delete this student?",
+      variant: "default",
+      showCancel: true,
+    });
+    setConfirmOpen(true);
+  };
+  const handleDelete = async () => {
+    try {
+      const { id } = currentAction;
+      await deleteUser(id);
+      setAlertMessage({
+        title: "Success",
+        description: "Student deleted successfully",
+        variant: "success",
+      });
+      setAlertOpen(true);
+      fetchStudents();
+    } catch (error) {
+      console.log(error);
+      setAlertMessage({
+        title: "Error",
+        description:
+          error.response?.data?.message || "Failed to delete student!",
+        variant: "destructive",
+      });
+      setAlertOpen(true);
+    } finally {
+      setConfirmOpen(false);
     }
   };
 
   return (
     <div className="p-4">
       <h2 className="text-2xl font-semibold mb-4">All Students</h2>
+      {/* confirmation alert */}
+      <CustomAlert
+        open={confirmOpen}
+        setOpen={setConfirmOpen}
+        onConfirm={handleDelete}
+        {...alertMessage}
+      />
+      {/* result alert */}
+      <CustomAlert open={alertOpen} setOpen={setAlertOpen} {...alertMessage} />
       <table className="w-full border-collapse border border-gray-300 shadow-md">
         <thead>
           <tr className="bg-gray-200">
@@ -60,7 +102,7 @@ const GetAllStudent = () => {
                 <td className="border p-2">{student.studentId}</td>
                 <td className="border p-2">
                   <button
-                    onClick={() => handleDelete(student._id)}
+                    onClick={() => showConfirmation(student._id)}
                     className="bg-red-500 hover:bg-red-600 text-white font-semibold cursor-pointer px-4 py-1.5 rounded-md transition-all duration-200 shadow-md"
                   >
                     <Trash2 size={18} /> Delete
