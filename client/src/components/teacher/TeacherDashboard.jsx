@@ -10,16 +10,28 @@ import {
   UpcomingAppointmentSchedule,
   PastAppointmentSchedule,
 } from "./index";
+import { CustomAlert } from "../../common/components";
 
 export const TeacherDashboard = () => {
   const [selectedOption, setSelectedOption] = useState("addSlot");
+  const [logoutAlertOpen, setLogoutAlertOpen] = useState(false);
+  const [alertMessage, setAlertMessage] = useState({
+    title: "",
+    description: "",
+  });
   const navigate = useNavigate();
-
+  const showLogooutConfirmation = () => {
+    setAlertMessage({
+      title: "Confirm Logout",
+      description: "Are you sure you want to Logout?",
+      showCancel: true,
+    });
+    setLogoutAlertOpen(true);
+  };
   const handleLogout = () => {
     const user = JSON.parse(localStorage.getItem(appConfig.CURRENT_USER_KEY));
     authServices.logout();
     localStorage.removeItem(user);
-    alert("Logged out successfully!");
     navigate("/login");
   };
 
@@ -29,12 +41,18 @@ export const TeacherDashboard = () => {
       <header className="flex justify-between items-center bg-gray-800 text-white p-4 w-full">
         <h2 className="text-xl font-bold">Teacher Dashboard</h2>
         <button
-          onClick={handleLogout}
+          onClick={showLogooutConfirmation}
           className="bg-red-600 hover:bg-red-700 text-white py-2 px-4 rounded"
         >
           Logout
         </button>
       </header>
+      <CustomAlert
+        open={logoutAlertOpen}
+        setOpen={setLogoutAlertOpen}
+        onConfirm={handleLogout}
+        {...alertMessage}
+      />
 
       <div className="flex flex-grow w-full">
         {/* Left Sidebar */}
