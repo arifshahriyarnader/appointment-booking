@@ -11,19 +11,32 @@ import {
   UpcomingAppointmentList,
 } from "./index";
 import { searchTeachers } from "../../api/services/studentServices";
+import { CustomAlert } from "../../common/components";
 
 export const StudentDashboard = () => {
   const [selectedOption, setSelectedOption] = useState("allTeacher");
   const [searchQuery, setSearchQuery] = useState("");
   const [searchResults, setSearchResults] = useState([]);
+  const [logoutAlertOpen, setLogoutAlertOpen] = useState(false);
+  const [alertMessage, setAlertMessage] = useState({
+    title: "",
+    description: "",
+  });
   const navigate = useNavigate();
 
   const handleLogout = () => {
     const user = JSON.parse(localStorage.getItem(appConfig.CURRENT_USER_KEY));
     authServices.logout();
     localStorage.removeItem(user);
-    alert("Logged out successfully!");
     navigate("/login");
+  };
+  const showLogoutConfirmation = () => {
+    setAlertMessage({
+      title: "Confirm Logout",
+      description: "Are you sure you want to logout?",
+      showCancel: true,
+    });
+    setLogoutAlertOpen(true);
   };
 
   const handleSearch = async () => {
@@ -45,12 +58,19 @@ export const StudentDashboard = () => {
       <header className="flex justify-between items-center bg-gray-800 text-white p-4 w-full">
         <h2 className="text-xl font-bold">Student Dashboard</h2>
         <button
-          onClick={handleLogout}
+          onClick={showLogoutConfirmation}
           className="bg-red-600 hover:bg-red-700 text-white py-2 px-4 rounded cursor-pointer"
         >
           Logout
         </button>
       </header>
+
+      <CustomAlert
+        open={logoutAlertOpen}
+        setOpen={setLogoutAlertOpen}
+        onConfirm={handleLogout}
+        {...alertMessage}
+      />
 
       <div className="flex justify-end items-center p-4 bg-gray-100 w-full">
         <input
