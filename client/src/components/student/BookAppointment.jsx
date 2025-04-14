@@ -4,6 +4,7 @@ import {
   bookAppointment,
   getAllTeachersList,
 } from "../../api/services/studentServices";
+import { CustomAlert } from "../../common/components";
 
 const BookAppointment = () => {
   const [teachers, setTeachers] = useState([]);
@@ -14,6 +15,11 @@ const BookAppointment = () => {
   const [selectedSlot, setSelectedSlot] = useState(null);
   const [course, setCourse] = useState("");
   const [agenda, setAgenda] = useState("");
+  const [alertOpen, setAlertOpen] = useState(false);
+  const [alertMessage, setAlertMessage] = useState({
+    title: "",
+    description: "",
+  });
 
   useEffect(() => {
     fetchTeachers();
@@ -46,8 +52,8 @@ const BookAppointment = () => {
   const handleTeacherChange = (e) => {
     const teacherId = e.target.value;
     setSelectedTeacher(teacherId);
-    setSelectedDate(""); // Reset date when teacher changes
-    setTimeSlots([]); // Reset time slots
+    setSelectedDate("");
+    setTimeSlots([]);
     fetchAvailableSlots(teacherId);
   };
 
@@ -67,7 +73,11 @@ const BookAppointment = () => {
       !course ||
       !agenda
     ) {
-      alert("Please fill all fields!");
+      setAlertMessage({
+        title: "Error",
+        description: "Please fill all fields!",
+      });
+      setAlertOpen(true);
       return;
     }
 
@@ -84,7 +94,11 @@ const BookAppointment = () => {
       console.log("Response after booking:", response);
 
       if (response?.message) {
-        alert(response.message);
+        setAlertMessage({
+          title: "Success",
+          description: response.message,
+        });
+        setAlertOpen(true);
         setSelectedTeacher("");
         setAvailableDates([]);
         setSelectedDate("");
@@ -94,9 +108,16 @@ const BookAppointment = () => {
         setAgenda("");
       }
     } catch (error) {
-      console.log("Error in handleBookAppointment:", error);
+      setAlertMessage({
+        title: "Error",
+        description:
+          error.response?.data?.message ||
+          "Failed to book appointment. Please try again.",
+      });
+      setAlertOpen(true);
     }
   };
+
   return (
     <div className="max-w-lg mx-auto p-6 bg-white rounded-lg shadow-md">
       <h2 className="text-xl font-semibold mb-4">Book an Appointment</h2>
@@ -172,17 +193,11 @@ const BookAppointment = () => {
         <button
           type="submit"
           className="w-full bg-blue-500 text-white py-2 rounded"
-          disabled={
-            !selectedTeacher ||
-            !selectedDate ||
-            !selectedSlot ||
-            !course ||
-            !agenda
-          }
         >
           Book Appointment
         </button>
       </form>
+      <CustomAlert open={alertOpen} setOpen={setAlertOpen} {...alertMessage} />
     </div>
   );
 };
