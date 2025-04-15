@@ -1,8 +1,6 @@
 import { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { getTeacherProfile } from "../../api/services/studentServices";
-import { appConfig } from "../../common/config";
-import { authServices } from "../../auth";
 
 const TeacherProfile = () => {
   const { teacherId } = useParams();
@@ -30,13 +28,7 @@ const TeacherProfile = () => {
     fetchTeacherProfile();
   }, [teacherId]);
 
-  const handleLogout = () => {
-    const user = JSON.parse(localStorage.getItem(appConfig.CURRENT_USER_KEY));
-    authServices.logout();
-    localStorage.removeItem(user);
-    alert("Logged out successfully!");
-    navigate("/login");
-  };
+  
 
   return (
     <div className="p-6 bg-white shadow-md rounded-lg">
@@ -47,12 +39,7 @@ const TeacherProfile = () => {
         >
           Student Dashboard
         </h1>
-        <button
-          onClick={handleLogout}
-          className="bg-red-600 text-white px-4 py-2 rounded-md hover:bg-red-700 transition cursor-pointer"
-        >
-          Logout
-        </button>
+       
       </div>
 
       {loading ? (
