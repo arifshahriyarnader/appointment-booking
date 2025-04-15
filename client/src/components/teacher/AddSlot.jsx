@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { addAvailableHours } from "../../api/services/teacherServices";
 import { useNavigate } from "react-router-dom";
+import { CustomAlert } from "../../common/components";
 
 const AddSlot = () => {
   const [date, setDate] = useState("");
@@ -9,6 +10,11 @@ const AddSlot = () => {
   const [endTime, setEndTime] = useState("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
+  const [alertOpen, setAlertOpen] = useState(false);
+  const [alertMessage, setAlertMessage] = useState({
+    title: "",
+    description: "",
+  });
   const navigate = useNavigate();
 
   const handleSubmit = async (e) => {
@@ -24,7 +30,11 @@ const AddSlot = () => {
       setDay("");
       setStartTime("");
       setEndTime("");
-      alert("Slot added successfully!");
+      setAlertMessage({
+        title: "Success",
+        description: "Slot added successfully!",
+      });
+      setAlertOpen(true);
       navigate("/teacher-dashboard");
     } catch (err) {
       setError(err.response?.data?.message || "Failed to add slot");
@@ -36,6 +46,7 @@ const AddSlot = () => {
   return (
     <div className="p-6 bg-white rounded-lg shadow-md">
       <h2 className="text-xl font-bold mb-4">Add Slots</h2>
+      <CustomAlert open={alertOpen} setOpen={setAlertOpen} {...alertMessage} />
       {error && <p className="text-red-500">{error}</p>}
       <form onSubmit={handleSubmit} className="space-y-4">
         <div>
