@@ -5,6 +5,8 @@ import {
   updateAvailhours,
 } from "../../api/services/teacherServices";
 import { Pencil, Trash2 } from "lucide-react";
+import { CustomAlert } from "../../common/components";
+
 
 const GetAllSlots = () => {
   const [slots, setSlots] = useState([]);
@@ -18,21 +20,28 @@ const GetAllSlots = () => {
     startTime: "",
     endTime: "",
   });
+  const [alertOpen, setAlertOpen] = useState(false);
+  const [alertMessage, setAlertMessage] = useState({
+    title: "",
+    description: "",
+  });
+  const [confirmOpen, setConfirmOpen] = useState(false);
+  const [currentAction, setCurrentAction] = useState({ id: null });
 
   useEffect(() => {
-    const fetchSlots = async () => {
-      try {
-        const data = await getAllAvailhours();
-        setSlots(data?.availableHours || []);
-      } catch (error) {
-        setError("Failed to load slots", error);
-      } finally {
-        setLoading(false);
-      }
-    };
-
     fetchSlots();
   }, []);
+
+  const fetchSlots = async () => {
+    try {
+      const data = await getAllAvailhours();
+      setSlots(data?.availableHours || []);
+    } catch (error) {
+      setError("Failed to load slots", error);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   // Handle Edit Button Click (Open Modal)
   const handleEdit = (slot) => {
@@ -88,9 +97,11 @@ const GetAllSlots = () => {
     e.preventDefault();
 
     if (formData.startTime >= formData.endTime) {
-      return alert("Start time must be earlier than end time.");
+      return setAlertMessage({
+        title: "Invalid Time",
+        description: "Start time must be earlier than end time.",
+      });
     }
-
     try {
       await updateAvailhours(selectedSlot._id, {
         date: formData.date,
@@ -111,28 +122,53 @@ const GetAllSlots = () => {
             : s
         )
       );
-
       setIsModalOpen(false);
-      alert("Available hour updated successfully!");
+      setAlertMessage({
+        title: "Success",
+        description: "Available hour updated successfully!",
+      });
+      setAlertOpen(true);
     } catch (error) {
-      alert(
-        "Failed to update. " + (error.response?.data?.message || "Try again.")
-      );
+      setAlertMessage({
+        title: "Error",
+        description:
+          "Failed to update. " +
+          (error.response?.data?.message || "Try again."),
+      });
+      setAlertOpen(true);
     }
   };
 
   // Handle Delete
-  const handleDelete = async (id) => {
-    if (!window.confirm("Are you sure you want to delete this available hour?"))
-      return;
+  const showConfirmation = (id) => {
+    setCurrentAction({ id });
+    setAlertMessage({
+      title: "Delete Confirmation",
+      description: "Are you sure you want to delete this available hour?",
+      showCancel: true,
+    });
+    setConfirmOpen(true);
+  };
+  const handleDelete = async () => {
     try {
+      const { id } = currentAction;
       await deleteAvailhours(id);
       setSlots((prev) => prev.filter((slot) => slot._id !== id));
-      alert("Available hour deleted successfully!");
+      setAlertMessage({
+        title: "Success",
+        description: "Available hour deleted successfully!",
+      });
+      setAlertOpen(true);
     } catch (error) {
-      alert(
-        "Failed to delete. " + (error.response?.data?.message || "Try again.")
-      );
+      setAlertMessage({
+        title: "Error",
+        description:
+          "Failed to delete. " +
+          (error.response?.data?.message || "Try again."),
+      });
+      setAlertOpen(true);
+    } finally {
+      setConfirmOpen(false);
     }
   };
 
@@ -142,6 +178,13 @@ const GetAllSlots = () => {
   return (
     <div className="p-6 bg-white rounded-lg shadow-md">
       <h2 className="text-xl font-bold mb-4">Teacher Available Hours</h2>
+      <CustomAlert
+        open={confirmOpen}
+        setOpen={setConfirmOpen}
+        onConfirm={handleDelete}
+        {...alertMessage}
+      />
+      <CustomAlert open={alertOpen} setOpen={setAlertOpen} {...alertMessage} />
       {slots.length === 0 ? (
         <p className="text-center text-gray-600 text-base">No slots found</p>
       ) : (
@@ -181,7 +224,7 @@ const GetAllSlots = () => {
                       <Pencil size={18} />
                     </button>
                     <button
-                      onClick={() => handleDelete(slot._id)}
+                      onClick={() => showConfirmation(slot._id)}
                       className="p-1.5 rounded-full bg-red-500 text-white hover:bg-red-600 transition"
                     >
                       <Trash2 size={18} />
