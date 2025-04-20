@@ -1,7 +1,3 @@
-import { useState } from "react";
-import { useNavigate } from "react-router-dom";
-import { authServices } from "../../auth";
-import { appConfig } from "../../common/config";
 import {
   AddStudent,
   AddTeacher,
@@ -10,22 +6,18 @@ import {
   ViewRegistrationRequest,
 } from "./index";
 import { CustomAlert } from "../../common/components";
+import { useAdminDashboard } from "../../hooks/admin";
 
 export const AdminDashboard = () => {
-  const [selectedOption, setSelectedOption] = useState(
-    "viewRegistrationRequest"
-  );
-  const [logoutAlertOpen, setLogoutAlertOpen] = useState(false);
-  const navigate = useNavigate();
-  const handleLogout = () => {
-    const user = JSON.parse(localStorage.getItem(appConfig.CURRENT_USER_KEY));
-    authServices.logout();
-    localStorage.removeItem(user);
-    navigate("/login");
-  };
-  const showLogoutConfirmation = () => {
-    setLogoutAlertOpen(true);
-  };
+  const {
+    selectedOption,
+    setSelectedOption,
+    logoutAlertOpen,
+    setLogoutAlertOpen,
+    handleLogout,
+    showLogoutConfirmation,
+  } = useAdminDashboard();
+
   return (
     <div className="flex flex-col h-screen w-full">
       {/* Header */}
@@ -96,7 +88,7 @@ export const AdminDashboard = () => {
           </ul>
         </div>
 
-        {/* Right Content Area */}
+        {/* Right Sidebar */}
         <div className="w-4/5 p-6 bg-gray-100 min-h-screen">
           {selectedOption === "viewRegistrationRequest" && (
             <ViewRegistrationRequest />
