@@ -1,75 +1,17 @@
 import { Trash2 } from "lucide-react";
-import { useEffect, useState } from "react";
-import {
-  deleteUser,
-  getAllStudent,
-} from "../../api/services/admin/adminServices";
 import { CustomAlert } from "../../common/components";
+import { useGetAllStudent } from "@/hooks/admin/useGetAllStudent";
 
 const GetAllStudent = () => {
-  const [students, setStudents] = useState([]);
-  const [alertOpen, setAlertOpen] = useState(false);
-  const [alertMessage, setAlertMessage] = useState({
-    title: "",
-    description: "",
-  });
-  const [confirmOpen, setConfirmOpen] = useState(false);
-  const [currentAction, setCurrentAction] = useState({ id: null });
-
-  useEffect(() => {
-    fetchStudents();
-  }, []);
-
-  const fetchStudents = async () => {
-    try {
-      const data = await getAllStudent();
-      setStudents(data.students || []);
-    } catch (error) {
-      console.log(error);
-      setAlertMessage({
-        title: "Error",
-        description:
-          error.response?.data?.message || "Failed to fetch students",
-        variant: "destructive",
-      });
-      setAlertOpen(true);
-    }
-  };
-  const showConfirmation = (id) => {
-    setCurrentAction({ id });
-    setAlertMessage({
-      title: "Confirm Action",
-      description: "Are you sure you want to delete this student?",
-      variant: "default",
-      showCancel: true,
-    });
-    setConfirmOpen(true);
-  };
-  const handleDelete = async () => {
-    try {
-      const { id } = currentAction;
-      await deleteUser(id);
-      setAlertMessage({
-        title: "Success",
-        description: "Student deleted successfully",
-        variant: "success",
-      });
-      setAlertOpen(true);
-      fetchStudents();
-    } catch (error) {
-      console.log(error);
-      setAlertMessage({
-        title: "Error",
-        description:
-          error.response?.data?.message || "Failed to delete student!",
-        variant: "destructive",
-      });
-      setAlertOpen(true);
-    } finally {
-      setConfirmOpen(false);
-    }
-  };
-
+  const {students,
+    alertOpen,
+    setAlertOpen,
+    alertMessage,
+    confirmOpen,
+    setConfirmOpen,
+    showConfirmation,
+    handleDelete} =useGetAllStudent()
+  
   return (
     <div className="p-4">
       <h2 className="text-2xl font-semibold mb-4">All Students</h2>

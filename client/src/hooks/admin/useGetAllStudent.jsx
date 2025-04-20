@@ -1,0 +1,78 @@
+import { useEffect, useState } from "react";
+import { deleteUser, getAllStudent } from "../../api/services/admin/adminServices";
+
+export function useGetAllStudent() {
+  const [students, setStudents] = useState([]);
+  const [alertOpen, setAlertOpen] = useState(false);
+  const [alertMessage, setAlertMessage] = useState({
+    title: "",
+    description: "",
+  });
+  const [confirmOpen, setConfirmOpen] = useState(false);
+  const [currentAction, setCurrentAction] = useState({ id: null });
+
+  useEffect(() => {
+    fetchStudents();
+  }, []);
+
+  const fetchStudents = async () => {
+    try {
+      const data = await getAllStudent();
+      setStudents(data.students || []);
+    } catch (error) {
+      console.log(error);
+      setAlertMessage({
+        title: "Error",
+        description:
+          error.response?.data?.message || "Failed to fetch students",
+        variant: "destructive",
+      });
+      setAlertOpen(true);
+    }
+  };
+  const showConfirmation = (id) => {
+    setCurrentAction({ id });
+    setAlertMessage({
+      title: "Confirm Action",
+      description: "Are you sure you want to delete this student?",
+      variant: "default",
+      showCancel: true,
+    });
+    setConfirmOpen(true);
+  };
+  const handleDelete = async () => {
+    try {
+      const { id } = currentAction;
+      await deleteUser(id);
+      setAlertMessage({
+        title: "Success",
+        description: "Student deleted successfully",
+        variant: "success",
+      });
+      setAlertOpen(true);
+      fetchStudents();
+    } catch (error) {
+      console.log(error);
+      setAlertMessage({
+        title: "Error",
+        description:
+          error.response?.data?.message || "Failed to delete student!",
+        variant: "destructive",
+      });
+      setAlertOpen(true);
+    } finally {
+      setConfirmOpen(false);
+    }
+  };
+
+  return {
+    students,
+    alertOpen,
+    setAlertOpen,
+    alertMessage,
+    confirmOpen,
+    setConfirmOpen,
+    showConfirmation,
+    handleDelete,
+  };
+}
