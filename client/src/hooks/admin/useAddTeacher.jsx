@@ -1,14 +1,14 @@
 import { useState } from "react";
-import { addStudent } from "../../api/services/admin/adminServices";
+import { addTeacher } from "../../api/services/admin/adminServices";
 
-export function useAddStudent() {
+export function useAddTeacher() {
   const [formData, setFormData] = useState({
     name: "",
     email: "",
     password: "",
-    role: "student",
+    role: "teacher",
     department: "",
-    studentId: "",
+    course: "",
   });
   const [loading, setLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
@@ -16,7 +16,9 @@ export function useAddStudent() {
   const [alertMessage, setAlertMessage] = useState({
     title: "",
     description: "",
+    variant: "default",
   });
+
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
@@ -24,21 +26,24 @@ export function useAddStudent() {
   const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
+
     try {
-      const response = await addStudent(formData);
+      const response = await addTeacher(formData);
+      console.log("Teacher added response:", response);
+
       if (response?.user) {
         setAlertMessage({
           title: "Success",
-          description: "Student added successfully",
+          description: "Teacher added successfully",
           variant: "success",
         });
         setFormData({
           name: "",
           email: "",
           password: "",
-          role: "student",
+          role: "teacher",
           department: "",
-          studentId: "",
+          course: "",
         });
       } else {
         setAlertMessage({
@@ -48,11 +53,12 @@ export function useAddStudent() {
         });
       }
     } catch (error) {
-      console.error("Error adding student", error);
-
+      console.error("Error adding teacher:", error);
       setAlertMessage({
         title: "Error",
-        description: error.response?.data?.message || "Failed to add student",
+        description: `Failed to add teacher! ${
+          error.response?.data?.message || error.message
+        }`,
         variant: "destructive",
       });
     } finally {
@@ -60,13 +66,14 @@ export function useAddStudent() {
       setAlertOpen(true);
     }
   };
+
   return {
-    formData,
     loading,
     showPassword,
     setShowPassword,
     alertOpen,
     setAlertOpen,
+    formData,
     alertMessage,
     handleChange,
     handleSubmit,
