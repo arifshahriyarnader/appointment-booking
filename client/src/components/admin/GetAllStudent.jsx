@@ -1,6 +1,6 @@
 import { Trash2 } from "lucide-react";
 import { CustomAlert } from "../../common/components";
-import { useGetAllStudent } from "@/hooks/admin/useGetAllStudent";
+import { useGetAllStudent } from "../../hooks/admin";
 
 const GetAllStudent = () => {
   const {students,
