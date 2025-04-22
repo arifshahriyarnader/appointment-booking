@@ -13,19 +13,41 @@ const UpdateAvailableHours = ({ availableHours, fetchAvailableHours }) => {
     endTime: "",
   });
 
+  const convertTo24HourFormat = (timeStr) => {
+    if (!timeStr) return "";
+
+    // Case 1: Already in 24-hour format (HH:mm)
+    if (/^\d{2}:\d{2}$/.test(timeStr)) return timeStr;
+
+    // Case 2: Convert 12-hour format like "2:00 PM"
+    const regex = /(\d{1,2}):(\d{2})\s?(AM|PM)/i;
+    const match = timeStr.match(regex);
+
+    if (!match) return "";
+
+    let [hours, minutes, period] = match;
+    hours = parseInt(hours, 10);
+    minutes = parseInt(minutes, 10);
+
+    if (period.toUpperCase() === "PM" && hours < 12) hours += 12;
+    if (period.toUpperCase() === "AM" && hours === 12) hours = 0;
+
+    return `${String(hours).padStart(2, "0")}:${String(minutes).padStart(
+      2,
+      "0"
+    )}`;
+  };
+
   // Open Modal & Pre-fill Form Data
   const handleEdit = (hour) => {
     setSelectedHour(hour);
 
-    // Ensure slots exist before extracting times
-    const firstSlot =
-      hour.slots.length > 0 ? hour.slots[0] : { startTime: "", endTime: "" };
-    const lastSlot =
-      hour.slots.length > 0
-        ? hour.slots[hour.slots.length - 1]
-        : { startTime: "", endTime: "" };
+    const firstSlot = hour.slots[0] || { startTime: "", endTime: "" };
+    const lastSlot = hour.slots[hour.slots.length - 1] || {
+      startTime: "",
+      endTime: "",
+    };
 
-    // Convert date to YYYY-MM-DD format
     const formattedDate = hour.date
       ? new Date(hour.date).toISOString().split("T")[0]
       : "";
@@ -33,8 +55,8 @@ const UpdateAvailableHours = ({ availableHours, fetchAvailableHours }) => {
     setFormData({
       date: formattedDate,
       day: hour.day || "",
-      startTime: firstSlot.startTime,
-      endTime: lastSlot.endTime,
+      startTime: convertTo24HourFormat(firstSlot.startTime),
+      endTime: convertTo24HourFormat(lastSlot.endTime),
     });
 
     setIsModalOpen(true);
@@ -45,26 +67,42 @@ const UpdateAvailableHours = ({ availableHours, fetchAvailableHours }) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
 
-  // Handle Form Submit
   const handleSubmit = async (e) => {
     e.preventDefault();
+    console.log("Form submitted");
 
-    if (formData.startTime >= formData.endTime) {
-      return alert("Start time must be earlier than end time.");
+    const { startTime, endTime } = formData;
+
+    if (!startTime || !endTime) {
+      alert("Please select both start and end time.");
+      return;
     }
 
+    console.log("Start Time:", startTime, "End Time:", endTime);
+
+    const [sh, sm] = startTime.split(":").map(Number);
+    const [eh, em] = endTime.split(":").map(Number);
+
+    const startTotal = sh * 60 + sm;
+    const endTotal = eh * 60 + em;
+
+    console.log("Total Minutes:", startTotal, endTotal);
+
+    if (startTotal >= endTotal) {
+      alert("Start time must be earlier than end time.");
+      return;
+    }
+
+    // If valid, continue
     try {
       const updatedData = {
         date: formData.date,
         day: formData.day,
-        startTime: formData.startTime,
-        endTime: formData.endTime,
+        startTime,
+        endTime,
       };
-
       await updateAvailhours(selectedHour._id, updatedData);
-
       fetchAvailableHours();
-
       setIsModalOpen(false);
       alert("Available hour updated successfully!");
     } catch (error) {
@@ -77,7 +115,6 @@ const UpdateAvailableHours = ({ availableHours, fetchAvailableHours }) => {
 
   return (
     <div>
-      {/* Available Hours List */}
       {availableHours.map((hour) => (
         <div
           key={hour._id}
@@ -109,7 +146,6 @@ const UpdateAvailableHours = ({ availableHours, fetchAvailableHours }) => {
                 value={formData.date}
                 onChange={handleChange}
                 className="w-full p-2 border rounded"
-                required
               />
 
               <label className="block mt-2">Day:</label>
@@ -119,27 +155,26 @@ const UpdateAvailableHours = ({ availableHours, fetchAvailableHours }) => {
                 value={formData.day}
                 onChange={handleChange}
                 className="w-full p-2 border rounded"
-                required
               />
 
               <label className="block mt-2">Start Time:</label>
               <input
                 type="time"
                 name="startTime"
-                value={formData.startTime}
+                value={formData.startTime || ""}
                 onChange={handleChange}
                 className="w-full p-2 border rounded"
-                required
+                step="900"
               />
 
               <label className="block mt-2">End Time:</label>
               <input
                 type="time"
                 name="endTime"
-                value={formData.endTime}
+                value={formData.endTime || ""}
                 onChange={handleChange}
                 className="w-full p-2 border rounded"
-                required
+                step="900"
               />
 
               <div className="mt-4 flex justify-end">

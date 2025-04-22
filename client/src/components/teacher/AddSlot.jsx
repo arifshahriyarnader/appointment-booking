@@ -24,6 +24,15 @@ const AddSlot = () => {
     console.log({ date, day, startTime, endTime });
     const payload = { date, day, startTime, endTime };
 
+    if(startTime >= endTime){
+      setAlertMessage({
+        title: "Error",
+        description: "Start time must be before end time.",
+      });
+      setAlertOpen(true);
+      setLoading(false);
+      return;
+    }
     try {
       await addAvailableHours(payload);
       setDate("");
