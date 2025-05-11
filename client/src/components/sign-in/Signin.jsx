@@ -2,7 +2,7 @@ import { useState } from "react";
 import { EyeIcon, EyeOffIcon } from "lucide-react";
 import { Link, useNavigate } from "react-router-dom";
 import { authServices } from "../../auth";
-import { CustomAlert } from "@/common/components";
+import { CustomAlert } from "../../common/components";
 export const Signin = () => {
   const navigate = useNavigate();
   const [formData, setFormData] = useState({
