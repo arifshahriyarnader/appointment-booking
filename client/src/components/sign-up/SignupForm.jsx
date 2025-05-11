@@ -25,7 +25,7 @@ export const SignupForm = () => {
         {/* Role Toggle Buttons */}
         <div className="flex justify-center mb-4">
           <button
-            className={`px-4 py-2 rounded-l ${
+            className={`px-4 py-2 cursor-pointer rounded-l ${
               role === "teacher" ? "bg-blue-500 text-white" : "bg-gray-300"
             }`}
             onClick={() => handleRoleChange("teacher")}
@@ -33,7 +33,7 @@ export const SignupForm = () => {
             As a Teacher
           </button>
           <button
-            className={`px-4 py-2 rounded-r ${
+            className={`px-4 py-2 cursor-pointer rounded-r ${
               role === "student" ? "bg-blue-500 text-white" : "bg-gray-300"
             }`}
             onClick={() => handleRoleChange("student")}
@@ -126,7 +126,7 @@ export const SignupForm = () => {
           />
           <button
             type="submit"
-            className="w-full bg-blue-500 text-white py-2 rounded hover:bg-blue-600"
+            className="w-full bg-blue-500 text-white py-2 cursor-pointer rounded hover:bg-blue-600"
           >
             Register
           </button>

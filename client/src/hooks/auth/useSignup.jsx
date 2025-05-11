@@ -24,7 +24,7 @@ export const useSignup = () => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
 
-  // Handle role change (Teacher <-> Student)
+  // Handle role change
   const handleRoleChange = (newRole) => {
     setRole(newRole);
     setFormData({
