@@ -1,37 +1,8 @@
-import { useEffect, useState } from "react";
+import { useAllTeacher } from "../../hooks/student";
 import PropTypes from "prop-types";
-import { useNavigate } from "react-router-dom";
-import { getAllTeachersList } from "../../api/services/studentServices";
 
 const AllTeacher = ({ searchResults }) => {
-  const [teachers, setTeachers] = useState([]);
-
-  const [loading, setLoading] = useState(true);
-  const navigate = useNavigate();
-
-  useEffect(() => {
-    if (!searchResults || searchResults.length === 0) {
-      const fetchTeachers = async () => {
-        setLoading(true);
-        try {
-          const response = await getAllTeachersList();
-          setTeachers(response.teacher || []);
-        } catch (error) {
-          console.error("Error fetching teachers:", error);
-        } finally {
-          setLoading(false);
-        }
-      };
-      fetchTeachers();
-    } else {
-      setTeachers(searchResults);
-      setLoading(false);
-    }
-  }, [searchResults]);
-
-  const handleViewProfile = (teacherId) => {
-    navigate(`/teacher-profile/${teacherId}`);
-  };
+  const { teachers, loading, handleViewProfile } = useAllTeacher({searchResults});
 
   return (
     <div className="p-6 bg-white shadow-md rounded-lg">
@@ -48,7 +19,7 @@ const AllTeacher = ({ searchResults }) => {
               <th className="border p-2">Email</th>
               <th className="border p-2">Department</th>
               <th className="border p-2">Course</th>
-              <th className="border p-2">Actions</th>{" "}
+              <th className="border p-2">Actions</th>
             </tr>
           </thead>
           <tbody>
