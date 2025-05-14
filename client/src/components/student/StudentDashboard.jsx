@@ -6,7 +6,7 @@ import {
   PastAppointmentList,
   UpcomingAppointmentList,
 } from "./index";
-
+import { Header } from "../index";
 import { CustomAlert } from "../../common/components";
 import { useStudentDashboard } from "../../hooks/student";
 
@@ -20,24 +20,15 @@ export const StudentDashboard = () => {
     setSearchResults,
     logoutAlertOpen,
     setLogoutAlertOpen,
+    showLogoutConfirmation,
     alertMessage,
     handleLogout,
-    showLogoutConfirmation,
     handleSearch,
   } = useStudentDashboard();
 
   return (
     <div className="flex flex-col h-screen w-full">
-      <header className="flex justify-between items-center bg-gray-800 text-white p-4 w-full">
-        <h2 className="text-xl font-bold">Student Dashboard</h2>
-        <button
-          onClick={showLogoutConfirmation}
-          className="bg-red-600 hover:bg-red-700 text-white py-2 px-4 rounded cursor-pointer"
-        >
-          Logout
-        </button>
-      </header>
-
+      <Header title="Student Dashboard" showLogoutConfirmation={showLogoutConfirmation}  />
       <CustomAlert
         open={logoutAlertOpen}
         setOpen={setLogoutAlertOpen}
