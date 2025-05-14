@@ -1,6 +1,6 @@
-import { getAllTeachersList } from "@/api/services/studentServices";
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { getAllTeachersList } from "../../api/services/studentServices";
 
 export const useAllTeacher = ({ searchResults } = {}) => {
   const [teachers, setTeachers] = useState([]);

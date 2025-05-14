@@ -1,29 +1,7 @@
-import { useEffect, useState } from "react";
-import { pastAppointmentList } from "../../api/services/studentServices";
+import { usePastAppointment } from "../../hooks/student";
 
 const PastAppointmentList = () => {
-  const [appointments, setAppointments] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [message, setMessage] = useState("");
-
-  useEffect(() => {
-    const fetchAppointments = async () => {
-      try {
-        const data = await pastAppointmentList();
-        if (data.pastAppointments && data.pastAppointments.length > 0) {
-          setAppointments(data.pastAppointments);
-        } else {
-          setMessage("You have no past appointments.");
-        }
-      } catch (error) {
-        setMessage("Error fetching past appointments.", error);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchAppointments();
-  }, []);
+  const { appointments, loading, message } = usePastAppointment();
 
   return (
     <div className="max-w-5xl mx-auto p-6 bg-white rounded-lg shadow-md">
