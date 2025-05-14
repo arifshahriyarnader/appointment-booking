@@ -1,34 +1,9 @@
-import { useEffect, useState } from "react";
-import { useParams, useNavigate } from "react-router-dom";
-import { getTeacherProfile } from "../../api/services/studentServices";
+import { useNavigate } from "react-router-dom";
+import { useTeacherProfile } from "../../hooks/student";
 
 const TeacherProfile = () => {
-  const { teacherId } = useParams();
-  const [teacher, setTeacher] = useState(null);
-  const [availableHours, setAvailableHours] = useState([]);
-  const [loading, setLoading] = useState(true);
   const navigate = useNavigate();
-
-  useEffect(() => {
-    const fetchTeacherProfile = async () => {
-      setLoading(true);
-      try {
-        const data = await getTeacherProfile(teacherId);
-        if (data) {
-          setTeacher(data.teacher);
-          setAvailableHours(data.availableHours);
-        }
-      } catch (error) {
-        console.error("Error fetching teacher profile:", error);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchTeacherProfile();
-  }, [teacherId]);
-
-  
+  const { teacher, availableHours, loading } = useTeacherProfile();
 
   return (
     <div className="p-6 bg-white shadow-md rounded-lg">
@@ -39,7 +14,6 @@ const TeacherProfile = () => {
         >
           Student Dashboard
         </h1>
-       
       </div>
 
       {loading ? (
