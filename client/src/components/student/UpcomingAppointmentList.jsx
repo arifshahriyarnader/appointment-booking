@@ -1,30 +1,7 @@
-import { useEffect, useState } from "react";
-import { upcomingAppointmentList } from "../../api/services/studentServices";
+import { useUpcomingAppointment } from "../../hooks/student";
 
 const UpcomingAppointmentList = () => {
-  const [appointments, setAppointments] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [message, setMessage] = useState("");
-
-  useEffect(() => {
-    const fetchAppointments = async () => {
-      try {
-        const data = await upcomingAppointmentList();
-        if (data.upcomingAppointments && data.upcomingAppointments.length > 0) {
-          setAppointments(data.upcomingAppointments);
-        } else {
-          setMessage("You have no upcoming appointments.");
-        }
-      } catch (error) {
-        setMessage("Error fetching upcoming appointments.",error);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchAppointments();
-  }, []);
-
+  const { appointments, loading, message } = useUpcomingAppointment();
   return (
     <div className="max-w-5xl mx-auto p-6 bg-white rounded-lg shadow-md">
       <h2 className="text-xl font-semibold mb-4">Upcoming Appointments</h2>
@@ -36,7 +13,9 @@ const UpcomingAppointmentList = () => {
           <thead>
             <tr className="bg-gray-200">
               <th className="border border-gray-300 px-4 py-2">Teacher Name</th>
-              <th className="border border-gray-300 px-4 py-2">Teacher Email</th>
+              <th className="border border-gray-300 px-4 py-2">
+                Teacher Email
+              </th>
               <th className="border border-gray-300 px-4 py-2">Course</th>
               <th className="border border-gray-300 px-4 py-2">Agenda</th>
               <th className="border border-gray-300 px-4 py-2">Date</th>
@@ -67,7 +46,11 @@ const UpcomingAppointmentList = () => {
                 </td>
                 <td
                   className={`border border-gray-300 px-4 py-2 font-semibold 
-                    ${appointment.status === "approved" ? "text-green-600" : "text-orange-600"}`}
+                    ${
+                      appointment.status === "approved"
+                        ? "text-green-600"
+                        : "text-orange-600"
+                    }`}
                 >
                   {appointment.status}
                 </td>
