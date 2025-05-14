@@ -1,22 +1,7 @@
-import { useState, useEffect } from "react";
-import { checkAppointmentStatus } from "../../api/services/studentServices";
+import { useAppointmentStatus } from "../../hooks/student";
 
 const AppointmentStatus = () => {
-  const [appointments, setAppointments] = useState([]);
-  const [message, setMessage] = useState("");
-
-  useEffect(() => {
-    fetchAppointments();
-  }, []);
-
-  const fetchAppointments = async () => {
-    const response = await checkAppointmentStatus();
-    if (response.appointments?.length) {
-      setAppointments(response.appointments);
-    } else {
-      setMessage(response.message || "You have no booked appointments.");
-    }
-  };
+  const { appointments, message } = useAppointmentStatus();
 
   return (
     <div className="max-w-5xl mx-auto p-6 bg-white rounded-lg shadow-md">
@@ -27,9 +12,15 @@ const AppointmentStatus = () => {
           <table className="w-full border-collapse border border-gray-300">
             <thead>
               <tr className="bg-gray-200">
-                <th className="border border-gray-300 px-4 py-2">Student Name</th>
-                <th className="border border-gray-300 px-4 py-2">Teacher Name</th>
-                <th className="border border-gray-300 px-4 py-2">Teacher Email</th>
+                <th className="border border-gray-300 px-4 py-2">
+                  Student Name
+                </th>
+                <th className="border border-gray-300 px-4 py-2">
+                  Teacher Name
+                </th>
+                <th className="border border-gray-300 px-4 py-2">
+                  Teacher Email
+                </th>
                 <th className="border border-gray-300 px-4 py-2">Course</th>
                 <th className="border border-gray-300 px-4 py-2">Agenda</th>
                 <th className="border border-gray-300 px-4 py-2">Date</th>
@@ -63,7 +54,11 @@ const AppointmentStatus = () => {
                   </td>
                   <td
                     className={`border border-gray-300 px-4 py-2 font-semibold 
-                      ${appointment.status === "approved" ? "text-green-600" : "text-red-600"}`}
+                      ${
+                        appointment.status === "approved"
+                          ? "text-green-600"
+                          : "text-red-600"
+                      }`}
                   >
                     {appointment.status}
                   </td>
