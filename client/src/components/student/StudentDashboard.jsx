@@ -94,7 +94,7 @@ export const StudentDashboard = () => {
           <ul className="space-y-2">
             <li>
               <button
-                className="w-full p-2 bg-blue-600 hover:bg-blue-700 rounded"
+                className="w-full p-2 bg-blue-600 hover:bg-blue-700 rounded cursor-pointer"
                 onClick={() => {
                   setSelectedOption("allTeacher");
                   setSearchResults([]);
@@ -106,7 +106,7 @@ export const StudentDashboard = () => {
 
             <li>
               <button
-                className="w-full p-2 bg-blue-600 hover:bg-blue-700 rounded"
+                className="w-full p-2 bg-blue-600 hover:bg-blue-700 rounded cursor-pointer"
                 onClick={() => setSelectedOption("bookAppointment")}
               >
                 Book an Appointment
@@ -115,7 +115,7 @@ export const StudentDashboard = () => {
 
             <li>
               <button
-                className="w-full p-2 bg-blue-600 hover:bg-blue-700 rounded"
+                className="w-full p-2 bg-blue-600 hover:bg-blue-700 rounded cursor-pointer"
                 onClick={() => setSelectedOption("appointmentStatus")}
               >
                 Appointment Status
@@ -123,7 +123,7 @@ export const StudentDashboard = () => {
             </li>
             <li>
               <button
-                className="w-full p-2 bg-blue-600 hover:bg-blue-700 rounded"
+                className="w-full p-2 bg-blue-600 hover:bg-blue-700 rounded cursor-pointer"
                 onClick={() => setSelectedOption("dailyAppointmentSchedule")}
               >
                 Daily Appointment List
@@ -132,7 +132,7 @@ export const StudentDashboard = () => {
 
             <li>
               <button
-                className="w-full p-2 bg-blue-600 hover:bg-blue-700 rounded"
+                className="w-full p-2 bg-blue-600 hover:bg-blue-700 rounded cursor-pointer"
                 onClick={() => setSelectedOption("pastAppointmentHistory")}
               >
                 Past Appointment History
@@ -141,7 +141,7 @@ export const StudentDashboard = () => {
 
             <li>
               <button
-                className="w-full p-2 bg-blue-600 hover:bg-blue-700 rounded"
+                className="w-full p-2 bg-blue-600 hover:bg-blue-700 rounded cursor-pointer"
                 onClick={() => setSelectedOption("upcomingAppointmentSchedule")}
               >
                 Upcoming Appointment List
