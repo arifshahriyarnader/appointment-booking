@@ -1,7 +1,3 @@
-import { useState } from "react";
-import { useNavigate } from "react-router-dom";
-import { appConfig } from "../../common/config";
-import { authServices } from "../../auth";
 import {
   AddSlot,
   GetAllSlots,
@@ -11,29 +7,18 @@ import {
   PastAppointmentSchedule,
 } from "./index";
 import { CustomAlert } from "../../common/components";
+import { useTeacherDashboard } from "../../hooks/teacher";
 
 export const TeacherDashboard = () => {
-  const [selectedOption, setSelectedOption] = useState("addSlot");
-  const [logoutAlertOpen, setLogoutAlertOpen] = useState(false);
-  const [alertMessage, setAlertMessage] = useState({
-    title: "",
-    description: "",
-  });
-  const navigate = useNavigate();
-  const showLogooutConfirmation = () => {
-    setAlertMessage({
-      title: "Confirm Logout",
-      description: "Are you sure you want to Logout?",
-      showCancel: true,
-    });
-    setLogoutAlertOpen(true);
-  };
-  const handleLogout = () => {
-    const user = JSON.parse(localStorage.getItem(appConfig.CURRENT_USER_KEY));
-    authServices.logout();
-    localStorage.removeItem(user);
-    navigate("/login");
-  };
+  const {
+    selectedOption,
+    setSelectedOption,
+    logoutAlertOpen,
+    setLogoutAlertOpen,
+    alertMessage,
+    showLogooutConfirmation,
+    handleLogout,
+  } = useTeacherDashboard();
 
   return (
     <div className="flex flex-col h-screen w-full">
