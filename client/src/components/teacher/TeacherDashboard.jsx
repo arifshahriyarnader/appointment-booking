@@ -8,6 +8,7 @@ import {
 } from "./index";
 import { CustomAlert } from "../../common/components";
 import { useTeacherDashboard } from "../../hooks/teacher";
+import { Header } from "../index";
 
 export const TeacherDashboard = () => {
   const {
@@ -22,16 +23,10 @@ export const TeacherDashboard = () => {
 
   return (
     <div className="flex flex-col h-screen w-full">
-      {/* Header */}
-      <header className="flex justify-between items-center bg-gray-800 text-white p-4 w-full">
-        <h2 className="text-xl font-bold">Teacher Dashboard</h2>
-        <button
-          onClick={showLogooutConfirmation}
-          className="bg-red-600 hover:bg-red-700 text-white py-2 px-4 rounded cursor-pointer"
-        >
-          Logout
-        </button>
-      </header>
+      <Header
+        title="Teacher Dashboard"
+        showLogoutConfirmation={showLogooutConfirmation}
+      />
       <CustomAlert
         open={logoutAlertOpen}
         setOpen={setLogoutAlertOpen}
