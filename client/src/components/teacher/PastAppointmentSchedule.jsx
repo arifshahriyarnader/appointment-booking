@@ -1,25 +1,7 @@
-import { useEffect, useState } from "react";
-import { pastAppointmentSchedule } from "../../api/services/teacherServices";
+import { usePastAppointment } from "../../hooks/teacher";
 
 const PastAppointmentSchedule = () => {
-  const [pastAppointments, setPastAppointments] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState("");
-
-  useEffect(() => {
-    const fetchAppointments = async () => {
-      try {
-        const data = await pastAppointmentSchedule();
-        setPastAppointments(data?.pastAppointments || []);
-      } catch (error) {
-        setError("Failed to daily appointments schedule", error);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchAppointments();
-  }, []);
+  const { pastAppointments, loading, error } = usePastAppointment();
 
   if (loading) return <p>Loading past appointments history...</p>;
   if (error) return <p className="text-red-500">{error}</p>;
@@ -45,10 +27,18 @@ const PastAppointmentSchedule = () => {
           <tbody>
             {pastAppointments.map((pastAppointment) => (
               <tr key={pastAppointment._id} className="text-center">
-                <td className="border p-2">{pastAppointment.student?.name || "N/A"}</td>
-                <td className="border p-2">{pastAppointment.student?.email || "N/A"}</td>
-                <td className="border p-2">{pastAppointment?.course || "N/A"}</td>
-                <td className="border p-2">{pastAppointment?.agenda || "N/A"}</td>
+                <td className="border p-2">
+                  {pastAppointment.student?.name || "N/A"}
+                </td>
+                <td className="border p-2">
+                  {pastAppointment.student?.email || "N/A"}
+                </td>
+                <td className="border p-2">
+                  {pastAppointment?.course || "N/A"}
+                </td>
+                <td className="border p-2">
+                  {pastAppointment?.agenda || "N/A"}
+                </td>
                 <td className="border p-2">
                   {" "}
                   {pastAppointment.date

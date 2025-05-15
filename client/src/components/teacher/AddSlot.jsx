@@ -1,5 +1,5 @@
 import { CustomAlert } from "../../common/components";
-import { useAddSlot } from "@/hooks/teacher";
+import { useAddSlot } from "../../hooks/teacher";
 
 const AddSlot = () => {
   const {
