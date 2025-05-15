@@ -1,29 +1,9 @@
-import { useState, useEffect } from "react";
-import { dailyAppointmentSchedule } from "../../api/services/teacherServices";
+import { useDailyAppointment } from "../../hooks/teacher";
 
 const DailyAppointmentSchedules = () => {
-  const [appointments, setAppointments] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState("");
-
-  useEffect(() => {
-    const fetchAppointments = async () => {
-      try {
-        const data = await dailyAppointmentSchedule();
-        setAppointments(data?.appointments || []);
-      } catch (error) {
-        setError("Failed to daily appointments schedule", error);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchAppointments();
-  }, []);
-
+  const { appointments, loading, error } = useDailyAppointment();
   if (loading) return <p>Loading daily appointments...</p>;
   if (error) return <p className="text-red-500">{error}</p>;
-
   return (
     <div className="p-4">
       <h2 className="text-xl font-bold mb-4">Daily Appointment Schedule</h2>

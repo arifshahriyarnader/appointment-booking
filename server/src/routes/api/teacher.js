@@ -271,7 +271,7 @@ router.get("/schedule/today", authenticateToken, async (req, res) => {
       .populate("teacher", "course");
     if (appointments.length === 0) {
       return res
-        .status(403)
+        .status(200)
         .json({ message: "You have no appointment schedule for today" });
     }
     res.status(200).json({ appointments });
