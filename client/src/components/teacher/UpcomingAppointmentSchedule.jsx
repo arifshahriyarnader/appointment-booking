@@ -1,23 +1,7 @@
-import { useState, useEffect } from "react";
-import { upcomingAppointmentSchedule } from "../../api/services/teacherServices";
-const UpcomingAppointmentSchedule = () => {
-  const [appointments, setAppointments] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState("");
-  useEffect(() => {
-    const fetchAppointments = async () => {
-      try {
-        const data = await upcomingAppointmentSchedule();
-        setAppointments(data?.appointments || []);
-      } catch (error) {
-        setError("Failed to upcoming appointments schedule", error);
-      } finally {
-        setLoading(false);
-      }
-    };
+import { useUpcomingAppointment } from "../../hooks/teacher";
 
-    fetchAppointments();
-  }, []);
+const UpcomingAppointmentSchedule = () => {
+  const { appointments, loading, error } = useUpcomingAppointment();
 
   if (loading) return <p>Loading upcoming appointments...</p>;
   if (error) return <p className="text-red-500">{error}</p>;
