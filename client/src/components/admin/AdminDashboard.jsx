@@ -41,7 +41,7 @@ export const AdminDashboard = () => {
           <ul className="space-y-2">
             <li>
               <button
-                className="w-full p-2 bg-blue-600 hover:bg-blue-700 rounded"
+                className="w-full p-2 bg-blue-600 hover:bg-blue-700 rounded cursor-pointer"
                 onClick={() => setSelectedOption("viewRegistrationRequest")}
               >
                 View Registration Request
@@ -49,7 +49,7 @@ export const AdminDashboard = () => {
             </li>
             <li>
               <button
-                className="w-full p-2 bg-blue-600 hover:bg-blue-700 rounded"
+                className="w-full p-2 bg-blue-600 hover:bg-blue-700 rounded cursor-pointer"
                 onClick={() => setSelectedOption("addTeacher")}
               >
                 Add Teacher
@@ -57,7 +57,7 @@ export const AdminDashboard = () => {
             </li>
             <li>
               <button
-                className="w-full p-2 bg-blue-600 hover:bg-blue-700 rounded"
+                className="w-full p-2 bg-blue-600 hover:bg-blue-700 rounded cursor-pointer"
                 onClick={() => setSelectedOption("addStudent")}
               >
                 Add Student
@@ -65,7 +65,7 @@ export const AdminDashboard = () => {
             </li>
             <li>
               <button
-                className="w-full p-2 bg-blue-600 hover:bg-blue-700 rounded"
+                className="w-full p-2 bg-blue-600 hover:bg-blue-700 rounded cursor-pointer"
                 onClick={() => setSelectedOption("getAllTeacher")}
               >
                 Get All Teacher
@@ -73,7 +73,7 @@ export const AdminDashboard = () => {
             </li>
             <li>
               <button
-                className="w-full p-2 bg-blue-600 hover:bg-blue-700 rounded"
+                className="w-full p-2 bg-blue-600 hover:bg-blue-700 rounded cursor-pointer"
                 onClick={() => setSelectedOption("getAllStudent")}
               >
                 Get All Student

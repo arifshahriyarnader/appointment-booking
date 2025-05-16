@@ -10,6 +10,7 @@ import { Header } from "../index";
 import { CustomAlert } from "../../common/components";
 import { useStudentDashboard } from "../../hooks/student";
 
+
 export const StudentDashboard = () => {
   const {
     selectedOption,
@@ -27,8 +28,11 @@ export const StudentDashboard = () => {
   } = useStudentDashboard();
 
   return (
-    <div className="flex flex-col h-screen w-full">
-      <Header title="Student Dashboard" showLogoutConfirmation={showLogoutConfirmation}  />
+    <div className="min-h-screen w-full bg-gray-100 flex flex-col">
+      <Header
+        title="Student Dashboard"
+        showLogoutConfirmation={showLogoutConfirmation}
+      />
       <CustomAlert
         open={logoutAlertOpen}
         setOpen={setLogoutAlertOpen}
@@ -36,7 +40,7 @@ export const StudentDashboard = () => {
         {...alertMessage}
       />
 
-      <div className="flex justify-end items-center p-4 bg-gray-100 w-full">
+      <div className="flex justify-end items-center p-4  w-full">
         <input
           type="text"
           placeholder="Search..."
@@ -54,7 +58,7 @@ export const StudentDashboard = () => {
 
       <div className="flex flex-grow w-full">
         {/* Left Sidebar */}
-        <div className="w-1/4 bg-gray-800 text-white p-4 min-h-screen">
+        <div className="w-1/4 bg-gray-800 text-white p-4">
           <ul className="space-y-2">
             <li>
               <button
@@ -115,7 +119,7 @@ export const StudentDashboard = () => {
         </div>
 
         {/* Right Content Area */}
-        <div className="w-4/5 p-6 bg-gray-100 min-h-screen">
+        <div className="w-4/5 p-6">
           {selectedOption === "allTeacher" && (
             <AllTeacher searchResults={searchResults} />
           )}
