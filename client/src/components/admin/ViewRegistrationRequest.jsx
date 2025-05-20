@@ -1,9 +1,12 @@
-import { CustomAlert } from "../../common/components";
+import { CustomAlert, CustomPagination } from "../../common/components";
 import { useViewRegistrationRequest } from "../../hooks/admin";
 
 const ViewRegistrationRequest = () => {
   const {
     requests,
+    currentPage,
+    totalPages,
+    setCurrentPage,
     alertOpen,
     setAlertOpen,
     alertMessage,
@@ -60,13 +63,13 @@ const ViewRegistrationRequest = () => {
                       <div className="flex gap-2">
                         <button
                           onClick={() => showConfirmation(user._id, "approved")}
-                          className="bg-green-500 text-white px-2 py-1 rounded mr-2"
+                          className="bg-green-500 text-white px-2 py-1 rounded mr-2 cursor-pointer"
                         >
                           Approve
                         </button>
                         <button
                           onClick={() => showConfirmation(user._id, "rejected")}
-                          className="bg-red-500 text-white px-2 py-1 rounded"
+                          className="bg-red-500 text-white px-2 py-1 rounded cursor-pointer"
                         >
                           Reject
                         </button>
@@ -78,6 +81,11 @@ const ViewRegistrationRequest = () => {
             )}
           </tbody>
         </table>
+        <CustomPagination
+          currentPage={currentPage}
+          totalPages={totalPages}
+          setCurrentPage={setCurrentPage}
+        />
       </div>
     </div>
   );

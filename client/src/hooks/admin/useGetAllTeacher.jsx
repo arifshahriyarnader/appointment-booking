@@ -4,7 +4,7 @@ import {
   getAllTeacher,
 } from "../../api/services/admin/adminServices";
 
-export function useGetAllTeacher() {
+export const useGetAllTeacher =() => {
   const [teachers, setTeachers] = useState([]);
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
@@ -24,7 +24,7 @@ export function useGetAllTeacher() {
     try {
       const data = await getAllTeacher(page, 5);
       setTeachers(data.teachers || []);
-         setTotalPages(data.totalPages || 1);
+      setTotalPages(data.totalPages || 1);
     } catch (error) {
       console.log("Error fetching teachers:", error);
       setAlertMessage({

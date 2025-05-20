@@ -94,15 +94,13 @@ router.get("/all-teachers", authenticateToken, async (req, res) => {
       .select("-password")
       .skip(skip)
       .limit(limit);
-      const total = await User.countDocuments({ role: "teacher" });
-    res
-      .status(200)
-      .json({
-        teachers,
-        currentPage: page,
-        totalPages: Math.ceil(total / limit),
-        totalStudents: total,
-      });
+    const total = await User.countDocuments({ role: "teacher" });
+    res.status(200).json({
+      teachers,
+      currentPage: page,
+      totalPages: Math.ceil(total / limit),
+      totalStudents: total,
+    });
   } catch (error) {
     res.status(500).json({ message: "Something went wrong" });
   }
@@ -129,15 +127,24 @@ router.get("/registration-request", authenticateToken, async (req, res) => {
         message: "Only admin can view who sent the registration request",
       });
     }
-    const userRequest = await User.find({ status: "pending" }).select(
-      "name email role department course studentId status createdAt"
-    );
-    if (userRequest === 0) {
-      return res
-        .status(404)
-        .json({ message: "No pending registration request" });
-    }
-    res.status(200).json({ userRequest });
+    const page = parseInt(req.query.page) || 1;
+    const limit = parseInt(req.query.limit) || 5;
+    const skip = (page - 1) * limit;
+    const userRequest = await User.find({ status: "pending" })
+      .select("name email role department course studentId status createdAt")
+      .skip(skip)
+      .limit(limit);
+
+    const total = await User.countDocuments({ status: "pending" });
+
+    res
+      .status(200)
+      .json({
+        userRequest,
+        currentPage: page,
+        totalPages: Math.ceil(total / limit),
+        totalRequests: total,
+      });
   } catch (error) {
     res.status(500).json({ message: "Something went wrong", error });
   }

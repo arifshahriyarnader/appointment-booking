@@ -4,8 +4,10 @@ import {
   userRegistrationRequestUpdate,
 } from "../../api/services/admin/adminServices";
 
-export function useViewRegistrationRequest() {
+export const useViewRegistrationRequest = () => {
   const [requests, setRequests] = useState([]);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(1);
   const [alertOpen, setAlertOpen] = useState(false);
   const [alertMessage, setAlertMessage] = useState({
     title: "",
@@ -15,13 +17,14 @@ export function useViewRegistrationRequest() {
   const [currentAction, setCurrentAction] = useState({ id: null, status: "" });
 
   useEffect(() => {
-    fetchRequests();
-  }, []);
+    fetchRequests(currentPage);
+  }, [currentPage]);
 
-  const fetchRequests = async () => {
+  const fetchRequests = async (page) => {
     try {
-      const data = await userRegistrationRequest();
+      const data = await userRegistrationRequest(page, 5);
       setRequests(data.userRequest || []);
+      setTotalPages(data.totalPages || 1);
     } catch (error) {
       console.log(error);
       setAlertMessage({
@@ -48,7 +51,7 @@ export function useViewRegistrationRequest() {
       await userRegistrationRequestUpdate(currentAction.id, {
         status: currentAction.status,
       });
-      fetchRequests();
+      fetchRequests(currentPage);
       setAlertMessage({
         title: "Success",
         description: `Registration Request ${currentAction.status} successfully`,
@@ -69,6 +72,9 @@ export function useViewRegistrationRequest() {
   };
   return {
     requests,
+    currentPage,
+    totalPages,
+    setCurrentPage,
     alertOpen,
     setAlertOpen,
     alertMessage,
@@ -77,4 +83,4 @@ export function useViewRegistrationRequest() {
     showConfirmation,
     handleUpdateStatus,
   };
-}
+};

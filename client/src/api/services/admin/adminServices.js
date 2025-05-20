@@ -1,8 +1,8 @@
 import { http } from "../../../common/https";
 
-export const userRegistrationRequest = async () => {
+export const userRegistrationRequest = async (page = 1, limit = 5) => {
   try {
-    const response = await http.get("/api/admin/registration-request");
+    const response = await http.get(`/api/admin/registration-request?page=${page}&limit=${limit}`);
     console.log(response.data);
     return response.data;
   } catch (error) {

@@ -3,7 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { appConfig } from "../../common/config";
 import { authServices } from "../../auth";
 
-export function useAdminDashboard() {
+export const useAdminDashboard =() => {
   const [selectedOption, setSelectedOption] = useState(
     "viewRegistrationRequest"
   );

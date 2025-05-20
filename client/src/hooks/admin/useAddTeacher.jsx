@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { addTeacher } from "../../api/services/admin/adminServices";
 
-export function useAddTeacher() {
+export const useAddTeacher=() =>{
   const [formData, setFormData] = useState({
     name: "",
     email: "",

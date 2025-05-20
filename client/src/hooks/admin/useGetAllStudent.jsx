@@ -4,7 +4,7 @@ import {
   getAllStudent,
 } from "../../api/services/admin/adminServices";
 
-export function useGetAllStudent() {
+export const useGetAllStudent =() => {
   const [students, setStudents] = useState([]);
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
