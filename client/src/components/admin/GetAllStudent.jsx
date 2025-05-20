@@ -1,9 +1,12 @@
 import { Trash2 } from "lucide-react";
-import { CustomAlert } from "../../common/components";
+import { CustomAlert, CustomPagination } from "../../common/components";
 import { useGetAllStudent } from "../../hooks/admin";
 
 const GetAllStudent = () => {
   const {students,
+    currentPage,
+    totalPages,
+    setCurrentPage,
     alertOpen,
     setAlertOpen,
     alertMessage,
@@ -55,12 +58,13 @@ const GetAllStudent = () => {
           ) : (
             <tr>
               <td colSpan="5" className="p-4 text-center text-gray-500">
-                No teachers found.
+                No students found.
               </td>
             </tr>
           )}
         </tbody>
       </table>
+      <CustomPagination currentPage={currentPage} totalPages={totalPages} setCurrentPage={setCurrentPage} />
     </div>
   );
 };

@@ -28,9 +28,9 @@ export const getAllTeacher = async () => {
   }
 };
 
-export const getAllStudent = async () => {
+export const getAllStudent = async (page = 1, limit = 5) => {
   try {
-    const response = await http.get("/api/admin/all-students");
+    const response = await http.get(`/api/admin/all-students?page=${page}&limit=${limit}`);
     return response.data;
   } catch (error) {
     console.log(error);

@@ -1,8 +1,13 @@
 import { useEffect, useState } from "react";
-import { deleteUser, getAllStudent } from "../../api/services/admin/adminServices";
+import {
+  deleteUser,
+  getAllStudent,
+} from "../../api/services/admin/adminServices";
 
 export function useGetAllStudent() {
   const [students, setStudents] = useState([]);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(1);
   const [alertOpen, setAlertOpen] = useState(false);
   const [alertMessage, setAlertMessage] = useState({
     title: "",
@@ -12,13 +17,14 @@ export function useGetAllStudent() {
   const [currentAction, setCurrentAction] = useState({ id: null });
 
   useEffect(() => {
-    fetchStudents();
-  }, []);
+    fetchStudents(currentPage);
+  }, [currentPage]);
 
-  const fetchStudents = async () => {
+  const fetchStudents = async (page) => {
     try {
-      const data = await getAllStudent();
+      const data = await getAllStudent(page, 5);
       setStudents(data.students || []);
+      setTotalPages(data.totalPages || 1);
     } catch (error) {
       console.log(error);
       setAlertMessage({
@@ -50,7 +56,7 @@ export function useGetAllStudent() {
         variant: "success",
       });
       setAlertOpen(true);
-      fetchStudents();
+      fetchStudents(currentPage);
     } catch (error) {
       console.log(error);
       setAlertMessage({
@@ -67,6 +73,9 @@ export function useGetAllStudent() {
 
   return {
     students,
+    currentPage,
+    totalPages,
+    setCurrentPage,
     alertOpen,
     setAlertOpen,
     alertMessage,

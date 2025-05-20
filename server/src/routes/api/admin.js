@@ -58,8 +58,24 @@ router.get("/all-students", authenticateToken, async (req, res) => {
         .status(403)
         .json({ message: "Only admin can view all students list" });
     }
-    const students = await User.find({ role: "student" }).select("-password");
-    res.status(200).json({ students });
+
+    const page = parseInt(req.query.page) || 1;
+    const limit = parseInt(req.query.limit) || 5;
+    const skip = (page - 1) * limit;
+
+    const students = await User.find({ role: "student" })
+      .select("-password")
+      .skip(skip)
+      .limit(limit);
+    const total = await User.countDocuments({ role: "student" });
+    res
+      .status(200)
+      .json({
+        students,
+        currentPage: page,
+        totalPages: Math.ceil(total / limit),
+        totalStudents: total,
+      });
   } catch (error) {
     res.status(500).json({ message: "Something went wrong" });
   }
