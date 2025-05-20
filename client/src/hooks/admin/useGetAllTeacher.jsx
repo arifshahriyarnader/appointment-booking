@@ -6,6 +6,8 @@ import {
 
 export function useGetAllTeacher() {
   const [teachers, setTeachers] = useState([]);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(1);
   const [alertOpen, setAlertOpen] = useState(false);
   const [alertMessage, setAlertMessage] = useState({
     title: "",
@@ -15,13 +17,14 @@ export function useGetAllTeacher() {
   const [currentAction, setCurrentAction] = useState({ id: null });
 
   useEffect(() => {
-    fetchTeachers();
-  }, []);
+    fetchTeachers(currentPage);
+  }, [currentPage]);
 
-  const fetchTeachers = async () => {
+  const fetchTeachers = async (page) => {
     try {
-      const data = await getAllTeacher();
+      const data = await getAllTeacher(page, 5);
       setTeachers(data.teachers || []);
+         setTotalPages(data.totalPages || 1);
     } catch (error) {
       console.log("Error fetching teachers:", error);
       setAlertMessage({
@@ -53,7 +56,7 @@ export function useGetAllTeacher() {
         variant: "success",
       });
       setAlertOpen(true);
-      fetchTeachers();
+      fetchTeachers(currentPage);
     } catch (error) {
       setAlertMessage({
         title: "Error",
@@ -68,6 +71,9 @@ export function useGetAllTeacher() {
   };
   return {
     teachers,
+    currentPage,
+    totalPages,
+    setCurrentPage,
     alertOpen,
     setAlertOpen,
     alertMessage,

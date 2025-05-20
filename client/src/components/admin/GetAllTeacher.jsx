@@ -1,10 +1,13 @@
 import { Trash2 } from "lucide-react";
-import { CustomAlert } from "../../common/components";
+import { CustomAlert, CustomPagination } from "../../common/components";
 import { useGetAllTeacher } from "../../hooks/admin";
 
 const GetAllTeacher = () => {
   const {
     teachers,
+    currentPage,
+    totalPages,
+    setCurrentPage,
     alertOpen,
     setAlertOpen,
     alertMessage,
@@ -64,6 +67,11 @@ const GetAllTeacher = () => {
           )}
         </tbody>
       </table>
+      <CustomPagination
+        currentPage={currentPage}
+        totalPages={totalPages}
+        setCurrentPage={setCurrentPage}
+      />
     </div>
   );
 };

@@ -19,9 +19,9 @@ export const userRegistrationRequestUpdate = async (id, status) => {
   }
 };
 
-export const getAllTeacher = async () => {
+export const getAllTeacher = async (page =1, limit =5) => {
   try {
-    const response = await http.get("/api/admin/all-teachers");
+    const response = await http.get(`/api/admin/all-teachers?page=${page}&limit=${limit}`);
     return response.data;
   } catch (error) {
     console.log(error);
