@@ -50,7 +50,7 @@ const GetAllTeacher = () => {
                     className="bg-red-500 hover:bg-red-600 text-white font-semibold
                      cursor-pointer px-4 py-1.5 rounded-md transition-all duration-200 shadow-md"
                   >
-                    <Trash2 size={18} /> Delete
+                    <Trash2 size={18} />
                   </button>
                 </td>
               </tr>
