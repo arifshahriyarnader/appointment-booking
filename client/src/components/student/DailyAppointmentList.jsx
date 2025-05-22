@@ -1,7 +1,15 @@
+import { CustomPagination } from "../../common/components";
 import { useDailyAppointmentList } from "../../hooks/student";
 
 const DailyAppointmentList = () => {
-  const { appointments, loading, message } = useDailyAppointmentList();
+  const {
+    appointments,
+    currentPage,
+    totalPages,
+    setCurrentPage,
+    loading,
+    message,
+  } = useDailyAppointmentList();
 
   return (
     <div className="max-w-5xl mx-auto p-6 bg-white rounded-lg shadow-md">
@@ -62,6 +70,11 @@ const DailyAppointmentList = () => {
       ) : (
         <p className="text-red-500 text-center mt-4">{message}</p>
       )}
+      <CustomPagination
+        currentPage={currentPage}
+        totalPages={totalPages}
+        setCurrentPage={setCurrentPage}
+      />
     </div>
   );
 };
