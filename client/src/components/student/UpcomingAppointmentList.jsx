@@ -1,4 +1,4 @@
-import { CustomPagination } from "@/common/components";
+import { CustomPagination } from "../../common/components";
 import { useUpcomingAppointment } from "../../hooks/student";
 
 const UpcomingAppointmentList = () => {
