@@ -1,7 +1,15 @@
+import { CustomPagination } from "@/common/components";
 import { useUpcomingAppointment } from "../../hooks/student";
 
 const UpcomingAppointmentList = () => {
-  const { appointments, loading, message } = useUpcomingAppointment();
+  const {
+    appointments,
+    currentPage,
+    totalPages,
+    setCurrentPage,
+    loading,
+    message,
+  } = useUpcomingAppointment();
   return (
     <div className="max-w-5xl mx-auto p-6 bg-white rounded-lg shadow-md">
       <h2 className="text-xl font-semibold mb-4">Upcoming Appointments</h2>
@@ -61,6 +69,11 @@ const UpcomingAppointmentList = () => {
       ) : (
         <p className="text-red-500 text-center mt-4">{message}</p>
       )}
+      <CustomPagination
+        currentPage={currentPage}
+        totalPages={totalPages}
+        setCurrentPage={setCurrentPage}
+      />
     </div>
   );
 };

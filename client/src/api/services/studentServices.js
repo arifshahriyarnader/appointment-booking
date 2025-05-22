@@ -97,7 +97,7 @@ export const todaysAppointmentList = async (page=1, limit=5) => {
 export const pastAppointmentList = async (page=1, limit=5) => {
   try {
     const response = await http.get(
-      `/api/student/appointment/history?page=${page}&limit=${limit}`
+      `/api/student/appointment-history?page=${page}&limit=${limit}`
     );
     console.log("Past Appointments List:", response.data);
     return response.data;
@@ -106,10 +106,10 @@ export const pastAppointmentList = async (page=1, limit=5) => {
   }
 };
 
-export const upcomingAppointmentList = async () => {
+export const upcomingAppointmentList = async (page=1, limit=5) => {
   try {
     const response = await http.get(
-      "/api/student/appointment/upcoming"
+      `/api/student/appointment-upcoming?page=${page}&limit=${limit}`
     );
     console.log("Past Appointments List:", response.data);
     return response.data;
