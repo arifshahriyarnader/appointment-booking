@@ -7,11 +7,26 @@ const router = express.Router();
 //get all teachers
 router.get("/all-teachers", async (req, res) => {
   try {
+    const page = parseInt(req.query.page) || 1;
+    const limit = parseInt(req.query.limit) || 5;
+    const skip = (page - 1) * limit;
     const teacher = await User.find({
       role: "teacher",
       status: "approved",
-    }).select("-password");
-    res.status(200).json({ teacher });
+    })
+      .select("-password")
+      .skip(skip)
+      .limit(limit);
+    const total = await User.countDocuments({
+      role: "teacher",
+      status: "approved",
+    });
+    res.status(200).json({
+      teacher,
+      currentPage: page,
+      totalPages: Math.ceil(total / limit),
+      totalTeachers: total,
+    });
   } catch (error) {
     res.status(500).json({ message: "Server error", error });
   }
@@ -261,7 +276,7 @@ router.get("/appointment/history", authenticateToken, async (req, res) => {
       _id: appointment._id,
       teacher: appointment.teacher,
       date: appointment.date,
-      agenda: appointment.agenda, 
+      agenda: appointment.agenda,
       slots: appointment.slots,
       status:
         appointment.status === "approved" ? "Completed" : appointment.status, // Shows "Completed" if approved

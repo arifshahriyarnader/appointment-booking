@@ -1,8 +1,16 @@
+import { CustomPagination } from "@/common/components";
 import { useAllTeacher } from "../../hooks/student";
 import PropTypes from "prop-types";
 
 const AllTeacher = ({ searchResults }) => {
-  const { teachers, loading, handleViewProfile } = useAllTeacher({searchResults});
+  const {
+    teachers,
+    currentPage,
+    totalPages,
+    setCurrentPage,
+    loading,
+    handleViewProfile,
+  } = useAllTeacher({ searchResults });
 
   return (
     <div className="p-6 bg-white shadow-md rounded-lg">
@@ -42,6 +50,11 @@ const AllTeacher = ({ searchResults }) => {
           </tbody>
         </table>
       )}
+      <CustomPagination
+        currentPage={currentPage}
+        totalPages={totalPages}
+        setCurrentPage={setCurrentPage}
+      />
     </div>
   );
 };
