@@ -69,10 +69,10 @@ export const bookAppointment = async (appointmentData) => {
   }
 };
 
-export const checkAppointmentStatus = async () => {
+export const checkAppointmentStatus = async (page=1, limit=5) => {
   try {
     const response = await http.get(
-      "/api/student-appointment/appointment-status"
+      `/api/student-appointment/appointment-status?page=${page}&limit=${limit}`
     );
     console.log("Appointment Status:", response.data);
     return response.data;

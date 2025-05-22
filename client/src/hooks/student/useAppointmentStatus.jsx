@@ -3,19 +3,22 @@ import { checkAppointmentStatus } from "../../api/services/studentServices";
 
 export const useAppointmentStatus = () => {
   const [appointments, setAppointments] = useState([]);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(1);
   const [message, setMessage] = useState("");
 
   useEffect(() => {
-    fetchAppointments();
-  }, []);
+    fetchAppointments(currentPage);
+  }, [currentPage]);
 
-  const fetchAppointments = async () => {
-    const response = await checkAppointmentStatus();
+  const fetchAppointments = async (page) => {
+    const response = await checkAppointmentStatus(page, 5);
     if (response.appointments?.length) {
       setAppointments(response.appointments);
+      setTotalPages(response.totalPages || 1);
     } else {
       setMessage(response.message || "You have no booked appointments.");
     }
   };
-  return { appointments, message };
+  return { appointments, currentPage, totalPages, setCurrentPage, message };
 };

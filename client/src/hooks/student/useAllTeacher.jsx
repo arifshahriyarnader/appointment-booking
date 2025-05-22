@@ -4,7 +4,7 @@ import { getAllTeachersList } from "../../api/services/studentServices";
 
 export const useAllTeacher = ({ searchResults } = {}) => {
   const [teachers, setTeachers] = useState([]);
-   const [currentPage, setCurrentPage] = useState(1);
+  const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
   const [loading, setLoading] = useState(true);
   const navigate = useNavigate();
@@ -34,5 +34,12 @@ export const useAllTeacher = ({ searchResults } = {}) => {
     navigate(`/teacher-profile/${teacherId}`);
   };
 
-  return { teachers,currentPage,totalPages,setCurrentPage, loading, handleViewProfile };
+  return {
+    teachers,
+    currentPage,
+    totalPages,
+    setCurrentPage,
+    loading,
+    handleViewProfile,
+  };
 };

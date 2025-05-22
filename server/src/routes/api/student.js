@@ -173,18 +173,25 @@ router.get("/appointment-status", authenticateToken, async (req, res) => {
         .json({ message: "Only students can view their appointment status" });
     }
 
+    const page = parseInt(req.query.page) || 1;
+    const limit = parseInt(req.query.limit) || 5;
+    const skip = (page - 1) * limit;
+    const total = await Appointment.countDocuments({ student: req.user._id });
+
     // Fetch appointments with populated teacher and student details
     const appointments = await Appointment.find({ student: req.user._id })
       .populate("teacher", "name email course")
       .populate("student", "name email")
-      .sort({ createdAt: -1 });
+      .sort({ createdAt: -1 })
+      .skip(skip)
+      .limit(limit);
 
     // If no appointments found
-    if (!appointments.length) {
-      return res
-        .status(200)
-        .json({ message: "You have no booked appointments." });
-    }
+    // if (!appointments.length) {
+    //   return res
+    //     .status(200)
+    //     .json({ message: "You have no booked appointments." });
+    // }
 
     // Formatting response for better readability
     const formattedAppointments = appointments.map((appointment) => ({
@@ -204,7 +211,14 @@ router.get("/appointment-status", authenticateToken, async (req, res) => {
       agenda: appointment.agenda,
     }));
 
-    res.status(200).json({ appointments: formattedAppointments });
+    res
+      .status(200)
+      .json({
+        appointments: formattedAppointments,
+        currentPage: page,
+        totalPages: Math.ceil(total / limit),
+        totalAppointments: total,
+      });
   } catch (error) {
     res.status(500).json({ message: "Server error", error });
   }
