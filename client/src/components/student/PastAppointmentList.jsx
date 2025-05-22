@@ -1,7 +1,15 @@
+import { CustomPagination } from "../../common/components";
 import { usePastAppointment } from "../../hooks/student";
 
 const PastAppointmentList = () => {
-  const { appointments, loading, message } = usePastAppointment();
+  const {
+    appointments,
+    currentPage,
+    totalPages,
+    setCurrentPage,
+    loading,
+    message,
+  } = usePastAppointment();
 
   return (
     <div className="max-w-5xl mx-auto p-6 bg-white rounded-lg shadow-md">
@@ -62,6 +70,11 @@ const PastAppointmentList = () => {
       ) : (
         <p className="text-red-500 text-center mt-4">{message}</p>
       )}
+      <CustomPagination
+        currentPage={currentPage}
+        totalPages={totalPages}
+        setCurrentPage={setCurrentPage}
+      />
     </div>
   );
 };

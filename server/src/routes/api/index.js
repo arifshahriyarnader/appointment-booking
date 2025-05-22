@@ -7,5 +7,5 @@ export default function configureRoutes(app) {
     app.use('/api/users', user);  
     app.use('/api/admin', admin);
     app.use('/api/teacher', teacher);  
-    app.use('/api/student-appointment', student);  
+    app.use('/api/student', student);  
 }

@@ -3,7 +3,7 @@ import { http } from "../../common/https";
 export const getAllTeachersList = async (page = 1, limit = 5) => {
   try {
     const response = await http.get(
-      `/api/student-appointment/all-teachers?page=${page}&limit=${limit}`
+      `/api/student/all-teachers?page=${page}&limit=${limit}`
     );
     console.log("All Teacher List:", response.data);
     return response.data;
@@ -15,7 +15,7 @@ export const getAllTeachersList = async (page = 1, limit = 5) => {
 export const getTeacherProfile = async (teacherId) => {
   try {
     const response = await http.get(
-      `/api/student-appointment/teacher/${teacherId}`
+      `/api/student/teacher/${teacherId}`
     );
     return response.data;
   } catch (error) {
@@ -27,7 +27,7 @@ export const getTeacherProfile = async (teacherId) => {
 export const searchTeachers = async (query) => {
   try {
     const response = await http.get(
-      `/api/student-appointment/search-teachers`,
+      `/api/student/search-teachers`,
       {
         params: { query },
       }
@@ -42,7 +42,7 @@ export const searchTeachers = async (query) => {
 export const checkTeacherBookedSlots = async (teacherId) => {
   try {
     const response = await http.get(
-      `/api/student-appointment/teacher/${teacherId}/upcoming-booked-slots`
+      `/api/student/teacher/${teacherId}/upcoming-booked-slots`
     );
     console.log("Teacher Booked Slots:", response.data);
     return response.data;
@@ -56,7 +56,7 @@ export const bookAppointment = async (appointmentData) => {
     console.log("Attempting to book appointment:", appointmentData);
 
     const response = await http.post(
-      "/api/student-appointment/appointment",
+      "/api/student/appointment",
       appointmentData
     );
 
@@ -72,7 +72,7 @@ export const bookAppointment = async (appointmentData) => {
 export const checkAppointmentStatus = async (page=1, limit=5) => {
   try {
     const response = await http.get(
-      `/api/student-appointment/appointment-status?page=${page}&limit=${limit}`
+      `/api/student/appointment-status?page=${page}&limit=${limit}`
     );
     console.log("Appointment Status:", response.data);
     return response.data;
@@ -84,7 +84,7 @@ export const checkAppointmentStatus = async (page=1, limit=5) => {
 export const todaysAppointmentList = async () => {
   try {
     const response = await http.get(
-      "/api/student-appointment/appointment/today"
+      "/api/student/appointment/today"
     );
     console.log("Todays Appointments List:", response.data);
     return response.data;
@@ -94,10 +94,10 @@ export const todaysAppointmentList = async () => {
   }
 };
 
-export const pastAppointmentList = async () => {
+export const pastAppointmentList = async (page=1, limit=5) => {
   try {
     const response = await http.get(
-      "/api/student-appointment/appointment/history"
+      `/api/student/appointment/history?page=${page}&limit=${limit}`
     );
     console.log("Past Appointments List:", response.data);
     return response.data;
@@ -109,7 +109,7 @@ export const pastAppointmentList = async () => {
 export const upcomingAppointmentList = async () => {
   try {
     const response = await http.get(
-      "/api/student-appointment/appointment/upcoming"
+      "/api/student/appointment/upcoming"
     );
     console.log("Past Appointments List:", response.data);
     return response.data;

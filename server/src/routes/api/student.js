@@ -186,13 +186,6 @@ router.get("/appointment-status", authenticateToken, async (req, res) => {
       .skip(skip)
       .limit(limit);
 
-    // If no appointments found
-    // if (!appointments.length) {
-    //   return res
-    //     .status(200)
-    //     .json({ message: "You have no booked appointments." });
-    // }
-
     // Formatting response for better readability
     const formattedAppointments = appointments.map((appointment) => ({
       _id: appointment._id,
@@ -211,14 +204,12 @@ router.get("/appointment-status", authenticateToken, async (req, res) => {
       agenda: appointment.agenda,
     }));
 
-    res
-      .status(200)
-      .json({
-        appointments: formattedAppointments,
-        currentPage: page,
-        totalPages: Math.ceil(total / limit),
-        totalAppointments: total,
-      });
+    res.status(200).json({
+      appointments: formattedAppointments,
+      currentPage: page,
+      totalPages: Math.ceil(total / limit),
+      totalAppointments: total,
+    });
   } catch (error) {
     res.status(500).json({ message: "Server error", error });
   }
@@ -275,17 +266,19 @@ router.get("/appointment/history", authenticateToken, async (req, res) => {
         .json({ message: "Only students can view their past appointments" });
     }
     const today = new Date();
+    const page = parseInt(req.query.page) || 1;
+    const limit = parseInt(req.query.limit) || 5;
+    const skip = (page - 1) * limit;
+    const total = await Appointment.countDocuments({ student: req.user._id });
     const pastAppointments = await Appointment.find({
       student: req.user._id,
       date: { $lt: today },
     })
       .populate("teacher", "name email course")
-      .sort({ date: -1 });
-    if (pastAppointments.length === 0) {
-      return res
-        .status(200)
-        .json({ message: "You have no past appointments." });
-    }
+      .sort({ date: -1 })
+      .skip(skip)
+      .limit(limit);
+
     const formattedAppointments = pastAppointments.map((appointment) => ({
       _id: appointment._id,
       teacher: appointment.teacher,
@@ -293,9 +286,14 @@ router.get("/appointment/history", authenticateToken, async (req, res) => {
       agenda: appointment.agenda,
       slots: appointment.slots,
       status:
-        appointment.status === "approved" ? "Completed" : appointment.status, // Shows "Completed" if approved
+        appointment.status === "approved" ? "Completed" : appointment.status,
     }));
-    res.status(200).json({ pastAppointments: formattedAppointments });
+    res.status(200).json({
+      pastAppointments: formattedAppointments,
+      currentPage: page,
+      totalPages: Math.ceil(total / limit),
+      totalAppointments: total,
+    });
   } catch (error) {
     res.status(500).json({ message: "Server error", error });
   }
