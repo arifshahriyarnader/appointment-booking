@@ -109,7 +109,7 @@ router.get("/all", authenticateToken, async (req, res) => {
     }
 
     let current = parseInt(req.query.current) || 1;
-    let pageSize = parseInt(req.query.pageSize) || 10;
+    let pageSize = parseInt(req.query.pageSize) || 5;
     let sort = req.query.sort || "asc";
     let day = req.query.day;
 
@@ -305,8 +305,7 @@ router.get("/appointment/upcoming", authenticateToken, async (req, res) => {
 });
 
 //past appointment history
-
-router.get("/past-schedule/history", authenticateToken, async (req, res) => {
+router.get("/past-schedule-history", authenticateToken, async (req, res) => {
   try {
     if (req.user.role !== "teacher") {
       return res
@@ -317,6 +316,11 @@ router.get("/past-schedule/history", authenticateToken, async (req, res) => {
     const today = new Date();
     today.setHours(0, 0, 0, 0);
 
+    const page = parseInt(req.query.page) || 1;
+    const limit = parseInt(req.query.limit) || 5;
+    const skip = (page - 1) * limit;
+    const total = await Appointment.countDocuments({ teacher: req.user._id });
+
     const pastAppointments = await Appointment.find({
       teacher: req.user._id,
       date: { $lt: today },
@@ -324,13 +328,9 @@ router.get("/past-schedule/history", authenticateToken, async (req, res) => {
     })
       .populate("student", "name email")
       .populate("teacher", "course")
-      .sort({ date: -1 });
-
-    if (pastAppointments.length === 0) {
-      return res
-        .status(404)
-        .json({ message: "No past appointment history found." });
-    }
+      .sort({ date: -1 })
+      .skip(skip)
+      .limit(limit);
 
     const formattedAppointments = pastAppointments.map((appointment) => ({
       _id: appointment._id,
@@ -342,7 +342,12 @@ router.get("/past-schedule/history", authenticateToken, async (req, res) => {
       status: "Completed",
     }));
 
-    res.status(200).json({ pastAppointments: formattedAppointments });
+    res.status(200).json({
+      pastAppointments: formattedAppointments,
+      currentPage: page,
+      totalPages: Math.ceil(total / limit),
+      totalAppointments: total,
+    });
   } catch (error) {
     console.error(error);
     res.status(500).json({ message: "Server error", error });
