@@ -1,9 +1,12 @@
 import { useViewAppointmentRequest } from "../../hooks/teacher";
-import { CustomAlert } from "../../common/components";
+import { CustomAlert, CustomPagination } from "../../common/components";
 
 const ViewAppointmentRequest = () => {
   const {
     appointments,
+    currentPage,
+    totalPages,
+    setCurrentPage,
     loading,
     error,
     alertOpen,
@@ -92,7 +95,7 @@ const ViewAppointmentRequest = () => {
                           onClick={() =>
                             showConfirmation(appointment._id, "approved")
                           }
-                          className="px-3 py-1 bg-green-500 text-white rounded hover:bg-green-600 transition"
+                          className="px-3 py-1 bg-green-500 text-white rounded hover:bg-green-600 transition cursor-pointer"
                         >
                           Approve
                         </button>
@@ -100,7 +103,7 @@ const ViewAppointmentRequest = () => {
                           onClick={() =>
                             showConfirmation(appointment._id, "rejected")
                           }
-                          className="px-3 py-1 bg-red-500 text-white rounded hover:bg-red-600 transition"
+                          className="px-3 py-1 bg-red-500 text-white rounded hover:bg-red-600 transition cursor-pointer"
                         >
                           Reject
                         </button>
@@ -113,6 +116,12 @@ const ViewAppointmentRequest = () => {
           </tbody>
         </table>
       </div>
+
+      <CustomPagination
+        currentPage={currentPage}
+        totalPages={totalPages}
+        setCurrentPage={setCurrentPage}
+      />
     </div>
   );
 };

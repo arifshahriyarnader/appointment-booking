@@ -24,5 +24,12 @@ export const usePastAppointment = () => {
     }
   };
 
-  return { pastAppointments,currentPage, setCurrentPage,totalPages, loading, error };
+  return {
+    pastAppointments,
+    currentPage,
+    setCurrentPage,
+    totalPages,
+    loading,
+    error,
+  };
 };

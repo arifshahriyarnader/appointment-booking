@@ -75,7 +75,7 @@ const AddSlot = () => {
         </div>
         <button
           type="submit"
-          className="w-full bg-green-500 text-white py-2 rounded-md hover:bg-green-600"
+          className="w-full bg-green-500 text-white py-2 rounded-md hover:bg-green-600 cursor-pointer"
           disabled={loading}
         >
           {loading ? "Adding..." : "Add Slot"}

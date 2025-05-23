@@ -209,15 +209,29 @@ router.get("/appointment-status", authenticateToken, async (req, res) => {
     const today = new Date();
     today.setHours(0, 0, 0, 0);
 
+    const page = parseInt(req.query.page) || 1;
+    const limit = parseInt(req.query.limit) || 5;
+    const skip = (page - 1) * limit;
+    const total = await Appointment.countDocuments({ teacher: req.user._id });
+
     // Fetch only appointments with today or future dates
     const appointments = await Appointment.find({
       teacher: req.user._id,
-      date: { $gte: today }, //Only include appointments for today or future dates
+      date: { $gte: today }, 
     })
       .populate("student", "name email")
-      .sort({ date: 1 }); // Sort by date (earliest first)
+      .sort({ date: 1 })
+      .skip(skip)
+      .limit(limit);
 
-    res.status(200).json({ message: appointments });
+    res
+      .status(200)
+      .json({
+        message: appointments,
+        currentPage: page,
+        totalPages: Math.ceil(total / limit),
+        totalAppointments: total,
+      });
   } catch (error) {
     res.status(500).json({ message: "Server error", error });
   }
@@ -254,7 +268,7 @@ router.put("/appointment/:id/status", authenticateToken, async (req, res) => {
 });
 
 //daily appointment schedules
-router.get("/schedule/today", authenticateToken, async (req, res) => {
+router.get("/schedule-today", authenticateToken, async (req, res) => {
   try {
     if (req.user.role !== "teacher") {
       return res
@@ -262,19 +276,28 @@ router.get("/schedule/today", authenticateToken, async (req, res) => {
         .json({ message: "Only Teacher can view daily appointment schedule" });
     }
     const today = new Date().toISOString().split("T")[0];
+
+     const page = parseInt(req.query.page) || 1;
+    const limit = parseInt(req.query.limit) || 5;
+    const skip = (page - 1) * limit;
+    const total = await Appointment.countDocuments({ teacher: req.user._id });
+
+
     const appointments = await Appointment.find({
       teacher: req.user._id,
       date: today,
       status: "approved",
     })
       .populate("student", "name email")
-      .populate("teacher", "course");
-    if (appointments.length === 0) {
-      return res
-        .status(200)
-        .json({ message: "You have no appointment schedule for today" });
-    }
-    res.status(200).json({ appointments });
+      .populate("teacher", "course").skip(skip).limit(limit);
+    // if (appointments.length === 0) {
+    //   return res
+    //     .status(200)
+    //     .json({ message: "You have no appointment schedule for today" });
+    // }
+    res.status(200).json({ appointments,  currentPage: page,
+      totalPages: Math.ceil(total / limit),
+      totalAppointments: total, });
   } catch (error) {
     res.status(500).json({ message: "Server error", error });
   }
@@ -305,14 +328,12 @@ router.get("/appointment-upcoming", authenticateToken, async (req, res) => {
       .populate("teacher", "course")
       .skip(skip)
       .limit(limit);
-    res
-      .status(200)
-      .json({
-        appointments,
-        currentPage: page,
-        totalPages: Math.ceil(total / limit),
-        totalAppointments: total,
-      });
+    res.status(200).json({
+      appointments,
+      currentPage: page,
+      totalPages: Math.ceil(total / limit),
+      totalAppointments: total,
+    });
   } catch (error) {
     res.status(500).json({ message: "Server error", error });
   }

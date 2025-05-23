@@ -30,9 +30,11 @@ export const deleteAvailhours = async (id) => {
   return response.data;
 };
 
-export const getAppointmentRequests = async () => {
+export const getAppointmentRequests = async (page = 1, limit = 5) => {
   try {
-    const response = await http.get(`api/teacher/appointment-status`);
+    const response = await http.get(
+      `api/teacher/appointment-status?page=${page}&limit=${limit}`
+    );
     console.log("Appointment Request:", response.data);
     return response.data;
   } catch (error) {
@@ -53,8 +55,10 @@ export const updateAppointmentStatus = async (id, updatedData) => {
   }
 };
 
-export const dailyAppointmentSchedule = async () => {
-  const response = await http.get(`/api/teacher/schedule/today`);
+export const dailyAppointmentSchedule = async (page = 1, limit = 5) => {
+  const response = await http.get(
+    `/api/teacher/schedule-today?page=${page}&limit=${limit}`
+  );
   console.log("Daily Appointment Schedule:", response.data);
   return response?.data || { appointments: [] };
 };

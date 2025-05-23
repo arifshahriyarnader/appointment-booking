@@ -6,6 +6,8 @@ import {
 
 export const useViewAppointmentRequest = () => {
   const [appointments, setAppointments] = useState([]);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(1);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const [alertOpen, setAlertOpen] = useState(false);
@@ -17,13 +19,14 @@ export const useViewAppointmentRequest = () => {
   const [currentAction, setCurrentAction] = useState({ id: null, status: "" });
 
   useEffect(() => {
-    fetchAppointments();
-  }, []);
+    fetchAppointments(currentPage);
+  }, [currentPage]);
 
-  const fetchAppointments = async () => {
+  const fetchAppointments = async (page) => {
     try {
-      const response = await getAppointmentRequests();
+      const response = await getAppointmentRequests(page, 5);
       setAppointments(response?.message || []);
+      setTotalPages(response.totalPages || 1);
     } catch (error) {
       setError("Failed to fetch appointment requests.", error);
     } finally {
@@ -47,6 +50,7 @@ export const useViewAppointmentRequest = () => {
       await updateAppointmentStatus(currentAction.id, {
         status: currentAction.status,
       });
+
       setAppointments((prev) =>
         prev.map((app) =>
           app._id === currentAction.id
@@ -75,6 +79,9 @@ export const useViewAppointmentRequest = () => {
 
   return {
     appointments,
+    currentPage,
+    totalPages,
+    setCurrentPage,
     loading,
     error,
     alertOpen,
