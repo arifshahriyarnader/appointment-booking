@@ -1,7 +1,15 @@
+import { CustomPagination } from "../../common/components";
 import { useUpcomingAppointment } from "../../hooks/teacher";
 
 const UpcomingAppointmentSchedule = () => {
-  const { appointments, loading, error } = useUpcomingAppointment();
+  const {
+    appointments,
+    currentPage,
+    totalPages,
+    setCurrentPage,
+    loading,
+    error,
+  } = useUpcomingAppointment();
 
   if (loading) return <p>Loading upcoming appointments...</p>;
   if (error) return <p className="text-red-500">{error}</p>;
@@ -49,6 +57,11 @@ const UpcomingAppointmentSchedule = () => {
           </tbody>
         </table>
       )}
+      <CustomPagination
+        currentPage={currentPage}
+        totalPages={totalPages}
+        setCurrentPage={setCurrentPage}
+      />
     </div>
   );
 };

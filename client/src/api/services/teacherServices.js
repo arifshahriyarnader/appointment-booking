@@ -59,9 +59,11 @@ export const dailyAppointmentSchedule = async () => {
   return response?.data || { appointments: [] };
 };
 
-export const upcomingAppointmentSchedule = async () => {
+export const upcomingAppointmentSchedule = async (page = 1, limit = 5) => {
   try {
-    const response = await http.get(`/api/teacher/appointment/upcoming`);
+    const response = await http.get(
+      `/api/teacher/appointment-upcoming?page=${page}&limit=${limit}`
+    );
     console.log("Upcoming Appointment Schedule", response.data);
     return response.data;
   } catch (error) {
