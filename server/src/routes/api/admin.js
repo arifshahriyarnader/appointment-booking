@@ -1,8 +1,10 @@
 import express from "express";
-import bcrypt from "bcrypt";
 import { authenticateToken } from "../../middleware/index.js";
 import { User } from "../../models/index.js";
-import { registerUserController } from "../../controllers/admin.controller.js";
+import {
+  getAllStudentsController,
+  registerUserController,
+} from "../../controllers/admin.controller.js";
 
 const router = express.Router();
 
@@ -10,33 +12,7 @@ const router = express.Router();
 router.post("/admin/register-user", authenticateToken, registerUserController);
 
 //get all students
-router.get("/all-students", authenticateToken, async (req, res) => {
-  try {
-    if (req.user.role !== "admin") {
-      return res
-        .status(403)
-        .json({ message: "Only admin can view all students list" });
-    }
-
-    const page = parseInt(req.query.page) || 1;
-    const limit = parseInt(req.query.limit) || 5;
-    const skip = (page - 1) * limit;
-
-    const students = await User.find({ role: "student" })
-      .select("-password")
-      .skip(skip)
-      .limit(limit);
-    const total = await User.countDocuments({ role: "student" });
-    res.status(200).json({
-      students,
-      currentPage: page,
-      totalPages: Math.ceil(total / limit),
-      totalStudents: total,
-    });
-  } catch (error) {
-    res.status(500).json({ message: "Something went wrong" });
-  }
-});
+router.get("/all-students", authenticateToken, getAllStudentsController);
 
 //get all teachers
 router.get("/all-teachers", authenticateToken, async (req, res) => {

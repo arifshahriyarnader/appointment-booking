@@ -29,3 +29,18 @@ export const registerUser = async ({
   await newUser.save();
   return newUser;
 };
+
+export const getAllStudentsService = async (page = 1, limit = 5) => {
+  const skip = (page - 1) * limit;
+  const students = await User.find({ role: "student" })
+    .select("-password")
+    .skip(skip)
+    .limit(limit);
+  const total = await User.countDocuments({ role: "student" });
+  return {
+    students,
+    currentPage: page,
+    totalPages: Math.ceil(total / limit),
+    totalStudents: total,
+  };
+};
