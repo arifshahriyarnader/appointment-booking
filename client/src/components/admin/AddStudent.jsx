@@ -75,7 +75,7 @@ const AddStudent = () => {
 
         <button
           type="submit"
-          className="w-full bg-blue-500 hover:bg-blue-600 text-white font-semibold py-2 rounded-md transition-all duration-200"
+          className="w-full bg-blue-500 hover:bg-blue-600 text-white font-semibold py-2 rounded-md transition-all duration-200 cursor-pointer"
           disabled={loading}
         >
           {loading ? "Adding..." : "Add Student"}

@@ -217,21 +217,19 @@ router.get("/appointment-status", authenticateToken, async (req, res) => {
     // Fetch only appointments with today or future dates
     const appointments = await Appointment.find({
       teacher: req.user._id,
-      date: { $gte: today }, 
+      date: { $gte: today },
     })
       .populate("student", "name email")
       .sort({ date: 1 })
       .skip(skip)
       .limit(limit);
 
-    res
-      .status(200)
-      .json({
-        message: appointments,
-        currentPage: page,
-        totalPages: Math.ceil(total / limit),
-        totalAppointments: total,
-      });
+    res.status(200).json({
+      message: appointments,
+      currentPage: page,
+      totalPages: Math.ceil(total / limit),
+      totalAppointments: total,
+    });
   } catch (error) {
     res.status(500).json({ message: "Server error", error });
   }
@@ -277,11 +275,10 @@ router.get("/schedule-today", authenticateToken, async (req, res) => {
     }
     const today = new Date().toISOString().split("T")[0];
 
-     const page = parseInt(req.query.page) || 1;
+    const page = parseInt(req.query.page) || 1;
     const limit = parseInt(req.query.limit) || 5;
     const skip = (page - 1) * limit;
     const total = await Appointment.countDocuments({ teacher: req.user._id });
-
 
     const appointments = await Appointment.find({
       teacher: req.user._id,
@@ -289,15 +286,18 @@ router.get("/schedule-today", authenticateToken, async (req, res) => {
       status: "approved",
     })
       .populate("student", "name email")
-      .populate("teacher", "course").skip(skip).limit(limit);
-    // if (appointments.length === 0) {
-    //   return res
-    //     .status(200)
-    //     .json({ message: "You have no appointment schedule for today" });
-    // }
-    res.status(200).json({ appointments,  currentPage: page,
-      totalPages: Math.ceil(total / limit),
-      totalAppointments: total, });
+      .populate("teacher", "course")
+      .skip(skip)
+      .limit(limit);
+
+    res
+      .status(200)
+      .json({
+        appointments,
+        currentPage: page,
+        totalPages: Math.ceil(total / limit),
+        totalAppointments: total,
+      });
   } catch (error) {
     res.status(500).json({ message: "Server error", error });
   }

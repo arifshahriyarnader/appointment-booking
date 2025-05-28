@@ -2,53 +2,12 @@ import express from "express";
 import bcrypt from "bcrypt";
 import { authenticateToken } from "../../middleware/index.js";
 import { User } from "../../models/index.js";
+import { registerUserController } from "../../controllers/admin.controller.js";
 
 const router = express.Router();
 
 //admin create teacher or student
-router.post("/admin/register-user", authenticateToken, async (req, res) => {
-  try {
-    // Only admins can create users
-    if (req.user.role !== "admin") {
-      return res.status(403).json({ message: "Only admins can create users" });
-    }
-
-    const { name, email, password, role, department, studentId, course } =
-      req.body;
-
-    // Check if user already exists
-    const existingUser = await User.findOne({ email });
-    if (existingUser) {
-      return res.status(400).json({ message: "User already exists" });
-    }
-
-    // Hash the password
-    const hashedPassword = await bcrypt.hash(password, 10);
-
-    // Set default status for teachers and students as "approved" when created by an admin
-    const status = "approved";
-
-    // Create a new user
-    const newUser = new User({
-      name,
-      email,
-      password: hashedPassword,
-      role,
-      department,
-      studentId: role === "student" ? studentId : undefined,
-      course: role === "teacher" ? course : undefined,
-      status, // Auto-approved by admin
-    });
-
-    await newUser.save();
-
-    res
-      .status(201)
-      .json({ message: "User registered successfully", user: newUser });
-  } catch (error) {
-    res.status(500).json({ message: "Server error", error });
-  }
-});
+router.post("/admin/register-user", authenticateToken, registerUserController);
 
 //get all students
 router.get("/all-students", authenticateToken, async (req, res) => {
@@ -137,14 +96,12 @@ router.get("/registration-request", authenticateToken, async (req, res) => {
 
     const total = await User.countDocuments({ status: "pending" });
 
-    res
-      .status(200)
-      .json({
-        userRequest,
-        currentPage: page,
-        totalPages: Math.ceil(total / limit),
-        totalRequests: total,
-      });
+    res.status(200).json({
+      userRequest,
+      currentPage: page,
+      totalPages: Math.ceil(total / limit),
+      totalRequests: total,
+    });
   } catch (error) {
     res.status(500).json({ message: "Something went wrong", error });
   }
