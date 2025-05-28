@@ -59,3 +59,8 @@ export const getAllTeachersService = async (page = 1, limit = 5) => {
     totalStudents: total,
   };
 };
+
+export const deleteUserService = async (userId) => {
+  const user = await User.findByIdAndDelete(userId);
+  return user;
+};

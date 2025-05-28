@@ -40,7 +40,7 @@ const GetAllStudent = () => {
         <tbody>
           {students.length > 0 ? (
             students.map((student) => (
-              <tr key={students._id} className="text-center border-t">
+              <tr key={student._id} className="text-center border-t">
                 <td className="border p-2">{student.name}</td>
                 <td className="border p-2">{student.email}</td>
                 <td className="border p-2">{student.department}</td>
