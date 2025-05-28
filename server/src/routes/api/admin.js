@@ -3,6 +3,7 @@ import { authenticateToken } from "../../middleware/index.js";
 import { User } from "../../models/index.js";
 import {
   getAllStudentsController,
+  getAllTeachersController,
   registerUserController,
 } from "../../controllers/admin.controller.js";
 
@@ -15,31 +16,7 @@ router.post("/admin/register-user", authenticateToken, registerUserController);
 router.get("/all-students", authenticateToken, getAllStudentsController);
 
 //get all teachers
-router.get("/all-teachers", authenticateToken, async (req, res) => {
-  try {
-    if (req.user.role !== "admin") {
-      return res
-        .status(403)
-        .json({ message: "Only admin can view all teachers list" });
-    }
-    const page = parseInt(req.query.page) || 1;
-    const limit = parseInt(req.query.limit) || 5;
-    const skip = (page - 1) * limit;
-    const teachers = await User.find({ role: "teacher" })
-      .select("-password")
-      .skip(skip)
-      .limit(limit);
-    const total = await User.countDocuments({ role: "teacher" });
-    res.status(200).json({
-      teachers,
-      currentPage: page,
-      totalPages: Math.ceil(total / limit),
-      totalStudents: total,
-    });
-  } catch (error) {
-    res.status(500).json({ message: "Something went wrong" });
-  }
-});
+router.get("/all-teachers", authenticateToken, getAllTeachersController);
 
 //delete user
 router.delete("/users/:id", authenticateToken, async (req, res) => {

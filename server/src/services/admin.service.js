@@ -44,3 +44,18 @@ export const getAllStudentsService = async (page = 1, limit = 5) => {
     totalStudents: total,
   };
 };
+
+export const getAllTeachersService = async (page = 1, limit = 5) => {
+  const skip = (page - 1) * limit;
+  const teachers = await User.find({ role: "teacher" })
+    .select("-password")
+    .skip(skip)
+    .limit(limit);
+  const total = await User.countDocuments({ role: "teacher" });
+  return {
+    teachers,
+    currentPage: page,
+    totalPages: Math.ceil(total / limit),
+    totalStudents: total,
+  };
+};
