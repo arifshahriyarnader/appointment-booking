@@ -1,7 +1,7 @@
 import express from "express";
 import { authenticateToken } from "../../middleware/index.js";
-import { User } from "../../models/index.js";
 import {
+  approveOrRejectUserController,
   deleteUserController,
   getAllStudentsController,
   getAllTeachersController,
@@ -24,28 +24,13 @@ router.get("/all-teachers", authenticateToken, getAllTeachersController);
 router.delete("/users/:id", authenticateToken, deleteUserController);
 
 //view registration request (admin only)
-router.get("/registration-request", authenticateToken, viewRegistrationRequestController);
+router.get(
+  "/registration-request",
+  authenticateToken,
+  viewRegistrationRequestController
+);
 
 //approve or reject user (only admin)
-router.put("/users/:id", authenticateToken, async (req, res) => {
-  try {
-    const { status } = req.body;
-    if (!["approved", "rejected"].includes(status)) {
-      return res.status(400).json({ message: "Invalid Status" });
-    }
-
-    const user = await User.findByIdAndUpdate(
-      req.params.id,
-      { status },
-      { new: true }
-    );
-    if (!user) {
-      return res.status(404).json({ message: "User not found" });
-    }
-    res.status(200).json({ message: `User ${status} successfully`, user });
-  } catch (error) {
-    res.status(500).json({ message: "Server error", error });
-  }
-});
+router.put("/users/:id", authenticateToken, approveOrRejectUserController);
 
 export default router;

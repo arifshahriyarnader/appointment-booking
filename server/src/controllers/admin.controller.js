@@ -1,4 +1,5 @@
 import {
+  approveOrRejectUserService,
   deleteUserService,
   getAllStudentsService,
   getAllTeachersService,
@@ -68,8 +69,8 @@ export const deleteUserController = async (req, res) => {
   }
 };
 
-export const viewRegistrationRequestController=async(req,res) =>{
-  try{
+export const viewRegistrationRequestController = async (req, res) => {
+  try {
     if (req.user.role !== "admin") {
       return res.status(403).json({
         message: "Only admin can view who sent the registration request",
@@ -78,10 +79,22 @@ export const viewRegistrationRequestController=async(req,res) =>{
     const page = parseInt(req.query.page) || 1;
     const limit = parseInt(req.query.limit) || 5;
 
-    const userRequest= await viewRegistrationRequestService(page,limit)
+    const userRequest = await viewRegistrationRequestService(page, limit);
     res.status(200).json(userRequest);
+  } catch (error) {
+    res.status(500).json({ message: "Something went wrong", error });
   }
-  catch(error){
-     res.status(500).json({ message: "Something went wrong", error });
+};
+
+export const approveOrRejectUserController = async (req, res) => {
+  try {
+    const { status } = req.body;
+    const { id } = req.params;
+    const updatedUser = await approveOrRejectUserService(id, status);
+    res
+      .status(200)
+      .json({ message: `User ${status} successfully`, updatedUser });
+  } catch (error) {
+    res.status(500).json({ message: "Server error", error });
   }
-}
+};

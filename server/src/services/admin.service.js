@@ -80,3 +80,17 @@ export const viewRegistrationRequestService = async (page = 1, limit = 5) => {
     totalRequests: total,
   };
 };
+
+export const approveOrRejectUserService = async (id, status) => {
+  if (!["approved", "rejected"].includes(status)) {
+    throw new Error("Invalid Status");
+  }
+
+  const user = await User.findByIdAndUpdate(id, { status }, { new: true });
+  if (!user) {
+    const error = new Error("User not found");
+    error.statusCode = 404;
+    throw error;
+  }
+  return user;
+};
