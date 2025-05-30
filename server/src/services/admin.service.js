@@ -64,3 +64,19 @@ export const deleteUserService = async (userId) => {
   const user = await User.findByIdAndDelete(userId);
   return user;
 };
+
+export const viewRegistrationRequestService = async (page = 1, limit = 5) => {
+  const skip = (page - 1) * limit;
+  const userRequest = await User.find({ status: "pending" })
+    .select("name email role department course studentId status createdAt")
+    .skip(skip)
+    .limit(limit);
+
+  const total = await User.countDocuments({ status: "pending" });
+  return {
+    userRequest,
+    currentPage: page,
+    totalPages: Math.ceil(total / limit),
+    totalRequests: total,
+  };
+};

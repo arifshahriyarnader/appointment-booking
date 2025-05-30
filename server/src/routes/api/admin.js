@@ -6,6 +6,7 @@ import {
   getAllStudentsController,
   getAllTeachersController,
   registerUserController,
+  viewRegistrationRequestController,
 } from "../../controllers/admin.controller.js";
 
 const router = express.Router();
@@ -23,33 +24,7 @@ router.get("/all-teachers", authenticateToken, getAllTeachersController);
 router.delete("/users/:id", authenticateToken, deleteUserController);
 
 //view registration request (admin only)
-router.get("/registration-request", authenticateToken, async (req, res) => {
-  try {
-    if (req.user.role !== "admin") {
-      return res.status(403).json({
-        message: "Only admin can view who sent the registration request",
-      });
-    }
-    const page = parseInt(req.query.page) || 1;
-    const limit = parseInt(req.query.limit) || 5;
-    const skip = (page - 1) * limit;
-    const userRequest = await User.find({ status: "pending" })
-      .select("name email role department course studentId status createdAt")
-      .skip(skip)
-      .limit(limit);
-
-    const total = await User.countDocuments({ status: "pending" });
-
-    res.status(200).json({
-      userRequest,
-      currentPage: page,
-      totalPages: Math.ceil(total / limit),
-      totalRequests: total,
-    });
-  } catch (error) {
-    res.status(500).json({ message: "Something went wrong", error });
-  }
-});
+router.get("/registration-request", authenticateToken, viewRegistrationRequestController);
 
 //approve or reject user (only admin)
 router.put("/users/:id", authenticateToken, async (req, res) => {
