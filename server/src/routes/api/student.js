@@ -2,36 +2,17 @@ import express from "express";
 import moment from "moment";
 import { authenticateToken } from "../../middleware/index.js";
 import { User, AvailableHour, Appointment } from "../../models/index.js";
-import { getAllApprovedTeachersController } from "../../controllers/student.controller.js";
+import {
+  getAllApprovedTeachersController,
+  getTeacherWithAvailableHoursController,
+} from "../../controllers/student.controller.js";
 const router = express.Router();
 
 //get all teachers
 router.get("/all-teachers", getAllApprovedTeachersController);
 
 //get teacher profile with available hours
-router.get("/teacher/:id", async (req, res) => {
-  try {
-    const teacher = await User.findById(req.params.id).select(
-      "name email department course role"
-    );
-    if (!teacher || teacher.role !== "teacher") {
-      return res.status(404).json({ message: "Teacher Not found" });
-    }
-
-    // Get today's date and filter only future available hours
-    const today = new Date();
-    today.setHours(0, 0, 0, 0);
-
-    const availableHours = await AvailableHour.find({
-      teacher: req.params.id,
-      date: { $gte: today },
-    });
-
-    res.status(200).json({ teacher, availableHours });
-  } catch (error) {
-    res.status(500).json({ message: "Server error", error });
-  }
-});
+router.get("/teacher/:id", getTeacherWithAvailableHoursController);
 
 // Search teachers by name or department
 router.get("/search-teachers", async (req, res) => {
