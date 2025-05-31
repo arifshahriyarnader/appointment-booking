@@ -2,35 +2,11 @@ import express from "express";
 import moment from "moment";
 import { authenticateToken } from "../../middleware/index.js";
 import { User, AvailableHour, Appointment } from "../../models/index.js";
+import { getAllApprovedTeachersController } from "../../controllers/student.controller.js";
 const router = express.Router();
 
 //get all teachers
-router.get("/all-teachers", async (req, res) => {
-  try {
-    const page = parseInt(req.query.page) || 1;
-    const limit = parseInt(req.query.limit) || 5;
-    const skip = (page - 1) * limit;
-    const teacher = await User.find({
-      role: "teacher",
-      status: "approved",
-    })
-      .select("-password")
-      .skip(skip)
-      .limit(limit);
-    const total = await User.countDocuments({
-      role: "teacher",
-      status: "approved",
-    });
-    res.status(200).json({
-      teacher,
-      currentPage: page,
-      totalPages: Math.ceil(total / limit),
-      totalTeachers: total,
-    });
-  } catch (error) {
-    res.status(500).json({ message: "Server error", error });
-  }
-});
+router.get("/all-teachers", getAllApprovedTeachersController);
 
 //get teacher profile with available hours
 router.get("/teacher/:id", async (req, res) => {
@@ -363,14 +339,12 @@ router.get("/appointment-upcoming", authenticateToken, async (req, res) => {
       .skip(skip)
       .limit(limit);
 
-    res
-      .status(200)
-      .json({
-        upcomingAppointments,
-        currentPage: page,
-        totalPages: Math.ceil(total / limit),
-        totalAppointments: total,
-      });
+    res.status(200).json({
+      upcomingAppointments,
+      currentPage: page,
+      totalPages: Math.ceil(total / limit),
+      totalAppointments: total,
+    });
   } catch (error) {
     res.status(500).json({ message: "Server error", error });
   }
