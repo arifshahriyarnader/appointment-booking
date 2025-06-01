@@ -1,3 +1,4 @@
+import moment from "moment";
 import { AvailableHour, User, Appointment } from "../models/index.js";
 
 export const getAllApprovedTeachersService = async (page = 1, limit = 5) => {
@@ -61,12 +62,12 @@ export const getUpcomingBookedSlotsService = async (teacherId) => {
   today.setHours(0, 0, 0, 0);
 
   const availableHours = await AvailableHour.find({
-    teacher: req.params.id,
+    teacher: teacherId,
     date: { $gte: today },
   }).lean();
 
   const bookedAppointments = await Appointment.find({
-    teacher: req.params.id,
+    teacher: teacherId,
     date: { $gte: today },
   })
     .select("date slots")
@@ -93,4 +94,34 @@ export const getUpcomingBookedSlotsService = async (teacherId) => {
       })),
     }));
   return formattedSlots;
+};
+
+export const bookAppointmentService = async ({
+ studentId,
+  teacher,
+  date,
+  slots,
+  course,
+  agenda,
+}) => {
+  const existingAppointment = await Appointment.findOne({
+    teacher,
+    date: date,
+    "slots.startTime": slots.startTime,
+    "slots.endTime": slots.endTime,
+  });
+  if (existingAppointment) {
+     throw new Error("This slot is already booked");
+  }
+  const appointment = new Appointment({
+    student: studentId,
+    teacher,
+    course,
+    date,
+    slots,
+    agenda,
+    status: "pending",
+  });
+  await appointment.save();
+  return appointment;
 };

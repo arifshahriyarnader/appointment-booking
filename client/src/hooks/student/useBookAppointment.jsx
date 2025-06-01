@@ -42,7 +42,7 @@ export const useBookAppointment = () => {
     if (!teacherId) return;
     try {
       const response = await checkTeacherBookedSlots(teacherId);
-      setAvailableDates(response.teacherUpcomingBookedSlots);
+      setAvailableDates(response || []);
     } catch (error) {
       console.log(error);
     }

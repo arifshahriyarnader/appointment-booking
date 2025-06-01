@@ -1,4 +1,5 @@
 import {
+  bookAppointmentService,
   getAllApprovedTeachersService,
   getTeacherWithAvailableHoursService,
   getUpcomingBookedSlotsService,
@@ -50,6 +51,33 @@ export const getUpcomingBookedSlotsController = async (req, res) => {
     res.status(200).json(slots);
   } catch (error) {
     console.error("Error fetching upcoming booked slots:", error);
+    res.status(500).json({ message: "Server error", error });
+  }
+};
+
+export const bookAppointmentController = async (req, res) => {
+  try {
+    if (req.user.role !== "student") {
+      return res
+        .status(403)
+        .json({ message: "Only students can books an appointment" });
+    }
+    const { teacher, date, slots, course, agenda } = req.body;
+    await bookAppointmentService({
+      studentId: req.user._id,
+      teacher,
+      date,
+      slots,
+      course,
+      agenda,
+    });
+    res.status(201).json({
+      message: "Appointment request sent! Waiting for teacher's approval",
+    });
+  } catch (error) {
+    if (error.message === "This slot is already booked") {
+      return res.status(400).json({ message: error.message });
+    }
     res.status(500).json({ message: "Server error", error });
   }
 };

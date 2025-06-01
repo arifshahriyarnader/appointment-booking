@@ -2,6 +2,7 @@ import express from "express";
 import { authenticateToken } from "../../middleware/index.js";
 import { Appointment } from "../../models/index.js";
 import {
+  bookAppointmentController,
   getAllApprovedTeachersController,
   getTeacherWithAvailableHoursController,
   getUpcomingBookedSlotsController,
@@ -25,41 +26,7 @@ router.get(
 );
 
 //students booked an appoinment
-router.post("/appointment", authenticateToken, async (req, res) => {
-  try {
-    if (req.user.role !== "student") {
-      return res
-        .status(403)
-        .json({ message: "Only students can books an appointment" });
-    }
-    const { teacher, date, slots, course, agenda } = req.body;
-
-    const existingAppointment = await Appointment.findOne({
-      teacher: teacher,
-      date: date,
-      "slots.startTime": slots.startTime,
-      "slots.endTime": slots.endTime,
-    });
-    if (existingAppointment) {
-      return res.status(400).json({ message: "This slot is already booked" });
-    }
-    const appointment = new Appointment({
-      student: req.user._id,
-      teacher: teacher,
-      course,
-      date,
-      slots,
-      agenda,
-      status: "pending",
-    });
-    await appointment.save();
-    res.status(201).json({
-      message: "Appointment request sent! Waiting for teacher's approval",
-    });
-  } catch (error) {
-    res.status(500).json({ message: "Server error", error });
-  }
-});
+router.post("/appointment", authenticateToken, bookAppointmentController);
 
 //check appointment status
 router.get("/appointment-status", authenticateToken, async (req, res) => {
