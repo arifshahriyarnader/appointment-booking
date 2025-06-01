@@ -1,10 +1,10 @@
 import express from "express";
-import moment from "moment";
 import { authenticateToken } from "../../middleware/index.js";
-import { AvailableHour, Appointment } from "../../models/index.js";
+import { Appointment } from "../../models/index.js";
 import {
   getAllApprovedTeachersController,
   getTeacherWithAvailableHoursController,
+  getUpcomingBookedSlotsController,
   searchApprovedTeachersController,
 } from "../../controllers/student.controller.js";
 const router = express.Router();
@@ -19,50 +19,10 @@ router.get("/teacher/:id", getTeacherWithAvailableHoursController);
 router.get("/search-teachers", searchApprovedTeachersController);
 
 //get teacher available hours and booked
-router.get("/teacher/:id/upcoming-booked-slots", async (req, res) => {
-  try {
-    const today = new Date();
-    today.setHours(0, 0, 0, 0);
-
-    const availableHours = await AvailableHour.find({
-      teacher: req.params.id,
-      date: { $gte: today },
-    }).lean();
-
-    const bookedAppointments = await Appointment.find({
-      teacher: req.params.id,
-      date: { $gte: today },
-    })
-      .select("date slots")
-      .lean();
-
-    const bookedSlotsSet = new Set(
-      bookedAppointments.map(
-        (appt) =>
-          `${appt.date.toISOString().split("T")[0]} ${appt.slots.startTime}`
-      )
-    );
-
-    const formattedSlots = availableHours
-      .filter((day) => new Date(day.date) >= today)
-      .map((day) => ({
-        date: day.date.toISOString().split("T")[0],
-        day: moment(day.date).format("dddd"),
-        slots: day.slots.map((slot) => ({
-          startTime: slot.startTime,
-          endTime: slot.endTime,
-          isBooked: bookedSlotsSet.has(
-            `${day.date.toISOString().split("T")[0]} ${slot.startTime}`
-          ),
-        })),
-      }));
-
-    res.status(200).json({ teacherUpcomingBookedSlots: formattedSlots });
-  } catch (error) {
-    console.error("Error fetching upcoming booked slots:", error);
-    res.status(500).json({ message: "Server error", error });
-  }
-});
+router.get(
+  "/teacher/:id/upcoming-booked-slots",
+  getUpcomingBookedSlotsController
+);
 
 //students booked an appoinment
 router.post("/appointment", authenticateToken, async (req, res) => {

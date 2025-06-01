@@ -1,6 +1,7 @@
 import {
   getAllApprovedTeachersService,
   getTeacherWithAvailableHoursService,
+  getUpcomingBookedSlotsService,
   searchApprovedTeachersService,
 } from "../services/student.service.js";
 
@@ -39,5 +40,16 @@ export const searchApprovedTeachersController = async (req, res) => {
   } catch (error) {
     console.error("Error fetching teachers:", error);
     res.status(500).json({ message: "Server error" });
+  }
+};
+
+export const getUpcomingBookedSlotsController = async (req, res) => {
+  try {
+    const teacherId = req.params.id;
+    const slots = await getUpcomingBookedSlotsService(teacherId);
+    res.status(200).json(slots);
+  } catch (error) {
+    console.error("Error fetching upcoming booked slots:", error);
+    res.status(500).json({ message: "Server error", error });
   }
 };

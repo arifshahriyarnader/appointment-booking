@@ -1,4 +1,4 @@
-import { AvailableHour, User } from "../models/index.js";
+import { AvailableHour, User, Appointment } from "../models/index.js";
 
 export const getAllApprovedTeachersService = async (page = 1, limit = 5) => {
   const skip = (page - 1) * limit;
@@ -54,4 +54,43 @@ export const searchApprovedTeachersService = async (query) => {
     ],
   });
   return teachers;
+};
+
+export const getUpcomingBookedSlotsService = async (teacherId) => {
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
+
+  const availableHours = await AvailableHour.find({
+    teacher: req.params.id,
+    date: { $gte: today },
+  }).lean();
+
+  const bookedAppointments = await Appointment.find({
+    teacher: req.params.id,
+    date: { $gte: today },
+  })
+    .select("date slots")
+    .lean();
+
+  const bookedSlotsSet = new Set(
+    bookedAppointments.map(
+      (appt) =>
+        `${appt.date.toISOString().split("T")[0]} ${appt.slots.startTime}`
+    )
+  );
+
+  const formattedSlots = availableHours
+    .filter((day) => new Date(day.date) >= today)
+    .map((day) => ({
+      date: day.date.toISOString().split("T")[0],
+      day: moment(day.date).format("dddd"),
+      slots: day.slots.map((slot) => ({
+        startTime: slot.startTime,
+        endTime: slot.endTime,
+        isBooked: bookedSlotsSet.has(
+          `${day.date.toISOString().split("T")[0]} ${slot.startTime}`
+        ),
+      })),
+    }));
+  return formattedSlots;
 };
