@@ -40,3 +40,18 @@ export const getTeacherWithAvailableHoursService = async (teacherId) => {
     availableHours,
   };
 };
+
+export const searchApprovedTeachersService = async (query) => {
+  if (!query) {
+    throw new Error("Search query is required");
+  }
+  const teachers = await User.find({
+    role: "teacher",
+    status: "approved",
+    $or: [
+      { name: { $regex: query, $options: "i" } },
+      { department: { $regex: query, $options: "i" } },
+    ],
+  });
+  return teachers;
+};

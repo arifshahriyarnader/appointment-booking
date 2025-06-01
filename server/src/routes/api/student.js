@@ -1,10 +1,11 @@
 import express from "express";
 import moment from "moment";
 import { authenticateToken } from "../../middleware/index.js";
-import { User, AvailableHour, Appointment } from "../../models/index.js";
+import { AvailableHour, Appointment } from "../../models/index.js";
 import {
   getAllApprovedTeachersController,
   getTeacherWithAvailableHoursController,
+  searchApprovedTeachersController,
 } from "../../controllers/student.controller.js";
 const router = express.Router();
 
@@ -15,28 +16,7 @@ router.get("/all-teachers", getAllApprovedTeachersController);
 router.get("/teacher/:id", getTeacherWithAvailableHoursController);
 
 // Search teachers by name or department
-router.get("/search-teachers", async (req, res) => {
-  try {
-    const { query } = req.query;
-
-    if (!query) {
-      return res.status(400).json({ message: "Search query is required" });
-    }
-    const teachers = await User.find({
-      role: "teacher",
-      status: "approved",
-      $or: [
-        { name: { $regex: query, $options: "i" } },
-        { department: { $regex: query, $options: "i" } },
-      ],
-    });
-
-    res.status(200).json(teachers);
-  } catch (error) {
-    console.error("Error fetching teachers:", error);
-    res.status(500).json({ message: "Server error" });
-  }
-});
+router.get("/search-teachers", searchApprovedTeachersController);
 
 //get teacher available hours and booked
 router.get("/teacher/:id/upcoming-booked-slots", async (req, res) => {

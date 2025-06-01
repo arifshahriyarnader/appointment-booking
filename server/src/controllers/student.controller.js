@@ -1,6 +1,7 @@
 import {
   getAllApprovedTeachersService,
   getTeacherWithAvailableHoursService,
+  searchApprovedTeachersService,
 } from "../services/student.service.js";
 
 export const getAllApprovedTeachersController = async (req, res) => {
@@ -24,5 +25,19 @@ export const getTeacherWithAvailableHoursController = async (req, res) => {
     res.status(200).json({ teacher, availableHours });
   } catch (error) {
     res.status(500).json({ message: "Server error", error });
+  }
+};
+
+export const searchApprovedTeachersController = async (req, res) => {
+  try {
+    const { query } = req.query;
+    if (!query) {
+      return res.status(400).json({ message: "Search query is required" });
+    }
+    const teachers = await searchApprovedTeachersService(query);
+    res.status(200).json(teachers);
+  } catch (error) {
+    console.error("Error fetching teachers:", error);
+    res.status(500).json({ message: "Server error" });
   }
 };
