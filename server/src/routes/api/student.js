@@ -3,6 +3,7 @@ import { authenticateToken } from "../../middleware/index.js";
 import { Appointment } from "../../models/index.js";
 import {
   bookAppointmentController,
+  checkAppointmentStatusController,
   getAllApprovedTeachersController,
   getTeacherWithAvailableHoursController,
   getUpcomingBookedSlotsController,
@@ -29,55 +30,11 @@ router.get(
 router.post("/appointment", authenticateToken, bookAppointmentController);
 
 //check appointment status
-router.get("/appointment-status", authenticateToken, async (req, res) => {
-  try {
-    if (req.user.role !== "student") {
-      return res
-        .status(401)
-        .json({ message: "Only students can view their appointment status" });
-    }
-
-    const page = parseInt(req.query.page) || 1;
-    const limit = parseInt(req.query.limit) || 5;
-    const skip = (page - 1) * limit;
-    const total = await Appointment.countDocuments({ student: req.user._id });
-
-    // Fetch appointments with populated teacher and student details
-    const appointments = await Appointment.find({ student: req.user._id })
-      .populate("teacher", "name email course")
-      .populate("student", "name email")
-      .sort({ createdAt: -1 })
-      .skip(skip)
-      .limit(limit);
-
-    // Formatting response for better readability
-    const formattedAppointments = appointments.map((appointment) => ({
-      _id: appointment._id,
-      date: appointment.date,
-      timeSlot: `${appointment.slots.startTime} - ${appointment.slots.endTime}`,
-      status: appointment.status,
-      teacher: {
-        name: appointment.teacher.name,
-        email: appointment.teacher.email,
-        course: appointment.teacher.course,
-      },
-      student: {
-        name: appointment.student.name,
-        email: appointment.student.email,
-      },
-      agenda: appointment.agenda,
-    }));
-
-    res.status(200).json({
-      appointments: formattedAppointments,
-      currentPage: page,
-      totalPages: Math.ceil(total / limit),
-      totalAppointments: total,
-    });
-  } catch (error) {
-    res.status(500).json({ message: "Server error", error });
-  }
-});
+router.get(
+  "/appointment-status",
+  authenticateToken,
+  checkAppointmentStatusController
+);
 
 // Student cancels their appointment
 router.put("/appointment/cancel/:id", authenticateToken, async (req, res) => {

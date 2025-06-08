@@ -1,5 +1,6 @@
 import {
   bookAppointmentService,
+  checkAppointmentStatusService,
   getAllApprovedTeachersService,
   getTeacherWithAvailableHoursService,
   getUpcomingBookedSlotsService,
@@ -78,6 +79,26 @@ export const bookAppointmentController = async (req, res) => {
     if (error.message === "This slot is already booked") {
       return res.status(400).json({ message: error.message });
     }
+    res.status(500).json({ message: "Server error", error });
+  }
+};
+
+export const checkAppointmentStatusController = async (req, res) => {
+  try {
+    if (req.user.role !== "student") {
+      return res
+        .status(401)
+        .json({ message: "Only students can view their appointment status" });
+    }
+    const page = parseInt(req.query.page) || 1;
+    const limit = parseInt(req.query.limit) || 5;
+    const result = await checkAppointmentStatusService(
+      req.user._id,
+      page,
+      limit
+    );
+    res.status(200).json(result);
+  } catch (error) {
     res.status(500).json({ message: "Server error", error });
   }
 };

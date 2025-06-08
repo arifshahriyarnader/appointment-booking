@@ -97,7 +97,7 @@ export const getUpcomingBookedSlotsService = async (teacherId) => {
 };
 
 export const bookAppointmentService = async ({
- studentId,
+  studentId,
   teacher,
   date,
   slots,
@@ -111,7 +111,7 @@ export const bookAppointmentService = async ({
     "slots.endTime": slots.endTime,
   });
   if (existingAppointment) {
-     throw new Error("This slot is already booked");
+    throw new Error("This slot is already booked");
   }
   const appointment = new Appointment({
     student: studentId,
@@ -124,4 +124,39 @@ export const bookAppointmentService = async ({
   });
   await appointment.save();
   return appointment;
+};
+
+export const checkAppointmentStatusService = async (studentId, page, limit) => {
+  const skip = (page - 1) * limit;
+  const total = await Appointment.countDocuments({ student: studentId });
+  const appointments = await Appointment.find({ student: studentId })
+    .populate("teacher", "name email course")
+    .populate("student", "name email")
+    .sort({ createdAt: -1 })
+    .skip(skip)
+    .limit(limit);
+
+  // Formatting response for better readability
+  const formattedAppointments = appointments.map((appointment) => ({
+    _id: appointment._id,
+    date: appointment.date,
+    timeSlot: `${appointment.slots.startTime} - ${appointment.slots.endTime}`,
+    status: appointment.status,
+    teacher: {
+      name: appointment.teacher.name,
+      email: appointment.teacher.email,
+      course: appointment.teacher.course,
+    },
+    student: {
+      name: appointment.student.name,
+      email: appointment.student.email,
+    },
+    agenda: appointment.agenda,
+  }));
+  return {
+    appointments: formattedAppointments,
+    currentPage: page,
+    totalPages: Math.ceil(total / limit),
+    totalAppointments: total,
+  };
 };
