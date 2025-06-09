@@ -1,6 +1,6 @@
 import express from "express";
 import { authenticateToken } from "../../middleware/index.js";
-import { Appointment } from "../../models/index.js";
+
 import {
   bookAppointmentController,
   cancelStudentAppointmentController,
@@ -51,43 +51,10 @@ router.get(
   todayAppointmentListController
 );
 
-//get upcoming schedule
-router.get("/appointment-upcoming", authenticateToken, async (req, res) => {
-  try {
-    if (req.user.role !== "student") {
-      return res
-        .status(403)
-        .json({ message: "Only students can access upcoming appointments" });
-    }
-
-    const today = new Date();
-    today.setHours(0, 0, 0, 0);
-    const nextWeek = new Date(today);
-    nextWeek.setDate(nextWeek.getDate() + 7);
-
-    const page = parseInt(req.query.page) || 1;
-    const limit = parseInt(req.query.limit) || 5;
-    const skip = (page - 1) * limit;
-    const total = await Appointment.countDocuments({ student: req.user._id });
-
-    const upcomingAppointments = await Appointment.find({
-      student: req.user._id,
-      date: { $gte: today, $lt: nextWeek },
-    })
-      .populate("teacher", "name email course")
-      .sort({ date: 1 })
-      .skip(skip)
-      .limit(limit);
-
-    res.status(200).json({
-      upcomingAppointments,
-      currentPage: page,
-      totalPages: Math.ceil(total / limit),
-      totalAppointments: total,
-    });
-  } catch (error) {
-    res.status(500).json({ message: "Server error", error });
-  }
-});
+router.get(
+  "/appointment-upcoming",
+  authenticateToken,
+  todayAppointmentListController
+);
 
 export default router;

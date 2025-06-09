@@ -249,3 +249,29 @@ export const todaysAppointmentListService = async (studentId, page, limit) => {
     totalAppointments: total,
   };
 };
+
+export const upcomingAppointmentService = async (studentId, page, limit) => {
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
+  const nextWeek = new Date(today);
+  nextWeek.setDate(nextWeek.getDate() + 7);
+  const skip = (page - 1) * limit;
+  const total = await Appointment.countDocuments({
+    student: studentId,
+    date: { $gte: today, $lt: nextWeek },
+  });
+  const upcomingAppointments = await Appointment.find({
+    student: studentId,
+    date: { $gte: today, $lt: nextWeek },
+  })
+    .populate("teacher", "name email course")
+    .sort({ date: 1 })
+    .skip(skip)
+    .limit(limit);
+  return {
+    upcomingAppointments,
+    currentPage: page,
+    totalPages: Math.ceil(total / limit),
+    totalAppointments: total,
+  };
+};

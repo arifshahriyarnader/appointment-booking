@@ -149,19 +149,44 @@ export const pastAppointmentHistoryController = async (req, res) => {
   }
 };
 
-export const todayAppointmentListController = async(req,res) => {
-  try{
- if (req.user.role !== "student") {
+export const todayAppointmentListController = async (req, res) => {
+  try {
+    if (req.user.role !== "student") {
       return res.status(403).json({
         message: "Only students can view their todays appointment list",
       });
     }
     const page = parseInt(req.query.page) || 1;
     const limit = parseInt(req.query.limit) || 5;
-    const result= await todaysAppointmentListService(req.user._id, page, limit);
+    const result = await todaysAppointmentListService(
+      req.user._id,
+      page,
+      limit
+    );
     res.status(200).json(result);
-  }
-  catch (error) {
+  } catch (error) {
     res.status(500).json({ message: "Server error", error });
   }
-}
+};
+
+export const upcomingAppointmentListController = async (req, res) => {
+  try {
+    if (req.user.role !== "student") {
+      return res
+        .status(403)
+        .json({ message: "Only students can access upcoming appointments" });
+    }
+
+    const page = parseInt(req.query.page) || 1;
+    const limit = parseInt(req.query.limit) || 5;
+
+    const result = await todaysAppointmentListService(
+      req.user._id,
+      page,
+      limit
+    );
+    res.status(200).json(result);
+  } catch (error) {
+    res.status(500).json({ message: "Server error", error });
+  }
+};
