@@ -3,122 +3,47 @@ import { authenticateToken } from "../../middleware/index.js";
 import { Appointment } from "../../models/index.js";
 import {
   bookAppointmentController,
+  cancelStudentAppointmentController,
   checkAppointmentStatusController,
   getAllApprovedTeachersController,
   getTeacherWithAvailableHoursController,
   getUpcomingBookedSlotsController,
+  pastAppointmentHistoryController,
   searchApprovedTeachersController,
 } from "../../controllers/student.controller.js";
 const router = express.Router();
 
-//get all teachers
 router.get("/all-teachers", getAllApprovedTeachersController);
 
-//get teacher profile with available hours
 router.get("/teacher/:id", getTeacherWithAvailableHoursController);
 
-// Search teachers by name or department
 router.get("/search-teachers", searchApprovedTeachersController);
 
-//get teacher available hours and booked
 router.get(
   "/teacher/:id/upcoming-booked-slots",
   getUpcomingBookedSlotsController
 );
 
-//students booked an appoinment
 router.post("/appointment", authenticateToken, bookAppointmentController);
 
-//check appointment status
 router.get(
   "/appointment-status",
   authenticateToken,
   checkAppointmentStatusController
 );
 
-// Student cancels their appointment
-router.put("/appointment/cancel/:id", authenticateToken, async (req, res) => {
-  try {
-    if (req.user.role !== "student") {
-      return res
-        .status(403)
-        .json({ message: "Only students can cancel appointments" });
-    }
-
-    const appointment = await Appointment.findOne({
-      _id: req.params.id,
-      student: req.user._id,
-    });
-
-    if (!appointment) {
-      return res
-        .status(404)
-        .json({ message: "Appointment not found or not owned by the student" });
-    }
-
-    // Ensure appointment is not already approved or completed
-    if (
-      appointment.status === "approved" ||
-      appointment.status === "completed"
-    ) {
-      return res.status(400).json({
-        message: "You cannot cancel an approved or completed appointment",
-      });
-    }
-
-    // Update appointment status to "canceled"
-    appointment.status = "canceled";
-    await appointment.save();
-
-    res
-      .status(200)
-      .json({ message: "Appointment canceled successfully", appointment });
-  } catch (error) {
-    res.status(500).json({ message: "Server error", error });
-  }
-});
+router.put(
+  "/appointment/cancel/:id",
+  authenticateToken,
+  cancelStudentAppointmentController
+);
 
 //past appointments history
-router.get("/appointment-history", authenticateToken, async (req, res) => {
-  try {
-    if (req.user.role !== "student") {
-      return res
-        .status(403)
-        .json({ message: "Only students can view their past appointments" });
-    }
-    const today = new Date();
-    const page = parseInt(req.query.page) || 1;
-    const limit = parseInt(req.query.limit) || 5;
-    const skip = (page - 1) * limit;
-    const total = await Appointment.countDocuments({ student: req.user._id });
-    const pastAppointments = await Appointment.find({
-      student: req.user._id,
-      date: { $lt: today },
-    })
-      .populate("teacher", "name email course")
-      .sort({ date: -1 })
-      .skip(skip)
-      .limit(limit);
-
-    const formattedAppointments = pastAppointments.map((appointment) => ({
-      _id: appointment._id,
-      teacher: appointment.teacher,
-      date: appointment.date,
-      agenda: appointment.agenda,
-      slots: appointment.slots,
-      status:
-        appointment.status === "approved" ? "Completed" : appointment.status,
-    }));
-    res.status(200).json({
-      pastAppointments: formattedAppointments,
-      currentPage: page,
-      totalPages: Math.ceil(total / limit),
-      totalAppointments: total,
-    });
-  } catch (error) {
-    res.status(500).json({ message: "Server error", error });
-  }
-});
+router.get(
+  "/appointment-history",
+  authenticateToken,
+  pastAppointmentHistoryController
+);
 
 //get today's appointments
 router.get("/appointment-today", authenticateToken, async (req, res) => {

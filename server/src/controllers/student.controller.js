@@ -1,9 +1,11 @@
 import {
   bookAppointmentService,
+  cancelStudentAppointmentService,
   checkAppointmentStatusService,
   getAllApprovedTeachersService,
   getTeacherWithAvailableHoursService,
   getUpcomingBookedSlotsService,
+  pastAppointmentHistoryService,
   searchApprovedTeachersService,
 } from "../services/student.service.js";
 
@@ -93,6 +95,49 @@ export const checkAppointmentStatusController = async (req, res) => {
     const page = parseInt(req.query.page) || 1;
     const limit = parseInt(req.query.limit) || 5;
     const result = await checkAppointmentStatusService(
+      req.user._id,
+      page,
+      limit
+    );
+    res.status(200).json(result);
+  } catch (error) {
+    res.status(500).json({ message: "Server error", error });
+  }
+};
+
+export const cancelStudentAppointmentController = async (req, res) => {
+  try {
+    if (req.user.role !== "student") {
+      return res
+        .status(403)
+        .json({ message: "Only students can cancel appointments" });
+    }
+    const result = await cancelStudentAppointmentService(
+      req.user._id,
+      req.params.id
+    );
+    return res
+      .status(result.status)
+      .json(
+        result.status === 200
+          ? { message: result.message, appointment: result.appointment }
+          : { message: result.message }
+      );
+  } catch (error) {
+    res.status(500).json({ message: "Server error", error });
+  }
+};
+
+export const pastAppointmentHistoryController = async (req, res) => {
+  try {
+    if (req.user.role !== "student") {
+      return res
+        .status(403)
+        .json({ message: "Only students can view their past appointments" });
+    }
+    const page = parseInt(req.query.page) || 1;
+    const limit = parseInt(req.query.limit) || 5;
+    const result = await pastAppointmentHistoryService(
       req.user._id,
       page,
       limit
