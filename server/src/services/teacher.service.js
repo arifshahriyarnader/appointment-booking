@@ -35,3 +35,20 @@ export const addTeacherAvailableHoursService = async (
   });
   return await availableHour.save();
 };
+
+export const updateTeacherAvailableHoursService = async (
+  teacherId,
+  id,
+  day,
+  date,
+  startTime,
+  endTime
+) => {
+  const slots = generateTimeSlots(startTime, endTime);
+  const updateHour = await AvailableHour.findOneAndUpdate(
+    { _id: id, teacher: teacherId },
+    { day, date: new Date(date), slots },
+    { new: true }
+  );
+  return updateHour;
+};

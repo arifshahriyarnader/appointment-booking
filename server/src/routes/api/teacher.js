@@ -2,52 +2,21 @@ import express from "express";
 import mongoose from "mongoose";
 import { authenticateToken } from "../../middleware/index.js";
 import { Appointment, AvailableHour } from "../../models/index.js";
-import { addTeacherAvailableHoursController } from "../../controllers/teacher.controller.js";
+import {
+  addTeacherAvailableHoursController,
+  updateTeacherAvailableHoursController,
+} from "../../controllers/teacher.controller.js";
 
 const router = express.Router();
 
-
-//add available hours
 router.post("/add", authenticateToken, addTeacherAvailableHoursController);
 
 //update available hours
-router.put("/update/:id", authenticateToken, async (req, res) => {
-  try {
-    if (req.user.role !== "teacher") {
-      return res
-        .status(403)
-        .json({ message: "Only teachers can update available hours" });
-    }
-
-    const { id } = req.params;
-    const { day, date, startTime, endTime } = req.body;
-
-    if (!day || !date || !startTime || !endTime) {
-      return res.status(400).json({
-        message: "All fields (day, startTime, endTime) are required.",
-      });
-    }
-
-    const slots = generateTimeSlots(startTime, endTime);
-
-    const updatedAvailableHour = await AvailableHour.findOneAndUpdate(
-      { _id: id, teacher: req.user._id },
-      { day, date, slots },
-      { new: true }
-    );
-
-    if (!updatedAvailableHour) {
-      return res.status(404).json({ message: "Available hour not found" });
-    }
-
-    res.status(200).json({
-      message: "Available hour updated successfully",
-      availableHour: updatedAvailableHour,
-    });
-  } catch (error) {
-    res.status(500).json({ message: "Server error", error });
-  }
-});
+router.put(
+  "/update/:id",
+  authenticateToken,
+  updateTeacherAvailableHoursController
+);
 
 //get all available hours
 router.get("/all", authenticateToken, async (req, res) => {
@@ -241,14 +210,12 @@ router.get("/schedule-today", authenticateToken, async (req, res) => {
       .skip(skip)
       .limit(limit);
 
-    res
-      .status(200)
-      .json({
-        appointments,
-        currentPage: page,
-        totalPages: Math.ceil(total / limit),
-        totalAppointments: total,
-      });
+    res.status(200).json({
+      appointments,
+      currentPage: page,
+      totalPages: Math.ceil(total / limit),
+      totalAppointments: total,
+    });
   } catch (error) {
     res.status(500).json({ message: "Server error", error });
   }
