@@ -1,63 +1,14 @@
 import express from "express";
 import mongoose from "mongoose";
-import moment from "moment";
 import { authenticateToken } from "../../middleware/index.js";
 import { Appointment, AvailableHour } from "../../models/index.js";
+import { addTeacherAvailableHoursController } from "../../controllers/teacher.controller.js";
 
 const router = express.Router();
 
-// Function to generate 20-minute slots
-function generateTimeSlots(startTime, endTime) {
-  const slots = [];
-  let start = moment(startTime, "hh:mm A");
-  const end = moment(endTime, "hh:mm A");
-
-  while (start < end) {
-    let nextSlot = start.clone().add(20, "minutes");
-    slots.push({
-      startTime: start.format("hh:mm A"),
-      endTime: nextSlot.format("hh:mm A"),
-    });
-    start = nextSlot;
-  }
-
-  return slots;
-}
 
 //add available hours
-router.post("/add", authenticateToken, async (req, res) => {
-  try {
-    if (req.user.role !== "teacher") {
-      return res
-        .status(403)
-        .json({ message: "Only teachers can add available hours" });
-    }
-
-    const { day, date, startTime, endTime } = req.body;
-
-    if (!day || !date || !startTime || !endTime) {
-      return res.status(400).json({
-        message: "All fields (day, date, startTime, endTime) are required.",
-      });
-    }
-
-    const newAvailableHour = new AvailableHour({
-      teacher: req.user._id,
-      day,
-      date: new Date(date),
-      slots: generateTimeSlots(startTime, endTime),
-    });
-
-    const savedAvailableHour = await newAvailableHour.save();
-
-    res.status(201).json({
-      message: "Available hour added successfully",
-      availableHour: savedAvailableHour,
-    });
-  } catch (error) {
-    res.status(500).json({ message: "Server error", error });
-  }
-});
+router.post("/add", authenticateToken, addTeacherAvailableHoursController);
 
 //update available hours
 router.put("/update/:id", authenticateToken, async (req, res) => {
