@@ -4,6 +4,7 @@ import {
   getAllTeacherAvailableHoursService,
   getAppointmentRequestService,
   getTodayAppointmentService,
+  getUpcomingAppointmentService,
   updateAppointmentStatusService,
   updateTeacherAvailableHoursService,
 } from "../services/teacher.service.js";
@@ -186,3 +187,24 @@ export const getTodayAppointmentController = async (req, res) => {
     res.status(500).json({ message: "Server error", error });
   }
 };
+
+export const getUpcomingAppointmentController= async(req,res) => {
+  try{
+if (req.user.role !== "teacher") {
+      return res.status(403).json({
+        message: "Only Teacher can view upcoming appointment schedule",
+      });
+    }
+    const page = parseInt(req.query.page) || 1;
+    const limit = parseInt(req.query.limit) || 5;
+    const result= await getUpcomingAppointmentService(
+      req.user._id,
+      parseInt(page),
+      parseInt(limit)
+    )
+    res.status(200).json(result);
+  }
+  catch (error) {
+    res.status(500).json({ message: "Server error", error });
+  }
+}

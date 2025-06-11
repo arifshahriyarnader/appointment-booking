@@ -219,3 +219,27 @@ export const getTodayAppointmentService = async (
     totalAppointments: total,
   };
 };
+
+export const getUpcomingAppointmentService= async(teacherId, page=1, limit=5) => {
+  const today = new Date();
+   today.setHours(0, 0, 0, 0);
+const skip = (page - 1) * limit;
+    const total = await Appointment.countDocuments({ teacher: teacherId, date: { $gte: today }, status: "approved" });
+
+    const appointments = await Appointment.find({
+      teacher: teacherId,
+      date: { $gte: today.toISOString().split("T")[0] },
+      status: "approved",
+    })
+      .sort({ date: 1, slots: 1 })
+      .populate("student", "name email")
+      .populate("teacher", "course")
+      .skip(skip)
+      .limit(limit);
+      return {
+    appointments,
+    currentPage: page,
+    totalPages: Math.ceil(total / limit),
+    totalAppointments: total,
+      }
+}
