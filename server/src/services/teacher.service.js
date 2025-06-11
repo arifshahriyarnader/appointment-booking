@@ -1,6 +1,6 @@
 import mongoose from "mongoose";
 import moment from "moment";
-import { AvailableHour } from "../models/index.js";
+import { Appointment, AvailableHour } from "../models/index.js";
 
 // Function to generate 20-minute slots
 function generateTimeSlots(startTime, endTime) {
@@ -134,5 +134,35 @@ export const deleteTeacherAvailableHoursService = async (id, userId) => {
     success: true,
     status: 200,
     message: "Available hours deleted successfully",
+  };
+};
+
+export const getAppointmentRequestService = async (
+  teacherId,
+  page = 1,
+  limit = 5
+) => {
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
+  const skip = (page - 1) * limit;
+  const total = await Appointment.countDocuments({
+    teacher: teacherId,
+    date: { $gte: today },
+    status: "pending",
+  });
+
+  const appointments = await Appointment.find({
+    teacher: teacherId,
+    date: { $gte: today },
+  })
+    .populate("student", "name email")
+    .sort({ date: 1 })
+    .skip(skip)
+    .limit(limit);
+  return {
+    appointments,
+    currentPage: page,
+    totalPages: Math.ceil(total / limit),
+    totalAppointments: total,
   };
 };

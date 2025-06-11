@@ -5,6 +5,7 @@ import {
   addTeacherAvailableHoursController,
   deleteTeacherAvailableHoursController,
   getAllTeacherAvailableHoursController,
+  getAppointmentRequestController,
   updateTeacherAvailableHoursController,
 } from "../../controllers/teacher.controller.js";
 
@@ -22,44 +23,7 @@ router.get("/all", authenticateToken, getAllTeacherAvailableHoursController);
 
 router.delete("/:id", authenticateToken, deleteTeacherAvailableHoursController);
 
-//teacher view who can sent the appointments request
-router.get("/appointment-status", authenticateToken, async (req, res) => {
-  try {
-    if (req.user.role !== "teacher") {
-      return res
-        .status(401)
-        .json({ message: "Only teacher can view appointment requests" });
-    }
-
-    // Get today's date at midnight (00:00:00)
-    const today = new Date();
-    today.setHours(0, 0, 0, 0);
-
-    const page = parseInt(req.query.page) || 1;
-    const limit = parseInt(req.query.limit) || 5;
-    const skip = (page - 1) * limit;
-    const total = await Appointment.countDocuments({ teacher: req.user._id });
-
-    // Fetch only appointments with today or future dates
-    const appointments = await Appointment.find({
-      teacher: req.user._id,
-      date: { $gte: today },
-    })
-      .populate("student", "name email")
-      .sort({ date: 1 })
-      .skip(skip)
-      .limit(limit);
-
-    res.status(200).json({
-      message: appointments,
-      currentPage: page,
-      totalPages: Math.ceil(total / limit),
-      totalAppointments: total,
-    });
-  } catch (error) {
-    res.status(500).json({ message: "Server error", error });
-  }
-});
+router.get("/appointment-status", authenticateToken, getAppointmentRequestController);
 
 //teacher approve or reject appointments request
 router.put("/appointment/:id/status", authenticateToken, async (req, res) => {
