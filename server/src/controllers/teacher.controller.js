@@ -1,5 +1,6 @@
 import {
   addTeacherAvailableHoursService,
+  deleteTeacherAvailableHoursService,
   getAllTeacherAvailableHoursService,
   updateTeacherAvailableHoursService,
 } from "../services/teacher.service.js";
@@ -94,6 +95,21 @@ export const getAllTeacherAvailableHoursController = async (req, res) => {
       totalRecords: availableHours.length,
       availableHours,
     });
+  } catch (error) {
+    res.status(500).json({ message: "Server error", error });
+  }
+};
+
+export const deleteTeacherAvailableHoursController = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const userId = req.user._id;
+    const result = await deleteTeacherAvailableHoursService(id, userId);
+    if (!result.success) {
+      return res.status(result.status).json({ message: result.message });
+    }
+
+    res.status(result.status).json({ message: result.message });
   } catch (error) {
     res.status(500).json({ message: "Server error", error });
   }

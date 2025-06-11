@@ -70,7 +70,7 @@ export const getAllTeacherAvailableHoursService = async (
     date: { $gte: today },
   };
 
-   if (day) {
+  if (day) {
     matchQuery.day = day;
   }
 
@@ -111,4 +111,28 @@ export const getAllTeacherAvailableHoursService = async (
 
   const availableHours = await AvailableHour.aggregate(pipeline);
   return availableHours;
+};
+
+export const deleteTeacherAvailableHoursService = async (id, userId) => {
+  const availableHour = await AvailableHour.findById(id);
+  if (!availableHour) {
+    return {
+      success: false,
+      status: 404,
+      message: "Available hours not found",
+    };
+  }
+  if (availableHour.teacher.toString() !== userId.toString()) {
+    return {
+      success: false,
+      status: 403,
+      message: "You can delete your own available hours",
+    };
+  }
+  await AvailableHour.findByIdAndDelete(id);
+  return {
+    success: true,
+    status: 200,
+    message: "Available hours deleted successfully",
+  };
 };

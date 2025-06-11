@@ -3,6 +3,7 @@ import { authenticateToken } from "../../middleware/index.js";
 import { Appointment, AvailableHour } from "../../models/index.js";
 import {
   addTeacherAvailableHoursController,
+  deleteTeacherAvailableHoursController,
   getAllTeacherAvailableHoursController,
   updateTeacherAvailableHoursController,
 } from "../../controllers/teacher.controller.js";
@@ -11,35 +12,15 @@ const router = express.Router();
 
 router.post("/add", authenticateToken, addTeacherAvailableHoursController);
 
-
 router.put(
   "/update/:id",
   authenticateToken,
   updateTeacherAvailableHoursController
 );
 
-
 router.get("/all", authenticateToken, getAllTeacherAvailableHoursController);
 
-//delete available hours
-router.delete("/:id", authenticateToken, async (req, res) => {
-  try {
-    const { id } = req.params;
-    const availableHour = await AvailableHour.findById(id);
-    if (!availableHour) {
-      return res.status(404).json({ message: "Available hours not found" });
-    }
-    if (availableHour.teacher.toString() !== req.user._id) {
-      return res
-        .status(403)
-        .json({ message: "You can delete your own available hours" });
-    }
-    await AvailableHour.findByIdAndDelete(id);
-    res.status(200).json({ message: "Available hours deleted successfully" });
-  } catch (error) {
-    res.status(500).json({ message: "Server error", error });
-  }
-});
+router.delete("/:id", authenticateToken, deleteTeacherAvailableHoursController);
 
 //teacher view who can sent the appointments request
 router.get("/appointment-status", authenticateToken, async (req, res) => {
