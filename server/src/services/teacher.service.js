@@ -220,26 +220,75 @@ export const getTodayAppointmentService = async (
   };
 };
 
-export const getUpcomingAppointmentService= async(teacherId, page=1, limit=5) => {
+export const getUpcomingAppointmentService = async (
+  teacherId,
+  page = 1,
+  limit = 5
+) => {
   const today = new Date();
-   today.setHours(0, 0, 0, 0);
-const skip = (page - 1) * limit;
-    const total = await Appointment.countDocuments({ teacher: teacherId, date: { $gte: today }, status: "approved" });
+  today.setHours(0, 0, 0, 0);
+  const skip = (page - 1) * limit;
+  const total = await Appointment.countDocuments({
+    teacher: teacherId,
+    date: { $gte: today },
+    status: "approved",
+  });
 
-    const appointments = await Appointment.find({
-      teacher: teacherId,
-      date: { $gte: today.toISOString().split("T")[0] },
-      status: "approved",
-    })
-      .sort({ date: 1, slots: 1 })
-      .populate("student", "name email")
-      .populate("teacher", "course")
-      .skip(skip)
-      .limit(limit);
-      return {
+  const appointments = await Appointment.find({
+    teacher: teacherId,
+    date: { $gte: today.toISOString().split("T")[0] },
+    status: "approved",
+  })
+    .sort({ date: 1, slots: 1 })
+    .populate("student", "name email")
+    .populate("teacher", "course")
+    .skip(skip)
+    .limit(limit);
+  return {
     appointments,
     currentPage: page,
     totalPages: Math.ceil(total / limit),
     totalAppointments: total,
-      }
-}
+  };
+};
+
+export const pastAppointmentHistoryService = async (
+  teacherId,
+  page = 1,
+  limit = 5
+) => {
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
+  const skip = (page - 1) * limit;
+  const total = await Appointment.countDocuments({
+    teacher: teacherId,
+    date: { $lt: today },
+    status: "approved",
+  });
+
+  const pastAppointments = await Appointment.find({
+    teacher: teacherId,
+    date: { $lt: today },
+    status: "approved",
+  })
+    .populate("student", "name email")
+    .populate("teacher", "course")
+    .sort({ date: -1 })
+    .skip(skip)
+    .limit(limit);
+  const formattedAppointments = pastAppointments.map((appointment) => ({
+    _id: appointment._id,
+    student: appointment.student,
+    course: appointment.teacher.course,
+    agenda: appointment.agenda,
+    date: appointment.date,
+    slots: appointment.slots,
+    status: "Completed",
+  }));
+  return {
+    pastAppointments: formattedAppointments,
+    currentPage: page,
+    totalPages: Math.ceil(total / limit),
+    totalAppointments: total,
+  };
+};
