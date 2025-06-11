@@ -3,6 +3,7 @@ import {
   deleteTeacherAvailableHoursService,
   getAllTeacherAvailableHoursService,
   getAppointmentRequestService,
+  updateAppointmentStatusService,
   updateTeacherAvailableHoursService,
 } from "../services/teacher.service.js";
 
@@ -134,6 +135,34 @@ export const getAppointmentRequestController = async (req, res) => {
       totalPages,
       totalAppointments: total,
     });
+  } catch (error) {
+    res.status(500).json({ message: "Server error", error });
+  }
+};
+
+export const updateAppointmentStatusController = async (req, res) => {
+  try {
+    if (req.user.role !== "teacher") {
+      return res
+        .status(403)
+        .json({ message: "Only Teacher can update appointment status" });
+    }
+    const { id } = req.params;
+    const { status } = req.body;
+    const result = await updateAppointmentStatusService(
+      id,
+      req.user._id,
+      status
+    );
+    if (!result.success) {
+      return res.status(result.status).json({ message: result.message });
+    }
+    res
+      .status(result.status)
+      .json({
+        message: `Appointment ${status} successfully`,
+        appointment: result.appointment,
+      });
   } catch (error) {
     res.status(500).json({ message: "Server error", error });
   }

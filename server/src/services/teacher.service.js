@@ -166,3 +166,27 @@ export const getAppointmentRequestService = async (
     totalAppointments: total,
   };
 };
+
+export const updateAppointmentStatusService = async (
+  appointmentId,
+  teacherId,
+  status
+) => {
+  if (!["approved", "rejected"].includes(status)) {
+    return res.status(400).json({ message: "Invalid status value" });
+  }
+  const appointment = await Appointment.findOne({
+    _id: appointmentId,
+    teacher: teacherId,
+  });
+  if (!appointment) {
+    return res.status(404).json({ message: "Appointment not found" });
+  }
+  appointment.status = status;
+  await appointment.save();
+  return {
+    success: true,
+    status: 200,
+    message: `Appointment ${status} successfully`,
+  };
+};

@@ -1,11 +1,12 @@
 import express from "express";
 import { authenticateToken } from "../../middleware/index.js";
-import { Appointment, AvailableHour } from "../../models/index.js";
+import { Appointment } from "../../models/index.js";
 import {
   addTeacherAvailableHoursController,
   deleteTeacherAvailableHoursController,
   getAllTeacherAvailableHoursController,
   getAppointmentRequestController,
+  updateAppointmentStatusController,
   updateTeacherAvailableHoursController,
 } from "../../controllers/teacher.controller.js";
 
@@ -23,37 +24,17 @@ router.get("/all", authenticateToken, getAllTeacherAvailableHoursController);
 
 router.delete("/:id", authenticateToken, deleteTeacherAvailableHoursController);
 
-router.get("/appointment-status", authenticateToken, getAppointmentRequestController);
+router.get(
+  "/appointment-status",
+  authenticateToken,
+  getAppointmentRequestController
+);
 
-//teacher approve or reject appointments request
-router.put("/appointment/:id/status", authenticateToken, async (req, res) => {
-  try {
-    if (req.user.role !== "teacher") {
-      return res
-        .status(403)
-        .json({ message: "Only Teacher can update appointment status" });
-    }
-    const { id } = req.params;
-    const { status } = req.body;
-    if (!["approved", "rejected"].includes(status)) {
-      return res.status(400).json({ message: "Invalid status value" });
-    }
-    const appointment = await Appointment.findOne({
-      _id: id,
-      teacher: req.user._id,
-    });
-    if (!appointment) {
-      return res.status(404).json({ message: "Appointment not found" });
-    }
-    appointment.status = status;
-    await appointment.save();
-    res
-      .status(200)
-      .json({ message: `Appointment ${status} successfully`, appointment });
-  } catch (error) {
-    res.status(500).json({ message: "Server error", error });
-  }
-});
+router.put(
+  "/appointment/:id/status",
+  authenticateToken,
+  updateAppointmentStatusController
+);
 
 //daily appointment schedules
 router.get("/schedule-today", authenticateToken, async (req, res) => {
