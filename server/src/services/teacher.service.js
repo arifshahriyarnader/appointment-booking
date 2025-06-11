@@ -190,3 +190,32 @@ export const updateAppointmentStatusService = async (
     message: `Appointment ${status} successfully`,
   };
 };
+
+export const getTodayAppointmentService = async (
+  teacherId,
+  page = 1,
+  limit = 5
+) => {
+  const today = new Date().toISOString().split("T")[0];
+  const skip = (page - 1) * limit;
+  const total = await Appointment.countDocuments({
+    teacher: teacherId,
+    date: today,
+    status: "approved",
+  });
+  const appointments = await Appointment.find({
+    teacher: teacherId,
+    date: today,
+    status: "approved",
+  })
+    .populate("student", "name email")
+    .populate("teacher", "course")
+    .skip(skip)
+    .limit(limit);
+  return {
+    appointments,
+    currentPage: page,
+    totalPages: Math.ceil(total / limit),
+    totalAppointments: total,
+  };
+};

@@ -6,6 +6,7 @@ import {
   deleteTeacherAvailableHoursController,
   getAllTeacherAvailableHoursController,
   getAppointmentRequestController,
+  getTodayAppointmentController,
   updateAppointmentStatusController,
   updateTeacherAvailableHoursController,
 } from "../../controllers/teacher.controller.js";
@@ -36,41 +37,7 @@ router.put(
   updateAppointmentStatusController
 );
 
-//daily appointment schedules
-router.get("/schedule-today", authenticateToken, async (req, res) => {
-  try {
-    if (req.user.role !== "teacher") {
-      return res
-        .status(403)
-        .json({ message: "Only Teacher can view daily appointment schedule" });
-    }
-    const today = new Date().toISOString().split("T")[0];
-
-    const page = parseInt(req.query.page) || 1;
-    const limit = parseInt(req.query.limit) || 5;
-    const skip = (page - 1) * limit;
-    const total = await Appointment.countDocuments({ teacher: req.user._id });
-
-    const appointments = await Appointment.find({
-      teacher: req.user._id,
-      date: today,
-      status: "approved",
-    })
-      .populate("student", "name email")
-      .populate("teacher", "course")
-      .skip(skip)
-      .limit(limit);
-
-    res.status(200).json({
-      appointments,
-      currentPage: page,
-      totalPages: Math.ceil(total / limit),
-      totalAppointments: total,
-    });
-  } catch (error) {
-    res.status(500).json({ message: "Server error", error });
-  }
-});
+router.get("/schedule-today", authenticateToken, getTodayAppointmentController);
 
 //upcoming appointment schedule
 router.get("/appointment-upcoming", authenticateToken, async (req, res) => {
