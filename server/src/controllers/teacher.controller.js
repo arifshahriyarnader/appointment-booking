@@ -1,5 +1,6 @@
 import {
   addTeacherAvailableHoursService,
+  getAllTeacherAvailableHoursService,
   updateTeacherAvailableHoursService,
 } from "../services/teacher.service.js";
 
@@ -65,6 +66,33 @@ export const updateTeacherAvailableHoursController = async (req, res) => {
     res.status(200).json({
       message: "Available hour updated successfully",
       availableHour: updatedAvailableHour,
+    });
+  } catch (error) {
+    res.status(500).json({ message: "Server error", error });
+  }
+};
+
+export const getAllTeacherAvailableHoursController = async (req, res) => {
+  try {
+    if (req.user.role !== "teacher") {
+      return res
+        .status(403)
+        .json({ message: "Only teachers can view their available hours" });
+    }
+    const { current = 1, pageSize = 5, sort = "asc", day } = req.query;
+    const availableHours = await getAllTeacherAvailableHoursService(
+      req.user._id,
+      parseInt(current),
+      parseInt(pageSize),
+      sort,
+      day
+    );
+
+    res.status(200).json({
+      current: parseInt(current),
+      pageSize: parseInt(pageSize),
+      totalRecords: availableHours.length,
+      availableHours,
     });
   } catch (error) {
     res.status(500).json({ message: "Server error", error });

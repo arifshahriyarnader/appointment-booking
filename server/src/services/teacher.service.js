@@ -1,3 +1,4 @@
+import mongoose from "mongoose";
 import moment from "moment";
 import { AvailableHour } from "../models/index.js";
 
@@ -51,4 +52,63 @@ export const updateTeacherAvailableHoursService = async (
     { new: true }
   );
   return updateHour;
+};
+
+export const getAllTeacherAvailableHoursService = async (
+  teacherId,
+  current = 1,
+  pageSize = 5,
+  sort = "asc",
+  day
+) => {
+  const pipeline = [];
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
+
+  const matchQuery = {
+    teacher: new mongoose.Types.ObjectId(teacherId),
+    date: { $gte: today },
+  };
+
+   if (day) {
+    matchQuery.day = day;
+  }
+
+  pipeline.push({ $match: matchQuery });
+
+  pipeline.push({
+    $sort: { createdAt: sort === "asc" ? 1 : -1 },
+  });
+
+  pipeline.push({ $skip: (current - 1) * pageSize });
+  pipeline.push({ $limit: pageSize });
+
+  pipeline.push({
+    $lookup: {
+      from: "users",
+      localField: "teacher",
+      foreignField: "_id",
+      as: "teacher",
+    },
+  });
+
+  pipeline.push({ $unwind: "$teacher" });
+
+  pipeline.push({
+    $project: {
+      _id: 1,
+      day: 1,
+      date: 1,
+      slots: 1,
+      createdAt: 1,
+      teacher: {
+        _id: "$teacher._id",
+        name: "$teacher.name",
+        department: "$teacher.department",
+      },
+    },
+  });
+
+  const availableHours = await AvailableHour.aggregate(pipeline);
+  return availableHours;
 };

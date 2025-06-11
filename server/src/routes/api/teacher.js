@@ -1,9 +1,9 @@
 import express from "express";
-import mongoose from "mongoose";
 import { authenticateToken } from "../../middleware/index.js";
 import { Appointment, AvailableHour } from "../../models/index.js";
 import {
   addTeacherAvailableHoursController,
+  getAllTeacherAvailableHoursController,
   updateTeacherAvailableHoursController,
 } from "../../controllers/teacher.controller.js";
 
@@ -11,90 +11,15 @@ const router = express.Router();
 
 router.post("/add", authenticateToken, addTeacherAvailableHoursController);
 
-//update available hours
+
 router.put(
   "/update/:id",
   authenticateToken,
   updateTeacherAvailableHoursController
 );
 
-//get all available hours
-router.get("/all", authenticateToken, async (req, res) => {
-  try {
-    // Ensure only teachers can access
-    if (req.user.role !== "teacher") {
-      return res
-        .status(403)
-        .json({ message: "Only teachers can view their available hours" });
-    }
 
-    let current = parseInt(req.query.current) || 1;
-    let pageSize = parseInt(req.query.pageSize) || 5;
-    let sort = req.query.sort || "asc";
-    let day = req.query.day;
-
-    const pipeline = [];
-    const today = new Date();
-    today.setHours(0, 0, 0, 0);
-
-    const matchQuery = {
-      teacher: new mongoose.Types.ObjectId(req.user._id),
-      date: { $gte: today },
-    };
-
-    if (day) matchQuery.day = day;
-
-    pipeline.push({ $match: matchQuery });
-
-    // Sorting (ascending or descending)
-    pipeline.push({
-      $sort: { createdAt: sort === "asc" ? 1 : -1 },
-    });
-
-    // Pagination
-    pipeline.push({ $skip: (current - 1) * pageSize });
-    pipeline.push({ $limit: pageSize });
-
-    // Populate teacher details (name, department)
-    pipeline.push({
-      $lookup: {
-        from: "users",
-        localField: "teacher",
-        foreignField: "_id",
-        as: "teacher",
-      },
-    });
-
-    pipeline.push({ $unwind: "$teacher" });
-
-    // Selecting required fields
-    pipeline.push({
-      $project: {
-        _id: 1,
-        day: 1,
-        date: 1,
-        slots: 1,
-        createdAt: 1,
-        teacher: {
-          _id: "$teacher._id",
-          name: "$teacher.name",
-          department: "$teacher.department",
-        },
-      },
-    });
-
-    const availableHours = await AvailableHour.aggregate(pipeline);
-
-    res.status(200).json({
-      current,
-      pageSize,
-      totalRecords: availableHours.length,
-      availableHours,
-    });
-  } catch (error) {
-    res.status(500).json({ message: "Server error", error });
-  }
-});
+router.get("/all", authenticateToken, getAllTeacherAvailableHoursController);
 
 //delete available hours
 router.delete("/:id", authenticateToken, async (req, res) => {
