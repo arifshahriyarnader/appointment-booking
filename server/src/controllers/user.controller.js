@@ -1,4 +1,7 @@
-import { registrationService } from "../services/user.service.js";
+import {
+  emailLoginService,
+  registrationService,
+} from "../services/user.service.js";
 
 export const registrationController = async (req, res) => {
   try {
@@ -12,5 +15,29 @@ export const registrationController = async (req, res) => {
     });
   } catch (error) {
     res.status(500).json({ message: "Server error", error });
+  }
+};
+
+export const emailLoginController = async (req, res) => {
+  try {
+    const { type, email, password, refreshToken } = req.body;
+    if (type === "email") {
+      const result = await emailLoginService({ email, password });
+      return res
+        .status(result.status)
+        .json(result.success ? result.user : { message: result.message });
+    }
+    if (type === "refresh") {
+      if (!refreshToken) {
+        return res.status(401).json({ message: "Refresh token not found" });
+      }
+      const result = await refreshTokenService(refreshToken);
+      return res
+        .status(result.status)
+        .json(result.success ? result.user : { message: result.message });
+    }
+    return res.status(400).json({ message: "Invalid login type" });
+  } catch (error) {
+    res.status(500).json({ message: "Something went wrong" });
   }
 };

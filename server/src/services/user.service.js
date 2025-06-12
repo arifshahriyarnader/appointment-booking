@@ -1,4 +1,6 @@
 import bcrypt from "bcrypt";
+import jwt from "jsonwebtoken";
+import { appConfig } from "../config/index.js";
 import { User } from "../models/index.js";
 
 export const registrationService = async ({
@@ -12,7 +14,7 @@ export const registrationService = async ({
 }) => {
   const existingUser = await User.findOne({ email });
   if (existingUser) {
-     return {
+    return {
       success: false,
       status: 400,
       message: "User already exists",
@@ -31,7 +33,7 @@ export const registrationService = async ({
     course: role === "teacher" ? course : undefined,
     status,
   });
-  
+
   await newUser.save();
   const responseMessage =
     role === "admin"
@@ -46,3 +48,98 @@ export const registrationService = async ({
     user: responseUser,
   };
 };
+
+export const emailLoginService = async ({ email, password }) => {
+  const user = await User.findOne({ email });
+  if (!user) {
+    return { success: false, status: 404, message: "User not found" };
+  }
+  if (user.status === "pending") {
+    return {
+      success: false,
+      status: 403,
+      message: "Your registration is pending approval from the admin.",
+    };
+  }
+
+  if (user.status === "rejected") {
+    return {
+      success: false,
+      status: 403,
+      message: "Your registration has been rejected by the admin.",
+    };
+  }
+  const isValidPassword = await bcrypt.compare(password, user.password);
+  if (!isValidPassword) {
+    return { success: false, status: 401, message: "Unable to login" };
+  }
+  const tokens = generateToken(user);
+  const userObj = user.toObject();
+  delete userObj.password;
+  return {
+    success: true,
+    status: 200,
+    user: { ...userObj, ...tokens },
+  };
+};
+
+export const refreshTokenService = async (refreshToken) => {
+  return new Promise((resolve) => {
+    jwt.verify(
+      refreshToken,
+      appConfig.AUTH.JWT_SECRET,
+      async (err, payload) => {
+        if (err) {
+          return resolve({
+            success: false,
+            status: 401,
+            message: "Unauthorized",
+          });
+        }
+
+        const user = await User.findById(payload._id);
+        if (!user) {
+          return resolve({
+            success: false,
+            status: 401,
+            message: "Unauthorized",
+          });
+        }
+
+        const tokens = generateToken(user);
+        const userObj = user.toObject();
+        delete userObj.password;
+
+        return resolve({
+          success: true,
+          status: 200,
+          user: { ...userObj, ...tokens },
+        });
+      }
+    );
+  });
+};
+
+function generateToken(user) {
+  const accessToken = jwt.sign(
+    {
+      _id: user._id,
+      email: user.email,
+      role: user.role,
+    },
+    appConfig.AUTH.JWT_SECRET,
+    { expiresIn: "1d" }
+  );
+
+  const refreshToken = jwt.sign(
+    {
+      _id: user._id,
+      email: user.email,
+      role: user.role,
+    },
+    appConfig.AUTH.JWT_SECRET,
+    { expiresIn: "30d" }
+  );
+
+  return { accessToken, refreshToken };
+}
