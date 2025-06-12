@@ -4,54 +4,12 @@ import jwt from "jsonwebtoken";
 import { appConfig } from "../../config/index.js";
 import { authenticateToken } from "../../middleware/index.js";
 import { User } from "../../models/index.js";
+import {  registrationController } from "../../controllers/user.controller.js";
 
 const router = express.Router();
 
-// registration
-router.post("/registration", async (req, res) => {
-  try {
-    const { name, email, password, role, department, studentId, course } =
-      req.body;
 
-    // Check if user already exists
-    const existingUser = await User.findOne({ email });
-    if (existingUser) {
-      return res.status(400).json({ message: "User already exists" });
-    }
-
-    // Hash the password
-    const hashedPassword = await bcrypt.hash(password, 10);
-
-    // Set status based on role
-    const status = role === "admin" ? "approved" : "pending";
-
-    // Create new user"
-    const newUser = new User({
-      name,
-      email,
-      password: hashedPassword,
-      role,
-      department,
-      studentId: role === "student" ? studentId : undefined,
-      course: role === "teacher" ? course : undefined,
-      status, // Admin status is "approved", others are "pending"
-    });
-
-    await newUser.save();
-
-    // Customize response message based on role
-    const responseMessage =
-      role === "admin"
-        ? "Admin registered successfully."
-        : "User registered successfully. Awaiting admin approval.";
-
-    const responseUser = newUser.toObject();
-
-    res.status(201).json({ message: responseMessage, user: responseUser });
-  } catch (error) {
-    res.status(500).json({ message: "Server error", error });
-  }
-});
+router.post("/registration", registrationController);
 
 //login a user
 router.post("/login", async (req, res) => {
@@ -104,8 +62,6 @@ router.get("/user-profile", authenticateToken, async (req, res) => {
     res.status(500).json({ message: "Something went wrong" });
   }
 });
-
-
 
 //update user
 router.put("/:id", async (req, res) => {
