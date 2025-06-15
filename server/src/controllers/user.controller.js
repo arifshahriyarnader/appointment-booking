@@ -2,6 +2,7 @@ import {
   emailLoginService,
   getUserProfileService,
   registrationService,
+  updateUserProfileService,
 } from "../services/user.service.js";
 
 export const registrationController = async (req, res) => {
@@ -53,5 +54,21 @@ export const getUserProfileController = async (req, res) => {
     res.status(200).json(result.user);
   } catch (error) {
     res.status(500).json({ message: "Something went wrong" });
+  }
+};
+
+export const updateUserProfileController = async (req, res) => {
+  try {
+    const id = req.params.id;
+    const userBody = req.body;
+    const updateUser = await updateUserProfileService(id, userBody);
+    if (!updateUser.success) {
+      return res
+        .status(updateUser.status)
+        .json({ message: updateUser.message });
+    }
+    res.status(200).json(updateUser.user);
+  } catch (error) {
+    res.status(500).json({ message: "Server error", error });
   }
 };

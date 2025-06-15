@@ -95,6 +95,18 @@ export const getUserProfileService = async (id) => {
   return { success: true, user, status: 200 };
 };
 
+export const updateUserProfileService = async (id, userBody) => {
+  const updateUser = await User.findByIdAndUpdate(id, userBody, {
+    new: true,
+  });
+  if (!updateUser) {
+    return { success: false, status: 404, message: "User not found" };
+  }
+  const userObj = updateUser.toObject();
+  delete userObj.password;
+  return { success: true, status: 200, user: userObj };
+};
+
 export const refreshTokenService = async (refreshToken) => {
   return new Promise((resolve) => {
     jwt.verify(
