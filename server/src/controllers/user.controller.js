@@ -1,5 +1,6 @@
 import {
   emailLoginService,
+  getUserProfileService,
   registrationService,
 } from "../services/user.service.js";
 
@@ -37,6 +38,19 @@ export const emailLoginController = async (req, res) => {
         .json(result.success ? result.user : { message: result.message });
     }
     return res.status(400).json({ message: "Invalid login type" });
+  } catch (error) {
+    res.status(500).json({ message: "Something went wrong" });
+  }
+};
+
+export const getUserProfileController = async (req, res) => {
+  try {
+    const id = req.user._id;
+    const result = await getUserProfileService(id);
+    if (!result.success) {
+      return res.status(result.status).json({ message: result.message });
+    }
+    res.status(200).json(result.user);
   } catch (error) {
     res.status(500).json({ message: "Something went wrong" });
   }

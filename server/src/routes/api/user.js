@@ -3,6 +3,7 @@ import { authenticateToken } from "../../middleware/index.js";
 import { User } from "../../models/index.js";
 import {
   emailLoginController,
+  getUserProfileController,
   registrationController,
 } from "../../controllers/user.controller.js";
 
@@ -12,20 +13,7 @@ router.post("/registration", registrationController);
 
 router.post("/login", emailLoginController);
 
-//get user profile
-router.get("/user-profile", authenticateToken, async (req, res) => {
-  try {
-    const id = req.user._id;
-    const user = await User.findById(id);
-    if (user) {
-      return res.json(user);
-    } else {
-      return res.status(500).json({ message: "User not found" });
-    }
-  } catch (error) {
-    res.status(500).json({ message: "Something went wrong" });
-  }
-});
+router.get("/user-profile", authenticateToken, getUserProfileController);
 
 //update user
 router.put("/:id", async (req, res) => {

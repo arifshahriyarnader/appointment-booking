@@ -83,6 +83,18 @@ export const emailLoginService = async ({ email, password }) => {
   };
 };
 
+export const getUserProfileService = async (id) => {
+  const user = await User.findById(id).select("-password");
+  if (!user) {
+    return {
+      success: false,
+      status: 404,
+      message: "User not found",
+    };
+  }
+  return { success: true, user, status: 200 };
+};
+
 export const refreshTokenService = async (refreshToken) => {
   return new Promise((resolve) => {
     jwt.verify(
