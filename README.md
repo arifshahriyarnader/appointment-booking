@@ -1,6 +1,6 @@
 # Appointment Booking
 
-### Booking Appointment System Project between the university teacher and the student.
+Booking Appointment System Project between the university teacher and the student.
 There are three functionalities in this project: Admin, Teacher, and Student.
 
 ## Admin Functionalities:
