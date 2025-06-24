@@ -3,6 +3,12 @@
 Booking Appointment System Project between the university teacher and the student.
 There are three functionalities in this project: Admin, Teacher, and Student.
 
+## AI-Based Appointment Agenda (Groq AI Integrated)
+- When booking an appointment, students can now use the "Generate With AI" button to automatically create a short agenda.
+- This feature uses Groq AI (LLaMA 3) to generate a clear and concise agenda based on the student's input prompt.
+- Example prompt: “I didn’t understand yesterday’s class”
+- **Example**: will generate a formatted agenda suggestion using Groq AI.
+
 ## Admin Functionalities:
 - Admin approves or rejects user registration request, without admin approval,
 the user can't be logged in.
@@ -27,6 +33,7 @@ logged in.
 - Students can view all teacher lists the teacher profiles and the teacher's
 available hours.
 - Students can book an appointment.
+- Students can generate agenda with AI while booking an appointment.
 - Students can view appointment status as approved or rejected.
 - Students can view the daily, upcoming, and past appointment schedule
 including the teacher's name, email, course, agenda, date, and time slot.
@@ -36,6 +43,7 @@ including the teacher's name, email, course, agenda, date, and time slot.
 - **Client**: React JS, Shadcn, Tailwind CSS
 - **Server**: Express JS
 - **Database**: MongoDB
+- **AI Integration**: Groq AI (LLaMA3 model)
 - **API Testing**: Postman
 
 ## Set up Instruction
