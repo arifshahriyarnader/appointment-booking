@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import {
   bookAppointment,
   checkTeacherBookedSlots,
+  generateAIAgenda,
   getAllTeachersList,
 } from "../../api/services/studentServices";
 
@@ -117,6 +118,40 @@ export const useBookAppointment = () => {
     }
   };
 
+  const handleGenerateWithAI = async () => {
+    if (!agenda) {
+      setAlertMessage({
+        title: "Missing Prompt",
+        description: "Please type a short prompt or agenda idea first.",
+      });
+      setAlertOpen(true);
+      return;
+    }
+
+    try {
+      const response = await generateAIAgenda(agenda);
+      const generated = response.generatedText;
+      const cleanedAgenda = generated
+        .replace(/^Here is.*?:\s*/i, "")
+        .replace(/^Agenda:\s*/i, "")
+        .replace(/Let me know.*$/i, "")
+        .trim();
+      setAgenda(cleanedAgenda);
+      setAlertMessage({
+        title: "AI Agenda Generated",
+        description: "The agenda has been generated successfully.",
+      });
+      setAlertOpen(true);
+    } catch (error) {
+      console.error("Error generating agenda with AI:", error);
+      setAlertMessage({
+        title: "AI Generation Error",
+        description: "Failed to generate agenda. Please try again.",
+      });
+      setAlertOpen(true);
+    }
+  };
+
   return {
     teachers,
     selectedTeacher,
@@ -135,5 +170,6 @@ export const useBookAppointment = () => {
     handleTeacherChange,
     handleDateChange,
     handleBookAppointment,
+    handleGenerateWithAI,
   };
 };

@@ -14,9 +14,7 @@ export const getAllTeachersList = async (page = 1, limit = 5) => {
 
 export const getTeacherProfile = async (teacherId) => {
   try {
-    const response = await http.get(
-      `/api/student/teacher/${teacherId}`
-    );
+    const response = await http.get(`/api/student/teacher/${teacherId}`);
     return response.data;
   } catch (error) {
     console.error("Error fetching teacher profile:", error);
@@ -26,12 +24,9 @@ export const getTeacherProfile = async (teacherId) => {
 
 export const searchTeachers = async (query) => {
   try {
-    const response = await http.get(
-      `/api/student/search-teachers`,
-      {
-        params: { query },
-      }
-    );
+    const response = await http.get(`/api/student/search-teachers`, {
+      params: { query },
+    });
     return response.data;
   } catch (error) {
     console.error("Error searching teachers:", error);
@@ -69,7 +64,7 @@ export const bookAppointment = async (appointmentData) => {
   }
 };
 
-export const checkAppointmentStatus = async (page=1, limit=5) => {
+export const checkAppointmentStatus = async (page = 1, limit = 5) => {
   try {
     const response = await http.get(
       `/api/student/appointment-status?page=${page}&limit=${limit}`
@@ -81,7 +76,7 @@ export const checkAppointmentStatus = async (page=1, limit=5) => {
   }
 };
 
-export const todaysAppointmentList = async (page=1, limit=5) => {
+export const todaysAppointmentList = async (page = 1, limit = 5) => {
   try {
     const response = await http.get(
       `/api/student/appointment-today?page=${page}&limit=${limit}`
@@ -94,7 +89,7 @@ export const todaysAppointmentList = async (page=1, limit=5) => {
   }
 };
 
-export const pastAppointmentList = async (page=1, limit=5) => {
+export const pastAppointmentList = async (page = 1, limit = 5) => {
   try {
     const response = await http.get(
       `/api/student/past-appointment-history?page=${page}&limit=${limit}`
@@ -106,12 +101,21 @@ export const pastAppointmentList = async (page=1, limit=5) => {
   }
 };
 
-export const upcomingAppointmentList = async (page=1, limit=5) => {
+export const upcomingAppointmentList = async (page = 1, limit = 5) => {
   try {
     const response = await http.get(
       `/api/student/appointment-upcoming?page=${page}&limit=${limit}`
     );
     console.log("Past Appointments List:", response.data);
+    return response.data;
+  } catch (error) {
+    console.log(error);
+  }
+};
+
+export const generateAIAgenda = async (userPrompt) => {
+  try {
+    const response = await http.post(`api/ai/generate`, {userPrompt});
     return response.data;
   } catch (error) {
     console.log(error);

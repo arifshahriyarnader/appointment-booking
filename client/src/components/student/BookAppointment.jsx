@@ -20,6 +20,7 @@ const BookAppointment = () => {
     handleTeacherChange,
     handleDateChange,
     handleBookAppointment,
+    handleGenerateWithAI,
   } = useBookAppointment();
 
   return (
@@ -89,17 +90,26 @@ const BookAppointment = () => {
         <label className="block font-medium">Agenda:</label>
         <textarea
           className="w-full p-2 border rounded mb-3"
+          rows="6"
           value={agenda}
           onChange={(e) => setAgenda(e.target.value)}
         />
 
-        {/* Book Appointment Button */}
-        <button
-          type="submit"
-          className="w-full bg-blue-500 text-white py-2 rounded cursor-pointer"
-        >
-          Book Appointment
-        </button>
+        <div className="flex gap-4">
+          <button
+            type="button"
+            className="w-full bg-indigo-600 text-white py-2 px-4 rounded-md font-bold hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500 cursor-pointer"
+            onClick={handleGenerateWithAI}
+          >
+            Generate With AI
+          </button>
+          <button
+            type="submit"
+            className="w-full bg-blue-500 text-white py-2 rounded cursor-pointer"
+          >
+            Book Appointment
+          </button>
+        </div>
       </form>
       <CustomAlert open={alertOpen} setOpen={setAlertOpen} {...alertMessage} />
     </div>
